@@ -31,6 +31,9 @@ sudo su
 sudo apt-get install cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev libyaml-cpp-dev libgtest-dev
 ```
 ```
+sudo apt-get install git
+```
+```
 git clone https://github.com/srsRAN/srsRAN_Project.git
 ```
 ```
