@@ -1,0 +1,277 @@
+apt-get install libuhd-dev uhd-host
+cd /usr/lib/uhd/utils
+sudo ./uhd_images_downloader.py
+cd /usr/share/uhd/images
+
+
+install srsRAN : https://docs.srsran.com/projects/project/en/latest/user_manuals/source/installation.html#manual-installation
+sudo apt-get install cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev libyaml-cpp-dev libgtest-dev
+
+git clone https://github.com/srsRAN/srsRAN_Project.git
+cd srsRAN_Project
+mkdir build
+cd build
+cmake ../
+make -j $(nproc)
+make test -j $(nproc)
+make install
+ldconfig
+
+Open5Gs installing : https://open5gs.org/open5gs/docs/guide/01-quickstart/
+sudo apt update
+sudo apt install gnupg
+curl -fsSL https://pgp.mongodb.com/server-6.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg --dearmor
+
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+sudo apt update
+sudo apt install -y mongodb-org
+
+#sudo systemctl start mongod (if '/usr/bin/mongod' is not running)
+#sudo systemctl enable mongod (ensure to automatically start it on system boot)
+
+sudo add-apt-repository ppa:open5gs/latest
+sudo apt update
+sudo apt install open5gs
+
+cd /etc/open5Gs
+ls
+
+ps aux | grep open5Gs
+
+
+
+Installing web UI
+apt update
+
+# Download and import the Nodesource GPG key
+ $ sudo apt update
+ $ sudo apt install -y ca-certificates curl gnupg
+ $ sudo mkdir -p /etc/apt/keyrings
+ $ curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+
+ # Create deb repository
+ $ NODE_MAJOR=20
+ $ echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+
+ # Run Update and Install
+ $ sudo apt update
+ $ sudo apt install nodejs -y
+
+
+Testing navigator by using : localhost:9999
+
+stop service Open5Gs one by one : 
+sudo systemctl stop open5gs-pcrfd
+
+sudo systemctl stop open5gs-mmed
+
+sudo systemctl stop open5gs-hssd
+
+sudo systemctl stop open5gs-spguwd
+
+sudo systemctl stop open5gs-sgwcd
+
+ps aux | grep open5Gs
+
+
+Open5Gs start on boot
+
+
+cd /usr/bin
+sudo touch 5gc
+sudo touch stop_5gc
+
+sudo vim 5gc_stop
+#!/usr/bin/zsh
+
+sudo systemctl stop open5gs-smfd
+sudo systemctl stop open5gs-amfd
+sudo systemctl stop open5gs-upfd
+sudo systemctl stop open5gs-nrfd
+sudo systemctl stop open5gs-scpd
+sudo systemctl stop open5gs-ausfd
+sudo systemctl stop open5gs-udmd
+sudo systemctl stop open5gs-pcfd
+sudo systemctl stop open5gs-nssfd
+sudo systemctl stop open5gs-bsfd
+sudo systemctl stop open5gs-webui
+sudo systemctl stop open5gs-udrd
+
+tape :wq
+
+sudo vim 5gc
+#!/usr/bin/zsh
+sudo rm /var/log/open5gs/
+sudo systemctl restart open5gs-smfd
+sudo systemctl restart open5gs-amfd
+sudo systemctl restart open5gs-upfd
+sudo systemctl restart open5gs-nrfd
+sudo systemctl restart open5gs-scpd
+sudo systemctl restart open5gs-ausfd
+sudo systemctl restart open5gs-udmd
+sudo systemctl restart open5gs-pcfd
+sudo systemctl restart open5gs-nssfd
+sudo systemctl restart open5gs-bsfd
+sudo systemctl restart open5gs-udrd
+sudo systemctl restart open5gs-webui
+
+tape :wq
+
+
+chmod +x 5gc
+chmod +x stop_5gc
+
+5gc
+ps aux | grep open5Gs
+
+stop_5gc
+ps aux | grep open5Gs
+
+
+
+CONFIGURATION
+CONFIGURATION OSGTUN
+cd /etc/open5gs
+
+ifconfig
+
+should appears ogstun and well configured if not run this tree command
+
+sudo ip tuneap add name ogstun mode tun
+sudo ip addr add 10.45.0.1/16 dev ogstun
+sudo ip link set ogstun up
+
+CONFIGURATION IPFORWARDING ENABLE
+check : 
+sudo sysctl -a | grep ip_forward
+
+see and verify if net.ipv4.ip_forward = 0, configure it by 1 by running : 
+sudo sysctl -w net.ipv4.ip_forward=1
+
+CONFIGURE IPTABLE TO NAT
+check : 
+sudo iptables -L -n -V -t nat
+
+see if ogstun 10.45.0.1/16 is displayed (masquerade) or not, if not running : 
+sudo iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE
+
+SEE ALL CONFIGURATION : 
+cd /etc/open5gs
+ls
+sudo vim amf.yaml
+
+uncomment level_info in logger and change to debug: 
+logger : 
+level debug
+
+configure also the three plmn if possible 
+
+you can change also timer value but generally don't touch that
+
+you can configure also reject cause : 
+access_control
+
+
+
+
+sudo vim smf.yaml
+make the same for level
+
+see the dns 
+
+
+
+
+sudo vim upf.yaml
+make the same for level
+
+
+
+CONFIGURE WEBUI : 
+lauch : 
+5gc
+
+tape on navigator : localhost:9999
+user_name : admin
+pass_word : 1432
+
+
+click ADD SUBSCRIBER
+IMSI , K: , OPC
+
+configure apn
+and set to ipv4
+
+add also apn for PCC rule for ims
+
+
+CONFIGURE GNB :
+cd srsRAN_Project/configs
+wget https://github.com/SitrakaResearchAndPOC/fork_nuradio_5G_Network/blob/main/srsRAN_Project/gnb_n3.yml
+
+or: 
+
+wget https://github.com/SitrakaResearchAndPOC/fork_nuradio_5G_Network/blob/main/srsRAN_Project/gnb_n28.yml
+
+vim gnb_n3.yml
+addr : 172.0.0.5
+bind_addr : 172.0.0.66
+
+clock : external 
+sync : external
+
+configure bandwith and scs
+plmn should match 
+
+
+with pci configuration is optimal
+
+pcap : 
+
+
+
+
+
+5G NETWORK RUNNIGN
+Plug card
+
+
+sudo tcpdump -i any -w 5gc.pcap
+
+running : 
+5gc 
+ps aux | grep open5Gs
+
+Checking active port Open5Gs netstat : 
+sudo netstat -tulpn | grep open5gs
+
+View logfile in realtimes
+sudo tail -f /var/log/open5gs/amf.log
+
+https://fr.aliexpress.com/item/1005006079669218.html?spm=a2g0o.productlist.main.7.321d5957rEoI6a&algo_pvid=66349811-c0ce-4326-9e4a-2f395bfb2d5b&algo_exp_id=66349811-c0ce-4326-9e4a-2f395bfb2d5b-3&pdp_npi=4%40dis%21USD%21209.20%21167.36%21%21%21209.20%21167.36%21%402103080517124611426014557ed8e3%2112000035635814831%21sea%21MG%214391203451%21&curPageLogUid=a8DWM9ibqbwA&utparam-url=scene%3Asearch%7Cquery_from%3A
+
+cd /usr/lib/uhd/utils
+sudo .query_gpsdo_sensors
+
+
+cd ~/srsRAN_Project/configs
+sudo gnb -C gnb_n3.yml
+
+running
+stop_5g
+
+vim nrf.yaml
+change plmn id
+
+
+
+
+
+
+
+ 
+
+
+
+
