@@ -261,7 +261,7 @@ ifconfig
 ```
 The screen should appears ogstun and, it should be well configured; if it is not the case, run this tree commands
 ```
-sudo ip tuneap add name ogstun mode tun
+sudo ip tuntap add name ogstun mode tun
 ```
 ```
 sudo ip addr add 10.45.0.1/16 dev ogstun
