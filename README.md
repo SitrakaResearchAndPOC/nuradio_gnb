@@ -1,6 +1,6 @@
 # UBUNTU 22.04 (jammy)
 # NURADIO GNB
-apt-get install vim zsh
+apt-get install vim zsh net-tools
 # INSTALLING DRIVER
 guide install uhd is at [guide_uhd](https://files.ettus.com/manual/page_install.html)
 ```
