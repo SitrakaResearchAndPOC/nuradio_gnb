@@ -1,6 +1,6 @@
 # UBUNTU 22.04 (jammy)
 # NURADIO GNB
-
+apt-get install vim zsh
 # INSTALLING DRIVER
 guide install uhd is at [guide_uhd](https://files.ettus.com/manual/page_install.html)
 ```
@@ -182,7 +182,7 @@ sudo touch 5gc
 sudo touch stop_5gc
 ```
 ```
-sudo vim 5gc_stop
+sudo vim stop_5gc
 ```
 script for stoping will be
 ```
