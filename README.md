@@ -4,6 +4,9 @@
 # INSTALLING DRIVER
 guide install uhd is at [guide_uhd](https://files.ettus.com/manual/page_install.html)
 ```
+apt update
+```
+```
 apt-get install libuhd-dev uhd-host
 ```
 ```
