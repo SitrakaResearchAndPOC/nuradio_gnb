@@ -91,6 +91,11 @@ sudo systemctl start mongod
 sudo systemctl enable mongod
 ```
 (ensure to automatically start it on system boot) </br>
+checking by 
+```
+sudo systemctl status mongod
+```
+
 ## installing open5gs
 ```
 sudo add-apt-repository ppa:open5gs/latest
