@@ -113,7 +113,7 @@ cd /etc/open5gs
 ls
 ```
 ```
-ps aux | grep open5Gs
+ps aux | grep open5gs
 ```
 # INSTALLING WEB UI
 ```
@@ -139,14 +139,19 @@ NODE_MAJOR=20
 ```
 echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 ```
-## Run Update and Install
+## Install Nodejs
 ```
 sudo apt update
 ```
 ```
 sudo apt install nodejs -y
 ```
+## installing Webgui
+```
+curl -fsSL https://open5gs.org/open5gs/assets/webui/install | sudo -E bash -
+```
 Testing on navigator by taping : localhost:9999
+
 
 # SCRIPT FOR RUNNING 5G
 ## stopping services
@@ -168,7 +173,7 @@ sudo systemctl stop open5gs-sgwcd
 ```
 ## verifying process
 ```
-ps aux | grep open5Gs
+ps aux | grep open5gs
 ```
 ## automatically script for stoping 5G
 Open5Gs start on script
@@ -236,13 +241,13 @@ chmod +x stop_5gc
 5gc
 ```
 ```
-ps aux | grep open5Gs
+ps aux | grep open5gs
 ```
 ```
 stop_5gc
 ```
 ```
-ps aux | grep open5Gs
+ps aux | grep open5gs
 ```
 Testing navigator by using : localhost:9999
 
@@ -382,7 +387,7 @@ sudo tcpdump -i any -w 5gc.pcap
 5gc
 ```
 ``` 
-ps aux | grep open5Gs
+ps aux | grep open5gs
 ```
 # checking active port Open5Gs using netstat  
 ```
