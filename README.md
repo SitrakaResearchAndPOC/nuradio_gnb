@@ -299,6 +299,11 @@ cd /etc/open5gs
 ```
 ls
 ```
+BEFORE VERIFYING : 
+* Tape i for insert over vim
+* Tape echap befor saving the file edited
+* saving with overide , tape :wq!  and after tape enter
+  
 ## verify amf.yaml
 ```
 sudo vim amf.yaml
