@@ -107,7 +107,7 @@ sudo apt update
 sudo apt install open5gs
 ```
 ```
-cd /etc/open5Gs
+cd /etc/open5gs
 ```
 ```
 ls
