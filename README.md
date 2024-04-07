@@ -18,9 +18,15 @@ sudo ./uhd_images_downloader.py
 ```
 cd /usr/share/uhd/images
 ```
+```
+exit
+```
 
 # INSTALLING SRSRAN
 guide install srsRAN is at [guide_srsRAN](https://docs.srsran.com/projects/project/en/latest/user_manuals/source/installation.html#manual-installation)
+```
+sudo su
+```
 ```
 sudo apt-get install cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev libyaml-cpp-dev libgtest-dev
 ```
