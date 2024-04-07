@@ -278,6 +278,10 @@ see and verify if net.ipv4.ip_forward = 0, configure it, and transform by net.ip
 ```
 sudo sysctl -w net.ipv4.ip_forward=1
 ```
+Recheck the ip_forwarding
+```
+sudo sysctl -a | grep ip_forward
+```
 ## CONFIGURE IPTABLE TO NAT
 check if iptable is correctly activate for ogstun
 ```
