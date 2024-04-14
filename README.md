@@ -166,7 +166,7 @@ sudo systemctl stop open5gs-mmed
 sudo systemctl stop open5gs-hssd
 ```
 ```
-sudo systemctl stop open5gs-spguwd
+sudo systemctl stop open5gs-sguwd
 ```
 ```
 sudo systemctl stop open5gs-sgwcd
