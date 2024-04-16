@@ -147,7 +147,7 @@ sudo apt update
 sudo apt install nodejs -y
 ```
 ## Avoiding problem "bad network and proxy" (ssl strict disallow)
-[link](https://stackoverflow.com/questions/64125554/an-unexpected-error-occurred-https-registry-yarnpkg-com-react-unable-to-get)
+[link](https://stackoverflow.com/questions/64125554/an-unexpected-error-occurred-https-registry-yarnpkg-com-react-unable-to-get) or [pdf](https://github.com/SitrakaResearchAndPOC/nuradio_gnb/blob/main/node.js%20-%20An%20unexpected%20error%20occurred%20https%20__registry.yarnpkg.com_react%20unable%20to%20get%20local%20issuer%20certificate%20while%20create-react-app%20-%20Stack%20Overflow.pdf)
 ```
 npm config set registry https://registry.npmjs.org/
 npm config set "strict-ssl" false -g
