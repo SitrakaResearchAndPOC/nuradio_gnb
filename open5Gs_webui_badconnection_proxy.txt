@@ -1,0 +1,7 @@
+https://stackoverflow.com/questions/64125554/an-unexpected-error-occurred-https-registry-yarnpkg-com-react-unable-to-get
+npm config set registry https://registry.npmjs.org/
+npm config set "strict-ssl" false -g
+npm config delete registry
+
+
+
