@@ -146,6 +146,15 @@ sudo apt update
 ```
 sudo apt install nodejs -y
 ```
+## Avoiding problem "bad network and proxy" (ssl strict disallow)
+[link](https://stackoverflow.com/questions/64125554/an-unexpected-error-occurred-https-registry-yarnpkg-com-react-unable-to-get)
+```
+npm config set registry https://registry.npmjs.org/
+npm config set "strict-ssl" false -g
+npm config delete registry
+```
+
+
 ## installing Webgui
 ```
 curl -fsSL https://open5gs.org/open5gs/assets/webui/install | sudo -E bash -
