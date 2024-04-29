@@ -223,7 +223,7 @@ sudo vim 5gc
 script for starting will be
 ```
 #!/usr/bin/zsh
-sudo rm /var/log/open5gs/
+sudo rm /var/log/open5gs/*
 sudo systemctl restart open5gs-smfd
 sudo systemctl restart open5gs-amfd
 sudo systemctl restart open5gs-upfd
