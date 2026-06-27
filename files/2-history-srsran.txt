@@ -1,0 +1,268 @@
+echo "history srsran"
+
+sudo apt install cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev libyaml-cpp-dev libgtest-dev 
+
+sudo git clone https://github.com/srsRAN/srsRAN_project
+
+cd srsRAN_project/
+
+sudo git checkout 50fe9623c
+
+sudo mkdir build 
+
+cd build/
+
+sudo cmake ../
+
+sudo make -j $(nproc --ignore 2)
+
+sudo make test -j $(nproc --ignore 2)
+
+sudo make install
+
+# sudo ldconfig
+
+gnb --version
+
+cd 
+
+echo "install mongodb"
+
+sudo apt update
+
+sudo apt install -y gnupg curl
+
+curl -fsSL https://pgp.mongodb.com/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+
+# deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu # jammy/mongodb-org/6.0 multiverse
+
+# sudo nano /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+grep -qxF 'deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse' /etc/apt/sources.list.d/mongodb-org-6.0.list 2>/dev/null || \
+echo 'deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse' | sudo tee -a /etc/apt/sources.list.d/mongodb-org-6.0.list > /dev/null
+
+sudo apt update
+
+sudo apt install -y mongodb-org
+
+sudo systemctl start mongod
+
+sudo systemctl enable mongod
+
+sudo systemctl status mongod
+
+# sudo add-apt-repository ppa:open5gs/latest
+# sudo apt update
+# sudo apt install open5gs
+# open5gs-amfd --version
+# open5gs-smfd --version
+
+sudo apt install -y   git build-essential cmake meson ninja-build   libglib2.0-dev libmongoc-dev libbson-dev   libsctp-dev lksctp-tools \
+libssl-dev   libidn11-dev libyaml-dev   flex bison   pkg-config  libtalloc-dev libmicrohttpd-dev libgcrypt20-dev libnghttp2-dev libcurl4-openssl-dev 
+
+sudo apt install python3-pip python3-setuptools python3-wheel ninja-build build-essential flex bison git cmake libsctp-dev libgnutls28-dev libgcrypt-dev libssl-dev libmongoc-dev libbson-dev libyaml-dev libnghttp2-dev libmicrohttpd-dev libcurl4-gnutls-dev libnghttp2-dev libtins-dev libtalloc-dev meson
+
+(
+if apt-cache show libidn-dev > /dev/null 2>&1; then
+    sudo apt-get install -y --no-install-recommends libidn-dev
+else
+    sudo apt-get install -y --no-install-recommends libidn11-dev
+fi
+)
+sudo apt install \
+    build-essential \
+    meson \
+    ninja-build \
+    cmake \
+    git \
+    pkg-config \
+    flex \
+    bison \
+    libsctp-dev \
+    libgnutls28-dev \
+    libgcrypt20-dev \
+    libidn11-dev \
+    libmongoc-dev \
+    libbson-dev \
+    libyaml-dev \
+    libmicrohttpd-dev \
+    libcurl4-openssl-dev \
+    libnghttp2-dev \
+    libssl-dev \
+    cppcheck \
+    clang-tidy
+    
+git clone https://github.com/open5gs/open5gs
+
+cd open5gs
+
+git checkout v2.7.0
+
+sudo meson build --prefix=/usr
+
+
+
+
+
+corrrection de cette erreur : 
+nr@nr:~/open5gs$ ./build/tests/registration/registration 
+06/15 22:56:41.404: [sock] ERROR: ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted) (../lib/tun/linux-setup.c:62)
+06/15 22:56:41.404: [upf] ERROR: tun_open(dev:ogstun) failed (../src/upf/gtp-path.c:793)
+06/15 22:56:41.404: [app] ERROR: Failed to initialize UPF (../src/upf/app.c:28)
+06/15 22:56:41.404: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+06/15 22:56:41.405: [core] FATAL: child_main: Assertion `out_return_code == 0' failed. (../tests/common/application.c:109)
+06/15 22:56:41.405: [core] FATAL: backtrace() returned 5 addresses (../lib/core/ogs-abort.c:37)
+./build/tests/registration/registration(+0x52bd7) [0x57fce58f0bd7]
+/home/nr/open5gs/build/tests/registration/../../lib/core/libogscore.so.2(+0x1199d) [0x7e3ac0c4f99d]
+/lib/x86_64-linux-gnu/libc.so.6(+0x94ac3) [0x7e3ac0294ac3]
+/lib/x86_64-linux-gnu/libc.so.6(+0x1268d0) [0x7e3ac03268d0]
+Aborted (core dumped)
+nr@nr:~/open5gs$ sudo ss -ltnp | grep 7777
+LISTEN 0      5         127.0.0.10:7777       0.0.0.0:*    users:(("open5gs-nrfd",pid=58047,fd=7))  
+LISTEN 0      5        127.0.0.200:7777       0.0.0.0:*    users:(("open5gs-scpd",pid=58050,fd=12)) 
+nr@nr:~/open5gs$ sudo pkill -9 -f open5gs
+sleep 1
+sudo ss -ltnp | grep 7777
+Killed
+nr@nr:~/open5gs$ sudo modprobe tun
+nr@nr:~/open5gs$ 
+nr@nr:~/open5gs$ ls -l /dev/net/tun
+crw-rw-rw- 1 root root 10, 200 Jon 15 20:42 /dev/net/tun
+nr@nr:~/open5gs$ sudo mkdir -p /dev/net
+sudo mknod /dev/net/tun c 10 200
+sudo chmod 666 /dev/net/tun
+mknod: /dev/net/tun: File exists
+nr@nr:~/open5gs$ sudo pkill -f open5gs
+sudo modprobe tun
+sudo ./build/tests/registration/registration
+simple-test         : -06/15 22:58:13.513: [sock] ERROR: ogs_write() failed (5:Input/output error) (../lib/tun/tunio.c:83)
+
+
+
+sudo ninja -C build
+
+sudo ninja -C build install
+
+sudo ldconfig
+
+ls /usr/bin/open5gs*
+
+which open5gs-amfd
+
+ldd $(which open5gs-amfd) | grep ogs
+
+sudo cp -rf configs/open5gs/* /etc/open5gs/
+
+ls /etc/open5gs/
+
+sudo mv /etc/open5gs/amf.yaml.in /etc/open5gs/amf.yaml
+
+#change file part to an existing address
+
+sudo nano /etc/open5gs/amf.yaml 
+
+sudo open5gs-amfd -c /etc/open5gs/amf.yaml -d
+
+sudo open5gs-amfd --version
+
+
+
+SYTEMCL : 
+---------
+sudo mkdir /var/log/open5gs
+
+sudo nano /etc/systemd/system/open5gs-mmed.service
+
+[Unit]
+Description=Open5GS MME
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/open5gs-mmed -c  /etc/open5gs/mme.yaml -d
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+
+sudo systemctl enable open5gs-mmed
+
+sudo systemctl start open5gs-mmed
+
+sudo systemctl status open5gs-mmed
+
+sudo systemctl restart open5gs-mmed
+
+sudo systemctl status open5gs-mmed
+sudo journalctl -u open5gs-mmed -n 50 --no-pager
+
+which open5gs-mmed
+
+
+
+
+
+*****************************
+ sudo apt update
+ sudo apt update
+ sudo mkdir -p /etc/apt/keyrings
+ curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+ echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+ sudo apt update
+ cd webui
+ npm ci
+ npm run dev
+ npm install
+ npm run build
+ 
+ ls .next 
+ 
+ verification : Tu dois voir des fichiers comme :
+ BUILD_ID
+ server/
+ static/ 
+ 
+ 
+ npm install -g
+ 
+ which node
+ marque le chemin de node : /usr/bin/node
+ 
+ sudo nano /etc/systemd/system/open5gs-webui.service
+ (verifie chemin de node et chemin de webui)
+
+----------------------------------------------
+[Unit]
+Description=Open5GS WebUI
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/nr/open5gs/webui
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+User=root
+
+[Install]
+WantedBy=multi-user.target
+
+----------------------------------------------
+
+
+En cas d'erreur : 
+journalctl -u open5gs-webui -f
+
+sudo systemctl daemon-reload
+sudo systemctl enable open5gs-webui
+sudo systemctl restart open5gs-webui
+sudo systemctl status open5gs-webui
+
+
+
+

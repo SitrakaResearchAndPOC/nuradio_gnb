@@ -1,0 +1,197 @@
+nr@nr:~/open5gs/webui$ history
+    1  nano uhd_install.sh
+    2  ls
+    3  chmod +x uhd_install.sh 
+    4  ls
+    5  sudo bash uhd_install.sh 
+    6  nano uhd_install.sh
+    7  clear
+    8  sudo query_gpsdo_sensors 
+    9  ls
+   10  sudo nano 
+   11  sudo nano srsan_install.sh
+   12  sudo bash srsan_install.sh 
+   13  sudo nano srsan_install.sh
+   14  sudo bash srsan_install.sh 
+   15  ls
+   16  sudo chmod +x srsran_install.sh
+   17  ls
+   18  sudo chmod +x srsan_install.sh 
+   19  sudo bash srsan_install.sh 
+   20  sudo nano srsan_install.sh
+   21  wget https://github.com/srsRAN/srsRAN_Project/archive/refs/heads/main.zip
+   22  rm -rf  main.zip 
+   23  sudo nano srsan_install.sh
+   24  sudo bash srsan_install.sh 
+   25  sudo git clone https://github.com/srsran/srsRAN_Project.git
+   26  sudo nano srsan_install.sh
+   27  sudo bash srsan_install.sh 
+   28  sudo nano srsan_install.sh
+   29  sudo bash srsan_install.sh 
+   30  sudo nano srsan_install.sh
+   31  sudo bash srsan_install.sh 
+   32  sudo nano srsan_install.sh
+   33  sudo bash srsan_install.sh 
+   34  sudo nano srsan_install.sh
+   35  sudo bash srsan_install.sh 
+   36  sudo nano srsan_install.sh
+   37  sudo bash srsan_install.sh 
+   38  cat srsan_install.sh 
+   39  sudo nano srsan_install.sh
+   40  sudo bash srsan_install.sh 
+   41  cd srsRAN_Project/
+   42  ls
+   43  cd ..
+   44  rm -rf srsRAN_Project/
+   45  sudo rm -rf srsRAN_Project/
+   46  sudo bash srsan_install.sh 
+   47  ls
+   48  sudo rm -rf srsRAN_project/
+   49  sudo rm -rf srsRAN_Project/
+   50  ls
+   51  clear
+   52  sudo git clone https://github.com/srsRAN/srsRAN_project
+   53  cd srsRAN_project/
+   54  ls
+   55  git tag
+   56  cd ..
+   57  rm -rf srsRAN_project/
+   58  sudo rm -rf srsRAN_project/
+   59  sudo git clone https://github.com/srsRAN/srsRAN_project.git
+   60  cd srsRAN_project/
+   61  ls
+   62  cd ..
+   63  sudo rm -rf srsRAN_project/
+   64  sudo git clone https://github.com/srsran/srsRAN_Project.git
+   65  cd srsRAN_Project/
+   66  ls
+   67  git checkout release_25_10
+   68  sudo git checkout release_25_10
+   69  sudo nano srsan_install.sh
+   70  cd ..
+   71  sudo nano srsan_install.sh
+   72  cd srsRAN_Project/
+   73  cmake ..
+   74  mkdir build
+   75  sudo mkdir build
+   76  cd build/
+   77  cmake ..
+   78  cd ..
+   79  sudo git checkout 50fe9623c
+   80  cd build/
+   81  sudo cmake ..
+   82  make -j 10
+   83  sudo make -j 10
+   84  ls
+   85  sudo make install
+   86  gnb --version
+   87  cd 
+   88  clear
+   89  sudo apt install -y gnupg curl
+   90  curl -fsSL https://pgp.mongodb.com/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+   91  grep -qxF 'deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse' /etc/apt/sources.list.d/mongodb-org-6.0.list 2>/dev/null || echo 'deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse' | sudo tee -a /etc/apt/sources.list.d/mongodb-org-6.0.list > /dev/null
+   92  sudo apt update
+   93  sudo apt install -y mongodb-org
+   94  sudo systemctl start mongod
+   95  sudo systemctl enable mongod
+   96  sudo systemctl status mongod
+   97  # sudo add-apt-repository ppa:open5gs/latest
+   98  sudo apt install -y   git build-essential cmake meson ninja-build   libglib2.0-dev libmongoc-dev libbson-dev   libsctp-dev lksctp-tools libssl-dev   libidn11-dev libyaml-dev   flex bison   pkg-config  libtalloc-dev libmicrohttpd-dev libgcrypt20-dev libnghttp2-dev libcurl4-openssl-dev 
+   99  sudo apt install python3-pip python3-setuptools python3-wheel ninja-build build-essential flex bison git cmake libsctp-dev libgnutls28-dev libgcrypt-dev libssl-dev libmongoc-dev libbson-dev libyaml-dev libnghttp2-dev libmicrohttpd-dev libcurl4-gnutls-dev libnghttp2-dev libtins-dev libtalloc-dev meson
+  100  ( if apt-cache show libidn-dev > /dev/null 2>&1; then     sudo apt-get install -y --no-install-recommends libidn-dev; else     sudo apt-get install -y --no-install-recommends libidn11-dev; fi; )
+  101  sudo apt install     build-essential     meson     ninja-build     cmake     git     pkg-config     flex     bison     libsctp-dev     libgnutls28-dev     libgcrypt20-dev     libidn11-dev     libmongoc-dev     libbson-dev     libyaml-dev     libmicrohttpd-dev     libcurl4-openssl-dev     libnghttp2-dev     libssl-dev     cppcheck     clang-tidy
+  102  git clone https://github.com/open5gs/open5gs
+  103  cd open5gs/
+  104  git checkout v2.7.0
+  105  sudo meson build --prefix=/usr
+  106  sudo ninja -C build
+  107  ./build/tests/registration/registration 
+  108  sudo ./build/tests/registration/registration 
+  109  clear
+  110  ./build/tests/registration/registration 
+  111  clear
+  112  sudo ./build/tests/registration/registration 
+  113  sudo ss -ltnp | grep 7777
+  114  sudo lsof -i :7777
+  115  sudo systemctl stop open5gs-nrfd
+  116  sudo systemctl stop open5gs-scpd
+  117  sudo systemctl stop open5gs-amfd
+  118  sudo systemctl stop open5gs-smfd
+  119  sudo systemctl stop open5gs-ausfd
+  120  sudo systemctl stop open5gs-udmd
+  121  sudo systemctl stop open5gs-udrd
+  122  sudo systemctl stop open5gs-pcfd
+  123  sudo systemctl stop open5gs-bsfd
+  124  sudo systemctl stop open5gs-upfd
+  125  sudo pkill -f open5gs
+  126  sudo ss -ltnp | grep 7777
+  127  ./build/tests/registration/registration 
+  128  sudo ss -ltnp | grep 7777
+  129  sudo pkill -9 -f open5gs
+  130  sleep 1
+  131  sudo ss -ltnp | grep 7777
+  132  sudo modprobe tun
+  133  ls -l /dev/net/tun
+  134  sudo mkdir -p /dev/net
+  135  sudo mknod /dev/net/tun c 10 200
+  136  sudo chmod 666 /dev/net/tun
+  137  sudo pkill -f open5gs
+  138  sudo modprobe tun
+  139  sudo ./build/tests/registration/registration
+  140  ls -l /dev/net/tun
+  141  ip link show ogstun
+  142  clear
+  143  sudo ninja -C build
+  144  clear
+  145  ls
+  146  sudo meson build --prefix=/usr
+  147  sudo ninja -C build
+  148  sudo ninja -C build install
+  149  sudo ldconfig
+  150  which open5gs-amfd
+  151  ldd $(which open5gs-amfd) | grep ogs
+  152  ls /usr/bin/
+  153  ls /usr/bin/open5gs*
+  154  sudo cp -rf configs/open5gs/* /etc/open5gs/
+  155  ls /etc/open5gs/
+  156  sudo mv /etc/open5gs/amf.yaml.in /etc/open5gs/amf.yaml
+  157  udo nano /etc/open5gs/amf.yaml 
+  158  sudo nano /etc/open5gs/amf.yaml 
+  159  clear
+  160  sudo open5gs-amfd -c /etc/open5gs/amf.yaml -d
+  161  clear
+  162  sudo apt update
+  163  sudo mkdir -p /etc/apt/keyrings
+  164  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+  165  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+  166  sudo apt update
+  167  cd webui
+  168  npm ci
+  169  npm run dev
+  170  npm install
+  171  sudo npm install -g
+  172  history
+  173  sudo nano /etc/systemd/system/open5gs-webui.service
+  174  which node
+  175  sudo systemctl daemon-reload
+  176  sudo systemctl enable open5gs-webui
+  177  sudo systemctl start open5gs-webui
+  178  sudo systemctl status open5gs-webui
+  179  sudo nano /etc/systemd/system/open5gs-webui.service
+  180  sudo systemctl daemon-reload
+  181  sudo systemctl enable open5gs-webui
+  182  sudo systemctl restart open5gs-webui
+  183  sudo systemctl status open5gs-webui
+  184  clear
+  185  sudo systemctl status open5gs-webui
+  186  journalctl -u open5gs-webui -n 50 --no-pager
+  187  cd ~/open5gs/webui
+  188  npm install
+  189  npm run build
+  190  ls .next
+  191  sudo systemctl restart open5gs-webui
+  192  sudo systemctl status open5gs-webui
+  193  history
+nr@nr:~/open5gs/webui$ 
+
+
