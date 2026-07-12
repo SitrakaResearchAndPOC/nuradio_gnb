@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo apt install cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev libyaml-cpp-dev libgtest-dev 
+sudo apt install -y cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev libyaml-cpp-dev libgtest-dev 
 
 # sudo git clone https://github.com/srsRAN/srsRAN_project
 # Cloner uniquement si le dépôt n'existe pas
