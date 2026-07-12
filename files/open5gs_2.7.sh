@@ -130,3 +130,13 @@ sudo systemctl restart  open5gs-webui
 # FOR WEBUI login : admin
 # FOR WEBUI password : 1423
 
+verify users : 
+mongosh
+use open5gs
+show collections
+# should find subscribers
+db.subscriber.find()
+db.subscriber.find().pretty
+db.subscriber.countDocuments
+# other functions mongodb
+
