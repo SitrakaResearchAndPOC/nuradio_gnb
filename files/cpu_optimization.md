@@ -130,6 +130,15 @@ sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 stress-ng --cpu
 cpupower frequency-set -g performance && \
 sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 ./uhd_install.sh
 ```
+# VERIFY IRQ
+```
+cat /proc/irq/122/smp_affinity
+```
+* CPU 0 only : 000000000001 so :  echo 1 | sudo tee /proc/irq/122/smp_affinity
+* CPU 0 and CPU 1 : 000000000011 so :  echo 3 | sudo tee /proc/irq/122/smp_affinity
+* CPU 0 and CPU 1 and CPU 2 : 000000000111 so :  echo 7 | sudo tee /proc/irq/122/smp_affinity
+...
+  
 # Measuring
 it's possible to measure: 
 *  UL/DL throughput;
