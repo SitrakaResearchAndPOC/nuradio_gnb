@@ -114,7 +114,8 @@ root
 ```
 
 
-# STRESS TESTING
+# TEST
+## Test for all cpu part on stress testing
 ```
 cpupower frequency-set -g performance && \ 
 sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 stress-ng --cpu $part1_number_cpu --timeout 3000s
@@ -124,8 +125,15 @@ cpupower frequency-set -g performance && \
 sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 stress-ng --cpu $part1_number_cpu --timeout 3000s
 ```
 
-# EXAMPLE
+## example
 ```
 cpupower frequency-set -g performance && \
 sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 ./uhd_install.sh
 ```
+# Measuring
+it's possible to measure: 
+*  UL/DL throughput;
+*  BER;
+*  CPU utilization (mpstat -P ALL 1);
+*  thread migrations (pidstat -t);
+*  timing stability (for example, using cyclictest if you're looking for real-time behavior).
