@@ -77,10 +77,11 @@ sudo apt update
 sudo sudo apt install nodejs -y
 
 cd webui
+rm -rf node_modules package-lock.json .next
 npm ci
 # NO NEED TO RUN IT , JUST TEST BEFORE LAUNCHING THE SYSTEMD OF OPEN5GS-WEBUI
 # npm run dev
-rm -rf node_modules package-lock.json .next
+
 npm install
 npm run build 
 
