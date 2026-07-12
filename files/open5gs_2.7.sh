@@ -11,12 +11,12 @@ curl -fsSL https://pgp.mongodb.com/server-6.0.asc | sudo gpg --dearmor --yes  -o
 grep -qxF 'deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse' /etc/apt/sources.list.d/mongodb-org-6.0.list 2>/dev/null || echo 'deb [signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse' | sudo tee -a /etc/apt/sources.list.d/mongodb-org-6.0.list > /dev/null
 sudo apt update
 sudo apt install -y mongodb-org
-sudo systemctl enable mongodb
-sudo systemctl restart mongodb
+sudo systemctl enable mongod
+sudo systemctl restart mongod
 
 # NEED FOR VERIFICATION
-# sudo systemctl restart mongodb
-# sudo  systemctl status mongodb
+# sudo systemctl restart mongod
+# sudo  systemctl status mongod
 
 
 # INSTALLING ALL DEPENDENCIES FOR OPEN5GS
@@ -80,6 +80,7 @@ cd webui
 npm ci
 # NO NEED TO RUN IT , JUST TEST BEFORE LAUNCHING THE SYSTEMD OF OPEN5GS-WEBUI
 # npm run dev
+rm -rf node_modules package-lock.json .next
 npm install
 npm run build 
 
@@ -89,7 +90,8 @@ npm run build
 # ls 
 # THE DIRECTORY SHOULD EXIST server/
 # THE DIRECTORY SHOULD EXIST static/ 
-npm install -g
+
+# npm install -g
 
  
 WEBUI_PATH=$(pwd)
