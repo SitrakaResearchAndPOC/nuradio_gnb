@@ -135,5 +135,11 @@ it's possible to measure:
 *  UL/DL throughput;
 *  BER;
 *  CPU utilization (mpstat -P ALL 1);
+*  mpstat -P ALL 1
+* pidstat -t
+* htop
+* /proc/interrupts
+* cyclictest (si tu t'intéresses à la latence)
 *  thread migrations (pidstat -t);
 *  timing stability (for example, using cyclictest if you're looking for real-time behavior).
+*  watch -n 0.5 'ps -eLo pid,tid,psr,comm | grep nr-softmodem'
