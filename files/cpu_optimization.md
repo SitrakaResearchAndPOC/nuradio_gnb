@@ -77,7 +77,13 @@ sudo cset shield --cpu=$part_all --kthread=on
 ```
 sudo cset set --list --recurse
 ```
-# DIVIDE THE SHIELDING CPU IN TWO PART
+```
+root
+├── system   CPU 0-1
+└── user     CPU 2-11
+```
+
+# DIVIDE THE SHIELDING CPU IN TWO PARTS
 The process will be represented as cpu named organized on file : 
 * the first part of cpu part is /user/cpu_part1
 * the second part of cpu part is /user/cpu_part2
@@ -99,6 +105,15 @@ sudo cset set --set=/user/cpu_part2 --cpu=$part2
 ```
 sudo cset set --list --recurse
 ```
+```
+root
+├── system          CPU 0-1
+└── user            CPU 2-11
+    ├── cpu_part1   CPU 2-6
+    └── cpu_part2   CPU 7-11
+```
+
+
 # STRESS TESTING
 ```
 cpupower frequency-set -g performance && \ 
