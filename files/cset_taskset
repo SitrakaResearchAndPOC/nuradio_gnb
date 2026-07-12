@@ -1,3 +1,90 @@
+D'accord. Tu veux tester exactement la configuration cset + taskset avec stress-ng, srsEPC et srsENB.
+
+Architecture :
+
+CPU 0-3    → OS
+CPU 4-7    → cpuset srsepc + taskset
+CPU 8-11   → cpuset srsenb + taskset
+1) Créer les cpusets
+sudo cset set --cpu=4-7 --set=srsepc
+sudo cset set --cpu=8-11 --set=srsenb
+
+Vérification :
+
+sudo cset set --list
+2) Lancer srsEPC
+sudo cset proc --set=srsepc --exec -- taskset -c 4-7 srsepc
+3) Lancer srsENB
+sudo cset proc --set=srsenb --exec -- taskset -c 8-11 srsenb
+Test avec stress-ng
+Test 1 : charger uniquement les CPU de l'OS
+taskset -c 0-3 stress-ng --cpu 4 --timeout 300s
+
+Attendu :
+
+CPU 0-3  → stress-ng
+CPU 4-7  → srsEPC
+CPU 8-11 → srsENB
+Test 2 : charger la zone srsEPC
+
+Dans un autre terminal :
+
+taskset -c 4-7 stress-ng --cpu 4 --timeout 300s
+
+Attendu :
+
+CPU 4-7  → stress-ng + srsEPC
+CPU 8-11 → srsENB
+Test 3 : charger la zone srsENB
+taskset -c 8-11 stress-ng --cpu 4 --timeout 300s
+
+Attendu :
+
+CPU 8-11 → stress-ng + srsENB
+CPU 4-7  → srsEPC
+Test 4 : stress-ng dans les mêmes cpusets que les applications
+
+Pour tester le comportement cset, lance stress-ng lui-même dans un cpuset.
+
+Stress sur le groupe srsEPC :
+sudo cset proc --set=srsepc --exec -- taskset -c 4-7 stress-ng --cpu 4 --timeout 300s
+Stress sur le groupe srsENB :
+sudo cset proc --set=srsenb --exec -- taskset -c 8-11 stress-ng --cpu 4 --timeout 300s
+
+Tu testes alors :
+
+cpuset srsepc:
+    CPU 4-7
+    srsepc + stress-ng
+
+cpuset srsenb:
+    CPU 8-11
+    srsenb + stress-ng
+Observation
+
+Utilise :
+
+htop
+
+ou :
+
+top -H
+
+Tu dois voir que :
+
+stress-ng lancé avec taskset -c 0-3 ne dépasse jamais CPU 3 ;
+stress-ng lancé avec taskset -c 4-7 reste dans 4-7 ;
+stress-ng lancé avec taskset -c 8-11 reste dans 8-11.
+
+La combinaison cset + taskset donne donc :
+
+cset → séparation des groupes de processus ;
+taskset → limitation stricte de l'affinité CPU.
+
+
+##############################################################################""""
+
+
 Dans ton cas, tu veux découper une machine 12 CPU logiques en 3 zones fixes :
 
 CPU 0-3   → OS uniquement (ne pas toucher)
