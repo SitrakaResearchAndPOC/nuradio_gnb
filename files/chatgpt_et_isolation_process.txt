@@ -1,0 +1,5195 @@
+faire un taskset ; on m'a dit aussi que le coeur paire sont des coeurs réell et impaire virtuel?
+
+
+
+
+Tu parles probablement de `taskset` sous Linux et de la numérotation des CPU (cœurs). Il y a une confusion fréquente : **les numéros pairs/impairs ne correspondent pas forcément aux cœurs physiques/virtuels**.
+
+### 1) Faire un `taskset`
+
+`taskset` sert à **affiner un processus à un ou plusieurs CPU logiques**.
+
+Voir les CPU disponibles :
+
+```bash
+lscpu
+```
+
+ou :
+
+```bash
+nproc
+```
+
+Voir l'affinité d'un processus :
+
+```bash
+taskset -p PID
+```
+
+Lancer un programme sur certains CPU :
+
+```bash
+taskset -c 0,2,4,6 mon_programme
+```
+
+Exemple : lancer un processus uniquement sur les CPU logiques 0 et 1 :
+
+```bash
+taskset -c 0,1 ./mon_programme
+```
+
+Changer l'affinité d'un processus déjà lancé :
+
+```bash
+taskset -pc 0,1 PID
+```
+
+---
+
+### 2) Cœurs pairs = physiques, impairs = virtuels ?
+
+**Non, ce n'est pas une règle.**
+
+Avec l'Hyper-Threading (Intel) ou le SMT (AMD), un cœur physique possède plusieurs **threads logiques**. Linux les numérote comme des CPU logiques, mais la numérotation dépend du BIOS, du noyau et de l'architecture.
+
+Exemple possible :
+
+```
+CPU 0  → cœur physique 0, thread 0
+CPU 1  → cœur physique 0, thread 1
+CPU 2  → cœur physique 1, thread 0
+CPU 3  → cœur physique 1, thread 1
+CPU 4  → cœur physique 2, thread 0
+CPU 5  → cœur physique 2, thread 1
+```
+
+Dans ce cas, pairs et impairs sont effectivement associés au même cœur physique.
+
+Mais une autre machine peut avoir :
+
+```
+CPU 0 → cœur 0 thread 0
+CPU 1 → cœur 1 thread 0
+CPU 2 → cœur 2 thread 0
+CPU 3 → cœur 0 thread 1
+CPU 4 → cœur 1 thread 1
+CPU 5 → cœur 2 thread 1
+```
+
+Donc la règle ne tient plus.
+
+---
+
+### 3) Vérifier la correspondance exacte
+
+Utilise :
+
+```bash
+lscpu -e
+```
+
+Tu verras quelque chose comme :
+
+```
+CPU NODE SOCKET CORE
+0   0    0      0
+1   0    0      0
+2   0    0      1
+3   0    0      1
+4   0    0      2
+5   0    0      2
+```
+
+Ici, CPU 0 et CPU 1 partagent le même cœur physique.
+
+Une autre commande pratique :
+
+```bash
+cat /sys/devices/system/cpu/cpu*/topology/thread_siblings_list
+```
+
+Elle affiche les couples de threads qui appartiennent au même cœur physique.
+
+---
+
+### 4) Exemple d'utilisation pour éviter les threads virtuels
+
+Si tu veux utiliser uniquement un thread par cœur physique, il faut d'abord identifier les CPU correspondants, puis faire par exemple :
+
+```bash
+taskset -c 0,2,4,6 ./mon_programme
+```
+
+mais **les numéros dépendent de ta machine**.
+
+Si tu me donnes la sortie de :
+
+```bash
+lscpu -e
+```
+
+je peux te dire exactement quels CPU sont physiques et lesquels sont des threads SMT.
+
+
+
+###########################################################################################################################
+aprés isolation, en lancant root@nr:/home/nr# taskset -c 4-7 bash uhd_install.sh  seulement cpu4 qui est au 100%?
+
+Si tu lances :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+cela signifie : **le processus `bash` et les processus enfants héritent de l'affinité CPU 4,5,6,7**. Le script peut donc utiliser **les 4 CPU logiques** disponibles.
+
+Si tu observes que **seul CPU4 monte à 100%**, plusieurs explications sont possibles :
+
+### 1) Le script est mono-thread
+
+`uhd_install.sh` lance probablement des commandes comme `make`, `cmake`, `gcc`, etc. Si la compilation n'utilise qu'un seul thread, un seul CPU travaille.
+
+Exemple :
+
+```bash
+make
+```
+
+→ souvent 1 job.
+
+Alors que :
+
+```bash
+make -j4
+```
+
+permet d'utiliser 4 threads de compilation.
+
+Tu peux vérifier pendant l'exécution :
+
+```bash
+top
+```
+
+puis appuie sur :
+
+```
+1
+```
+
+pour voir l'utilisation CPU par cœur.
+
+Ou :
+
+```bash
+htop
+```
+
+---
+
+### 2) CPU4 est le premier CPU disponible et Linux l'utilise en priorité
+
+Même avec :
+
+```bash
+taskset -c 4-7
+```
+
+Linux peut décider de placer un thread unique sur CPU4. L'affinité dit **"tu peux utiliser uniquement ces CPU"**, elle ne force pas la répartition.
+
+---
+
+### 3) Vérifier l'affinité réelle
+
+Pendant que le script tourne :
+
+```bash
+ps -eo pid,psr,comm | grep bash
+```
+
+ou pour un processus précis :
+
+```bash
+taskset -p PID
+```
+
+Tu devrais voir quelque chose comme :
+
+```
+pid 1234's current affinity list: 4-7
+```
+
+---
+
+### 4) Attention à l'isolation CPU
+
+Si tu as fait par exemple :
+
+```
+isolcpus=4-7
+```
+
+dans le kernel, ces CPU sont isolés du scheduler général, mais ils restent utilisables par les processus auxquels tu donnes explicitement une affinité avec `taskset`.
+
+---
+
+### Pour tester que les 4 CPU fonctionnent
+
+Lance un test multi-thread :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+Puis regarde :
+
+```bash
+htop
+```
+
+Tu devrais voir CPU4, CPU5, CPU6 et CPU7 chargés.
+
+---
+
+Donc dans ton cas, **le fait que CPU4 soit à 100% n'indique pas que taskset ne marche pas**. Cela indique plutôt que `uhd_install.sh` (ou une commande appelée par lui) n'a créé qu'un seul thread actif.
+
+Tu peux vérifier avec :
+
+```bash
+grep -E "make|cmake|ninja" uhd_install.sh
+```
+
+pour voir si la compilation est lancée en parallèle.
+
+
+
+######################################################################################################################################################
+
+ ( grep -qF 'static const std::regex gp_msg_regex("^\\$G.*$");' host/lib/usrp/gps_ctrl.cpp ||   sed -i '/static const std::regex gp_msg_regex/{s|^|// |;a\
+static const std::regex gp_msg_regex("^\\\\$G.*$");
+}' host/lib/usrp/gps_ctrl.cpp ) && ( grep -qF 'if(msg.substr(1,2) == "GN"){ msg.replace(1, 2, "GP");}' host/lib/usrp/gps_ctrl.cpp ||   sed -i '/msgs\[msg\.substr(1, 5)\] = msg;/i\
+        if(msg.substr(1,2) == "GN"){ msg.replace(1, 2, "GP");}
+' host/lib/usrp/gps_ctrl.cpp )
+
+cd host/
+
+sudo mkdir build
+
+cd build/
+
+sudo cmake .. 
+
+sudo make -j $(nproc --ignore 2)
+
+sudo make install
+
+sudo ldconfig
+
+sudo ln -s /usr/local/lib/uhd/utils/query_gpsdo_sensors /usr/local/bin/query_gpsdo_sensors
+
+sudo uhd_images_downloader 
+
+sudo query_gpsdo_sensors 
+root@nr:/home/nr# 
+
+
+
+******
+D'après ton extrait de `uhd_install.sh`, la partie importante est :
+
+```bash
+sudo make -j $(nproc --ignore 2)
+```
+
+Cela **devrait normalement lancer une compilation parallèle**. Donc si tu lances :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+et que seulement **CPU4 est à 100 %**, il y a plusieurs points à vérifier.
+
+### 1) Vérifier la valeur de `$(nproc --ignore 2)`
+
+Dans ton environnement avec isolation CPU, exécute :
+
+```bash
+nproc
+```
+
+puis :
+
+```bash
+nproc --ignore 2
+```
+
+Exemple :
+
+```
+8
+6
+```
+
+signifie que `make` reçoit :
+
+```bash
+make -j6
+```
+
+Mais attention : `nproc` ne tient pas toujours compte de l'affinité `taskset`. Il peut compter des CPU non autorisés selon la configuration.
+
+Teste plutôt :
+
+```bash
+taskset -c 4-7 bash -c 'nproc'
+```
+
+et :
+
+```bash
+taskset -c 4-7 bash -c 'nproc --all'
+```
+
+---
+
+### 2) Ton `sudo` peut casser l'affinité
+
+Tu lances :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+mais dans le script :
+
+```bash
+sudo make -j $(nproc --ignore 2)
+```
+
+Le `make` est exécuté par `root` via `sudo`.
+
+Selon la configuration sudo/systemd, l'affinité CPU peut être perdue.
+
+Vérifie pendant le `make` :
+
+```bash
+ps -eo pid,psr,comm | grep make
+```
+
+ou :
+
+```bash
+taskset -p $(pidof make)
+```
+
+Tu dois voir :
+
+```
+current affinity list: 4-7
+```
+
+Si tu vois :
+
+```
+0-7
+```
+
+alors `sudo` a supprimé l'affinité.
+
+---
+
+### 3) Force l'affinité sur make
+
+Modifie temporairement :
+
+```bash
+sudo make -j $(nproc --ignore 2)
+```
+
+en :
+
+```bash
+sudo taskset -c 4-7 make -j4
+```
+
+Là tu forces :
+
+* CPU autorisés : 4,5,6,7
+* 4 jobs de compilation
+
+---
+
+### 4) Attention aux CPU virtuels
+
+Si CPU 4-7 sont des threads SMT du même cœur physique, tu peux avoir :
+
+```
+CPU4 → cœur physique 2
+CPU5 → thread frère de CPU4
+CPU6 → cœur physique 3
+CPU7 → thread frère de CPU6
+```
+
+Dans ce cas, 4 jobs ne donnent pas forcément 4 fois plus de performance.
+
+Vérifie :
+
+```bash
+lscpu -e
+```
+
+Tu verras la relation :
+
+```
+CPU CORE
+4    2
+5    2
+6    3
+7    3
+```
+
+---
+
+Pour ton cas UHD (Ettus UHD), je testerais directement :
+
+```bash
+cd host/build
+sudo taskset -c 4-7 make -j4
+```
+
+puis regarde avec :
+
+```bash
+htop
+```
+
+Si CPU5-7 restent à 0 %, envoie la sortie de :
+
+```bash
+lscpu -e
+nproc --all
+taskset -pc $$
+```
+
+et on pourra voir si le problème vient de l'isolation, du SMT ou de `sudo`.
+
+
+########################
+meme en enleveant --ignore 2; pareil
+*****
+Si même avec :
+
+```bash
+sudo make -j $(nproc)
+```
+
+tu as toujours **seulement CPU4 à 100 %**, alors le problème n'est probablement pas `nproc --ignore 2`.
+
+Il faut distinguer deux choses :
+
+* `taskset -c 4-7` = **autorise** l'utilisation des CPU 4,5,6,7
+* `make -j4` = **crée jusqu'à 4 tâches de compilation en parallèle**
+
+Les deux doivent fonctionner ensemble.
+
+### 1) Vérifie d'abord si `make` lance plusieurs compilateurs
+
+Pendant la phase `make`, lance :
+
+```bash
+ps -ef | grep -E "cc1plus|g\+\+|gcc|make"
+```
+
+Tu devrais voir plusieurs processus `g++`/`cc1plus`.
+
+Si tu ne vois qu'un seul `g++`, alors la compilation est effectivement mono-thread (certains projets CMake peuvent avoir des étapes séquentielles).
+
+---
+
+### 2) Vérifie l'affinité des processus enfants
+
+Pendant la compilation :
+
+```bash
+ps -eo pid,psr,comm | grep -E "make|g\+\+|cc1plus"
+```
+
+Exemple attendu :
+
+```
+1234  4 make
+1235  5 cc1plus
+1236  6 cc1plus
+1237  7 cc1plus
+```
+
+Si tu vois :
+
+```
+1234  4 make
+1235  4 cc1plus
+1236  4 cc1plus
+1237  4 cc1plus
+```
+
+alors Linux concentre tout sur CPU4.
+
+---
+
+### 3) Le cas très fréquent : CPU4-7 sont des threads SMT
+
+Regarde :
+
+```bash
+lscpu -e
+```
+
+Exemple :
+
+```
+CPU  CORE
+4     2
+5     2
+6     3
+7     3
+```
+
+Dans ce cas, tu n'as peut-être que **2 vrais cœurs physiques** dans ton groupe 4-7. Pour une compilation lourde, il vaut parfois mieux utiliser les cœurs physiques :
+
+```bash
+taskset -c 0,2,4,6 make -j4
+```
+
+(selon ta topologie réelle).
+
+---
+
+### 4) Attention à `sudo`
+
+Ton script fait :
+
+```bash
+sudo make -j $(nproc)
+```
+
+Teste sans perdre l'affinité :
+
+```bash
+sudo taskset -c 4-7 make -j4
+```
+
+ou ouvre directement un shell root avec l'affinité :
+
+```bash
+sudo taskset -c 4-7 bash
+make -j4
+```
+
+---
+
+Pour avancer, envoie-moi simplement la sortie de :
+
+```bash
+lscpu -e
+```
+
+et pendant le `make` :
+
+```bash
+ps -eo pid,psr,comm | grep -E "make|g\+\+|cc1plus"
+```
+
+Avec ça on verra si CPU4 est un cœur physique, un thread SMT, ou si l'affinité est perdue.
+
+
+
+#########################
+
+c'est le uhd_install que je veut mettre dans taskset
+
+
+************
+
+D'accord, tu veux appliquer `taskset` **à tout le script `uhd_install.sh`**, pas seulement à `make`.
+
+Ta commande :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+est correcte. Elle donne l'affinité CPU 4-7 au shell qui exécute le script et, normalement, aux processus enfants.
+
+Par contre, dans ton script tu as :
+
+```bash
+sudo cmake ..
+sudo make -j $(nproc)
+sudo make install
+sudo ldconfig
+sudo uhd_images_downloader
+sudo query_gpsdo_sensors
+```
+
+Le point important est **`sudo`** : les commandes lancées avec `sudo` peuvent ne pas conserver l'affinité CPU héritée.
+
+Pour être sûr que **tout le contenu du script UHD** reste sur CPU 4-7, lance plutôt :
+
+```bash
+sudo taskset -c 4-7 bash uhd_install.sh
+```
+
+Ainsi le script complet tourne déjà en root avec l'affinité appliquée.
+
+Tu peux vérifier au début du script en ajoutant temporairement :
+
+```bash
+taskset -p $$
+```
+
+Tu devrais obtenir quelque chose comme :
+
+```
+pid xxxx's current affinity list: 4-7
+```
+
+Et pendant le `make` :
+
+```bash
+ps -eo pid,psr,comm | grep -E "make|g\+\+"
+```
+
+devrait montrer les processus sur les CPU 4,5,6,7.
+
+Une autre amélioration : dans ton script, remplace :
+
+```bash
+sudo make -j $(nproc)
+```
+
+par :
+
+```bash
+make -j4
+```
+
+si tu exécutes déjà tout le script avec :
+
+```bash
+sudo taskset -c 4-7 bash uhd_install.sh
+```
+
+Comme ça tu évites de créer des processus `sudo` intermédiaires qui pourraient modifier le comportement d'affinité.
+
+
+
+###########################################
+je lance taskset -c 4-7 bash uhd_install.sh  avec root@nr:/home/nr# cat uhd_install.sh 
+#!/bin/bash
+sudo apt update
+ 
+sudo apt install -y git cmake build-essential libboost-all-dev libusb-1.0-0-dev python3-dev python3-mako python3-numpy python3-requests python3-setuptools libfftw3-dev libcomedi-dev libgps-dev libgmp-dev swig pkg-config gedit
+
+sudo git clone https://github.com/EttusResearch/uhd.git
+
+sudo chown -R $USER:$USER ~/uhd
+
+cd uhd/
+
+sudo git checkout v4.1.0.5
+
+ls
+
+ ( grep -qF 'static const std::regex gp_msg_regex("^\\$G.*$");' host/lib/usrp/gps_ctrl.cpp ||   sed -i '/static const std::regex gp_msg_regex/{s|^|// |;a\
+static const std::regex gp_msg_regex("^\\\\$G.*$");
+}' host/lib/usrp/gps_ctrl.cpp ) && ( grep -qF 'if(msg.substr(1,2) == "GN"){ msg.replace(1, 2, "GP");}' host/lib/usrp/gps_ctrl.cpp ||   sed -i '/msgs\[msg\.substr(1, 5)\] = msg;/i\
+        if(msg.substr(1,2) == "GN"){ msg.replace(1, 2, "GP");}
+' host/lib/usrp/gps_ctrl.cpp )
+
+cd host/
+
+sudo mkdir build
+
+cd build/
+
+sudo cmake .. 
+
+sudo make -j $(nproc)
+
+sudo make install
+
+sudo ldconfig
+
+sudo ln -s /usr/local/lib/uhd/utils/query_gpsdo_sensors /usr/local/bin/query_gpsdo_sensors
+
+sudo uhd_images_downloader 
+
+sudo query_gpsdo_sensors 
+root@nr:/home/nr#  au cours de make seul cpu 4 et 100% et c'est trop lent
+
+*****************************
+Avec ton cas précis, `taskset -c 4-7 bash uhd_install.sh` est bien appliqué au **script**, mais il y a deux problèmes possibles dans ton script qui expliquent pourquoi `make` n'utilise qu'un seul CPU.
+
+### 1) Le `sudo` dans le script peut perdre l'affinité
+
+Tu lances :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+mais ensuite tu fais :
+
+```bash
+sudo make -j $(nproc)
+```
+
+Le `make` est un nouveau processus lancé par `sudo`. Vérifie pendant la compilation :
+
+```bash
+ps -eo pid,psr,comm | grep -E "make|g\+\+|cc1plus"
+```
+
+Si tu vois seulement :
+
+```
+1234  4 make
+1235  4 cc1plus
+```
+
+alors tout tourne sur CPU4.
+
+---
+
+### 2) Force l'affinité au niveau de `make`
+
+Modifie cette ligne :
+
+```bash
+sudo make -j $(nproc)
+```
+
+en :
+
+```bash
+sudo taskset -c 4-7 make -j4
+```
+
+Ainsi tu imposes :
+
+* CPU utilisables : 4,5,6,7
+* 4 compilations en parallèle
+
+---
+
+### 3) Encore mieux : lance tout le script en root
+
+Comme tu es déjà :
+
+```
+root@nr:/home/nr#
+```
+
+tu n'as pas besoin de `sudo` partout.
+
+Lance :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+mais enlève les `sudo` dans le script :
+
+```bash
+apt update
+apt install -y ...
+git clone ...
+cmake ..
+make -j4
+make install
+ldconfig
+```
+
+Sinon tu crées beaucoup de processus root intermédiaires.
+
+---
+
+### 4) Vérifie que `make` a bien plusieurs jobs
+
+Pendant `make`, exécute dans un autre terminal :
+
+```bash
+top
+```
+
+puis appuie sur :
+
+```
+1
+```
+
+ou :
+
+```bash
+htop
+```
+
+Tu devrais voir plusieurs `cc1plus` actifs.
+
+Tu peux aussi tester directement :
+
+```bash
+cd ~/uhd/host/build
+taskset -c 4-7 make -j4
+```
+
+Si les CPU 5,6,7 restent à 0 %, le problème n'est pas `taskset` mais la configuration de compilation.
+
+---
+
+### 5) Vérifie aussi la topologie CPU
+
+Envoie la sortie de :
+
+```bash
+lscpu -e
+```
+
+car il est possible que tes CPU 4-7 soient des threads SMT (virtuels). Si CPU4 est le seul cœur physique actif dans ton groupe, la lenteur est normale.
+############################################
+c'est pas le sudo le probleme, c'est le fait qu'il utilise 1 cpu seulement avec taskset -c 4-7?
+*******************************************
+Oui, tu as raison de cibler `taskset`. Mais il faut bien comprendre ce point :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+**n'oblige pas le programme à utiliser les 4 CPU.**
+Cela signifie seulement :
+
+> "Ce processus et ses enfants ont le droit d'utiliser uniquement les CPU 4, 5, 6 et 7."
+
+Si `make` ne lance qu'un seul travail à la fois, Linux choisira souvent un seul CPU (souvent CPU4) et il sera à 100 %. Les CPU5-7 resteront inactifs.
+
+Dans ton script, la ligne qui décide du parallélisme est :
+
+```bash
+sudo make -j $(nproc)
+```
+
+Il faut vérifier combien vaut réellement `$(nproc)` dans ton contexte :
+
+```bash
+taskset -c 4-7 nproc
+```
+
+Si ça affiche :
+
+```
+1
+```
+
+alors ton `make` devient :
+
+```bash
+make -j 1
+```
+
+et un seul CPU travaille.
+
+Teste aussi :
+
+```bash
+taskset -c 4-7 bash -c "nproc"
+```
+
+et :
+
+```bash
+taskset -c 4-7 bash -c "nproc --all"
+```
+
+---
+
+Pour forcer l'utilisation des 4 CPU, remplace temporairement :
+
+```bash
+make -j $(nproc)
+```
+
+par :
+
+```bash
+make -j4
+```
+
+ou :
+
+```bash
+make -j $(nproc --all)
+```
+
+Puis lance :
+
+```bash
+taskset -c 4-7 bash uhd_install.sh
+```
+
+---
+
+Autre vérification importante : regarde la topologie :
+
+```bash
+lscpu -e
+```
+
+Si tu vois par exemple :
+
+```
+CPU  CORE
+4    2
+5    2
+6    3
+7    3
+```
+
+alors tes CPU 4-7 ne représentent peut-être que 2 cœurs physiques avec Hyper-Threading.
+
+Mais le point principal : **`taskset -c 4-7` limite le choix des CPU, il ne crée pas 4 threads. C'est `make -j4` qui crée le parallélisme.**
+
+
+#####################################################
+root@nr:/home/nr# taskset -c 4-7 bash -c "nproc"
+4
+root@nr:/home/nr#  mais en regardant systemmonitor seul cpu4 est à fond
+
+*****************************************************
+Le résultat :
+
+```bash
+root@nr:/home/nr# taskset -c 4-7 bash -c "nproc"
+4
+```
+
+confirme que **l'affinité autorise bien 4 CPU (4,5,6,7)**. Donc `taskset` fonctionne.
+
+Si dans System Monitor tu vois uniquement **CPU4 à 100 %**, cela veut dire que **le programme en cours n'a qu'un seul thread actif à ce moment-là** (ou qu'une seule tâche est planifiée).
+
+Dans ton cas, le coupable le plus probable est cette ligne :
+
+```bash
+sudo make -j $(nproc)
+```
+
+Même si `nproc` retourne 4 avec `taskset`, il faut vérifier ce que voit réellement `make`.
+
+Pendant que `make` tourne, ouvre un autre terminal et fais :
+
+```bash
+ps aux | grep make
+```
+
+puis :
+
+```bash
+ps -eLf | grep -E "make|cc1plus|g\+\+" 
+```
+
+Si tu vois seulement un `g++` ou un `cc1plus`, la compilation est séquentielle.
+
+---
+
+### Test simple
+
+Arrête ton script et va dans le dossier de compilation :
+
+```bash
+cd ~/uhd/host/build
+```
+
+Lance directement :
+
+```bash
+taskset -c 4-7 make -j4
+```
+
+Regarde System Monitor.
+
+* Si CPU4,5,6,7 montent → le problème vient du script.
+* Si seul CPU4 monte → le projet UHD compile une étape qui ne peut pas être parallélisée à ce moment-là.
+
+---
+
+### Autre point : UHD/CMake
+
+Avec CMake, `make -j4` n'accélère pas toutes les étapes. Certaines parties (configuration, génération de fichiers, certains liens) sont **mono-thread**. Il est possible d'avoir plusieurs minutes sur un seul cœur.
+
+Pendant la compilation C++, tu devrais voir plusieurs processus :
+
+```
+cc1plus
+cc1plus
+cc1plus
+cc1plus
+```
+
+Si tu ne vois qu'un seul :
+
+```
+cc1plus
+```
+
+alors il n'y a qu'un seul fichier C++ compilé à la fois.
+
+---
+
+Pour confirmer, pendant le `make`, donne-moi la sortie de :
+
+```bash
+ps -eo pid,psr,pcpu,comm | grep -E "make|cc1plus|g\+\+"
+```
+
+On verra immédiatement si `taskset` limite mal ou si `make` n'utilise simplement pas plusieurs jobs.
+
+
+####################################################################
+comment optimiser le scheduler de taskset car j'ai testé autres programme seul  cpu4 qui est utilisé à100% puis cpu7 à100% les autres entre cpu4 à 7 reste à 0%???
+
+*******************************************************************
+
+Ce que tu observes est normal avec `taskset` : **`taskset` ne fait pas de répartition de charge entre les CPU**. Il définit seulement un **ensemble de CPU autorisés**.
+
+Exemple :
+
+```bash
+taskset -c 4-7 ./mon_programme
+```
+
+signifie :
+
+> Le programme peut être exécuté sur CPU4, CPU5, CPU6 ou CPU7.
+
+Cela ne signifie pas :
+
+> Répartis automatiquement le travail à 25 % sur chacun des CPU.
+
+Le scheduler Linux choisit un CPU parmi 4-7 selon l'état du système. Si ton programme est **mono-thread**, il peut tourner longtemps sur CPU4 à 100 %, puis migrer sur CPU7 à 100 %. Les CPU5 et CPU6 restent inutilisés car il n'existe qu'une seule tâche à exécuter.
+
+---
+
+### 1) Vérifier si ton programme est multi-thread
+
+Lance :
+
+```bash
+ps -eLf | grep nom_du_programme
+```
+
+ou :
+
+```bash
+top -H
+```
+
+Si tu vois un seul thread, un seul CPU sera utilisé.
+
+Pour utiliser 4 CPU, il faut que le programme crée plusieurs threads/processus.
+
+---
+
+### 2) Tester que `taskset` fonctionne bien
+
+Teste avec un programme multi-thread :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+Tu devrais voir CPU4, CPU5, CPU6 et CPU7 chargés.
+
+---
+
+### 3) Vérifier la topologie CPU
+
+Il est possible aussi que tes CPU 4-7 soient des threads virtuels SMT.
+
+Regarde :
+
+```bash
+lscpu -e
+```
+
+Exemple :
+
+```
+CPU  CORE
+4    2
+5    2
+6    3
+7    3
+```
+
+Ici CPU4 et CPU5 partagent le même cœur physique, idem pour CPU6/7.
+
+Pour une charge performante, il vaut parfois mieux sélectionner uniquement les cœurs physiques.
+
+---
+
+### 4) Pour forcer un équilibrage entre threads
+
+Si ton application utilise plusieurs threads, tu peux utiliser :
+
+```bash
+taskset -c 4-7 ./programme
+```
+
+mais aussi régler la politique CPU :
+
+```bash
+chrt -r 50 taskset -c 4-7 ./programme
+```
+
+(`chrt` change la priorité temps réel, à utiliser avec précaution.)
+
+Pour une application SDR/UHD temps réel, on utilise souvent plutôt :
+
+```bash
+taskset -c 4-7 chrt -f 50 ./programme
+```
+
+---
+
+### 5) Dans ton cas UHD
+
+Pour UHD (USRP), le plus important n'est pas d'avoir **un CPU à 100 %**, mais d'avoir :
+
+* un ou plusieurs cœurs dédiés,
+* pas de migration de threads,
+* faible latence.
+
+Il est souvent préférable de réserver des cœurs physiques dédiés plutôt que de chercher à équilibrer artificiellement la charge.
+
+---
+
+Pour diagnostiquer précisément, donne-moi :
+
+```bash
+lscpu -e
+```
+
+et :
+
+```bash
+cat /sys/devices/system/cpu/cpu4/topology/thread_siblings_list
+cat /sys/devices/system/cpu/cpu5/topology/thread_siblings_list
+cat /sys/devices/system/cpu/cpu6/topology/thread_siblings_list
+cat /sys/devices/system/cpu/cpu7/topology/thread_siblings_list
+```
+
+On saura si ton groupe 4-7 correspond à 4 vrais cœurs ou à des threads Hyper-Threading.
+
+
+
+
+######################################################################################
+
+root@nr:/home/nr# taskset -c 4-7 stress-ng --cpu 4
+taskset: failed to execute stress-ng: No such file or directory
+root@nr:/home/nr# 
+
+
+**********************************************************************
+L'erreur :
+
+```bash
+taskset: failed to execute stress-ng: No such file or directory
+```
+
+veut simplement dire que **`stress-ng` n'est pas installé**. Ce n'est pas un problème avec `taskset`.
+
+Installe-le :
+
+```bash
+apt update
+apt install -y stress-ng
+```
+
+Puis refais le test :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+Pendant ce test, ouvre :
+
+```bash
+htop
+```
+
+ou :
+
+```bash
+top
+```
+
+Tu devrais voir les CPU 4,5,6,7 travailler.
+
+---
+
+Si malgré `stress-ng --cpu 4` tu vois encore un seul CPU chargé, alors on vérifiera la topologie et l'affinité réelle :
+
+```bash
+lscpu -e
+```
+
+et :
+
+```bash
+taskset -pc $(pidof stress-ng)
+```
+
+Mais je m'attends plutôt à ce que ce test montre les 4 CPU actifs, car `stress-ng --cpu 4` crée bien 4 workers indépendants. Ton problème avec UHD vient probablement du fait que le processus UHD ou `make` ne crée pas assez de threads.
+
+
+######################################################################################################
+
+en lancant taskset -c 4-7 stress-ng --cpu 4root@nr:/home/nr# taskset -c 4-7 stress-ng --cpu 4
+stress-ng: info:  [34350] defaulting to a 86400 second (1 day, 0.00 secs) run per stressor
+stress-ng: info:  [34350] dispatching hogs: 4 cpu seul cpu5 est à 100%
+
+************************************************************************************
+Ce résultat est très intéressant : il montre que **`taskset` fonctionne**, mais il montre aussi un comportement du scheduler Linux.
+
+Tu as lancé :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+`stress-ng` crée bien **4 workers CPU**, mais Linux peut décider de placer ces 4 threads sur **un seul CPU logique** si quelque chose dans la configuration le permet (ou si les CPU 4-7 ne sont pas vus comme des CPU indépendants utilisables de la façon attendue).
+
+La première chose à vérifier est la topologie CPU.
+
+Exécute :
+
+```bash
+lscpu -e
+```
+
+et regarde les colonnes `CPU`, `CORE`, `SOCKET`.
+
+Exemple :
+
+```
+CPU NODE SOCKET CORE
+4   0    0      2
+5   0    0      2
+6   0    0      3
+7   0    0      3
+```
+
+Cela voudrait dire que 4-7 sont des threads SMT (Hyper-Threading), pas 4 cœurs physiques.
+
+---
+
+Ensuite vérifie l'affinité des threads `stress-ng` :
+
+Pendant que `stress-ng` tourne :
+
+```bash
+ps -eLo pid,tid,psr,comm | grep stress-ng
+```
+
+Tu devrais voir quelque chose comme :
+
+```
+PID    TID    PSR  COMMAND
+34350  34351  4    stress-ng
+34350  34352  5    stress-ng
+34350  34353  6    stress-ng
+34350  34354  7    stress-ng
+```
+
+Si tu vois :
+
+```
+34350 34351 5 stress-ng
+34350 34352 5 stress-ng
+34350 34353 5 stress-ng
+34350 34354 5 stress-ng
+```
+
+alors le scheduler garde tous les threads sur CPU5.
+
+---
+
+Tu peux aussi tester en forçant une répartition manuelle avec `taskset` par thread :
+
+```bash
+stress-ng --cpu 4 --cpu-method all
+```
+
+ou utiliser `numactl` si tu as plusieurs nœuds CPU :
+
+```bash
+numactl --physcpubind=4,5,6,7 stress-ng --cpu 4
+```
+
+---
+
+Une autre cause possible : tu as utilisé une isolation CPU (`isolcpus`). Si les CPU 4-7 sont isolés, le comportement du scheduler change. Donne-moi la sortie de :
+
+```bash
+cat /proc/cmdline
+```
+
+et :
+
+```bash
+lscpu -e
+```
+
+Avec ces deux sorties on pourra dire précisément pourquoi les 4 threads de `stress-ng` restent sur un seul CPU.
+####################################################################################
+root@nr:/home/nr# lscpu -e
+CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE    MAXMHZ   MINMHZ      MHZ
+  0    0      0    0 0:0:0:0          yes 4400,0000 800,0000 2000.000
+  1    0      0    0 0:0:0:0          yes 4400,0000 800,0000 2000.000
+  2    0      0    1 1:1:1:0          yes 4400,0000 800,0000 2000.000
+  3    0      0    1 1:1:1:0          yes 4400,0000 800,0000 1021.740
+  4    0      0    2 2:2:2:0          yes 4400,0000 800,0000 2000.000
+  5    0      0    2 2:2:2:0          yes 4400,0000 800,0000 2000.000
+  6    0      0    3 3:3:3:0          yes 4400,0000 800,0000 2000.000
+  7    0      0    3 3:3:3:0          yes 4400,0000 800,0000 2000.000
+  8    0      0    4 4:4:4:0          yes 4400,0000 800,0000 2000.000
+  9    0      0    4 4:4:4:0          yes 4400,0000 800,0000 2000.000
+ 10    0      0    5 5:5:5:0          yes 4400,0000 800,0000 2000.000
+ 11    0      0    5 5:5:5:0          yes 4400,0000 800,0000 2000.000
+root@nr:/home/nr# ps -eLo pid,tid,psr,comm | grep stress-ng
+root@nr:/home/nr# 
+
+*********************************************************
+Ta sortie `lscpu -e` donne une information importante :
+
+```
+CPU  CORE
+0     0
+1     0
+2     1
+3     1
+4     2
+5     2
+6     3
+7     3
+8     4
+9     4
+10    5
+11    5
+```
+
+Donc ta machine a :
+
+* **6 cœurs physiques** (`CORE 0` à `CORE 5`)
+* **12 CPU logiques** (Hyper-Threading / SMT activé)
+
+Les CPU 4-7 correspondent à :
+
+```
+CPU4 → cœur physique 2 (thread 0)
+CPU5 → cœur physique 2 (thread 1)
+CPU6 → cœur physique 3 (thread 0)
+CPU7 → cœur physique 3 (thread 1)
+```
+
+Donc ton groupe `4-7` contient seulement **2 vrais cœurs physiques** avec leurs deux threads SMT.
+
+---
+
+Pour `stress-ng`, le fait que seul CPU5 monte à 100 % est anormal. `stress-ng --cpu 4` doit créer 4 workers. Il faut regarder les threads pendant que le test tourne.
+
+Ton test s'arrête probablement avant ta commande `ps`. Relance avec une durée courte :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4 --timeout 60s
+```
+
+Pendant les 60 secondes, dans un autre terminal :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+Tu devrais voir 4 lignes avec des `psr` différents, par exemple :
+
+```
+PID    TID    PSR  %CPU COMMAND
+34350  34351   4   100  stress-ng
+34350  34352   5   100  stress-ng
+34350  34353   6   100  stress-ng
+34350  34354   7   100  stress-ng
+```
+
+---
+
+### Pour ton objectif UHD
+
+Pour un usage SDR temps réel, je ne choisirais pas `4-7`, car tu mélanges des frères SMT. Je testerais plutôt des cœurs physiques séparés :
+
+Par exemple :
+
+```
+CPU4 (core 2)
+CPU6 (core 3)
+CPU8 (core 4)
+CPU10 (core 5)
+```
+
+Test :
+
+```bash
+taskset -c 4,6,8,10 stress-ng --cpu 4 --timeout 60s
+```
+
+Tu devrais avoir une charge sur 4 cœurs physiques.
+
+---
+
+Pour comprendre pourquoi ton scheduler reste sur un seul CPU, donne aussi :
+
+```bash
+cat /proc/cmdline
+```
+
+car tu as parlé d'isolation CPU. Si tu as `isolcpus=4-7` ou des réglages `nohz_full`/`rcu_nocbs`, cela peut influencer la répartition des tâches.
+
+################################################################################################################
+seul cpu 5 100%
+
+***************************
+Le fait que **seul CPU5 soit à 100 % avec `stress-ng --cpu 4`** est anormal : `stress-ng --cpu 4` doit créer 4 workers et, avec une affinité `4-7`, ils devraient pouvoir tourner sur plusieurs CPU.
+
+Ta topologie montre cependant que :
+
+```
+CPU4 → CORE 2 (thread 0)
+CPU5 → CORE 2 (thread 1)
+CPU6 → CORE 3 (thread 0)
+CPU7 → CORE 3 (thread 1)
+```
+
+Donc il y a 2 cœurs physiques seulement dans ton groupe. Mais même ainsi, on devrait voir au moins CPU4/5 ou CPU6/7 chargés.
+
+Fais ce test pour voir où sont réellement les threads :
+
+Terminal 1 :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4 --timeout 120s
+```
+
+Terminal 2 pendant l'exécution :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress
+```
+
+Si la commande ne retourne rien, essaie :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+Le champ `PSR` indique le CPU utilisé par chaque thread.
+
+---
+
+Vérifie aussi directement l'affinité du processus :
+
+```bash
+pidof stress-ng
+```
+
+puis :
+
+```bash
+taskset -cp $(pidof stress-ng)
+```
+
+Le résultat attendu :
+
+```
+pid xxxx's current affinity list: 4-7
+```
+
+---
+
+Autre test important : force chaque worker sur un CPU différent avec `taskset` ne suffit pas. Essaie :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4 --cpu-load 100 --timeout 60s --metrics-brief
+```
+
+Puis regarde :
+
+```bash
+mpstat -P ALL 1
+```
+
+(si `sysstat` est installé)
+
+Installation si besoin :
+
+```bash
+apt install sysstat
+```
+
+---
+
+Enfin, comme tu as parlé d'isolation CPU, envoie la sortie de :
+
+```bash
+cat /proc/cmdline
+```
+
+Il est possible que tes paramètres kernel (`isolcpus`, `nohz_full`, `rcu_nocbs`) influencent fortement le placement des threads.
+
+########################################################################################
+root@nr:/home/nr# taskset -cp $(pidof stress-ng)
+taskset: invalid PID argument: '-cp'
+root@nr:/home/nr# 
+
+****************************************************************************************
+L'erreur :
+
+```bash
+taskset: invalid PID argument: '-cp'
+```
+
+vient du fait que :
+
+```bash
+$(pidof stress-ng)
+```
+
+ne retourne **aucun PID**. Donc ta commande devient en réalité :
+
+```bash
+taskset -cp
+```
+
+et `taskset` pense que `-cp` est un argument PID invalide.
+
+Cela veut dire que lorsque tu as lancé la commande, **stress-ng n'était plus en cours d'exécution** (probablement parce que le test était fini).
+
+Fais le test comme ceci :
+
+### Terminal 1
+
+Lance un test long :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4 --timeout 300s
+```
+
+### Terminal 2 (pendant les 300 secondes)
+
+Trouve le PID :
+
+```bash
+pidof stress-ng
+```
+
+Exemple :
+
+```
+34350
+```
+
+Puis :
+
+```bash
+taskset -cp 34350
+```
+
+Résultat attendu :
+
+```
+pid 34350's current affinity list: 4-7
+```
+
+---
+
+Ensuite regarde où tournent réellement les threads :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+Le champ `PSR` est le numéro du CPU.
+
+---
+
+Autre test utile : avec ta topologie, essaye plutôt les cœurs physiques :
+
+```bash
+taskset -c 4,6,8,10 stress-ng --cpu 4 --timeout 60s
+```
+
+Car :
+
+```
+CPU4 + CPU5 = même cœur physique
+CPU6 + CPU7 = même cœur physique
+CPU8 + CPU9 = même cœur physique
+CPU10 + CPU11 = même cœur physique
+```
+
+Pour de la performance (UHD, SDR, calcul), il vaut mieux éviter de mettre plusieurs threads sur les deux frères SMT d'un même cœur.
+
+---
+
+Il reste une question importante : est-ce que tu as activé `isolcpus` ? Donne :
+
+```bash
+cat /proc/cmdline
+```
+
+car une isolation CPU mal configurée peut expliquer pourquoi le scheduler ne répartit pas les threads comme attendu.
+
+########################################################################################
+root@nr:/home/nr# pidof stress-ng
+34971 34970 34969 34968 34967
+root@nr:/home/nr# 
+
+***********************************************************
+Parfait, maintenant on sait que `stress-ng` a bien créé plusieurs processus :
+
+```bash
+pidof stress-ng
+34971 34970 34969 34968 34967
+```
+
+Il y a le processus principal + 4 workers (ce qui correspond à `--cpu 4`). Maintenant il faut voir **sur quels CPU ils tournent réellement**.
+
+Pendant que `stress-ng` tourne, exécute :
+
+```bash id="1qj4i9"
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+La colonne importante est :
+
+* `PSR` = numéro du CPU actuellement utilisé
+* `PCPU` = charge CPU
+
+Exemple attendu :
+
+```
+PID     TID     PSR   %CPU COMMAND
+34971   34972    4    100  stress-ng
+34971   34973    5    100  stress-ng
+34971   34974    6    100  stress-ng
+34971   34975    7    100  stress-ng
+```
+
+Si tu obtiens quelque chose comme :
+
+```
+34971   34972    5    100  stress-ng
+34971   34973    5    100  stress-ng
+34971   34974    5    100  stress-ng
+34971   34975    5    100  stress-ng
+```
+
+alors on aura confirmé que le scheduler garde tout sur CPU5.
+
+Ensuite vérifie aussi l'affinité de chaque worker :
+
+```bash id="i5r8c7"
+for p in $(pidof stress-ng); do taskset -cp $p; done
+```
+
+Tu devrais voir :
+
+```
+pid 34971's current affinity list: 4-7
+pid 34970's current affinity list: 4-7
+...
+```
+
+---
+
+Vu ta topologie, je remarque aussi quelque chose : tu as un système avec **SMT activé** et des couples :
+
+```
+4-5 → même cœur physique
+6-7 → même cœur physique
+```
+
+Pour un test plus propre, essaie :
+
+```bash id="t5l8sx"
+taskset -c 4,6,8,10 stress-ng --cpu 4 --timeout 60s
+```
+
+Cela utilise quatre cœurs physiques différents.
+
+Mais avant de conclure sur le scheduler, envoie-moi surtout le résultat de :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+C'est lui qui dira exactement où Linux place les threads.
+
+##################################################################################################
+mais en regardant sur sysmonitor seul cpu6 à 100% les restes presque 0%?
+**************************************************************************
+Le fait que **System Monitor affiche seulement CPU6 à 100 %** alors que `stress-ng --cpu 4` est lancé indique qu'il faut vérifier ce qui se passe réellement, car ce n'est pas le comportement attendu.
+
+`stress-ng --cpu 4` crée 4 workers, mais **le scheduler Linux peut déplacer les threads**. Le graphique de System Monitor peut aussi être trompeur (il montre parfois une moyenne ou un rafraîchissement qui ne suit pas les migrations rapides).
+
+Fais ce test plus précis :
+
+1. Lance :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4 --timeout 120s
+```
+
+2. Pendant que ça tourne, dans un autre terminal :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+La colonne `PSR` doit montrer sur quels CPU tournent les threads.
+
+---
+
+Ensuite regarde directement par CPU avec :
+
+```bash
+mpstat -P ALL 1
+```
+
+Si `mpstat` n'existe pas :
+
+```bash
+apt install sysstat
+```
+
+Puis :
+
+```bash
+mpstat -P ALL 1
+```
+
+Tu auras quelque chose comme :
+
+```
+CPU    %usr
+4      100
+5      100
+6      100
+7      100
+```
+
+ou tu verras le vrai comportement.
+
+---
+
+Une autre vérification importante : regarde si tes CPU 4-7 sont bien autorisés :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus 2>/dev/null
+```
+
+et :
+
+```bash
+taskset -pc $$
+```
+
+---
+
+Pour ton cas UHD, je note aussi que ton groupe `4-7` contient seulement **deux cœurs physiques** :
+
+```
+CPU4 + CPU5 → Core 2
+CPU6 + CPU7 → Core 3
+```
+
+Si tu veux réserver 4 vrais cœurs physiques, il faut plutôt utiliser :
+
+```
+CPU4,6,8,10
+```
+
+(car ce sont des cœurs physiques différents).
+
+Mais d'abord il faut voir le résultat de :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+C'est la mesure la plus fiable pour savoir si le scheduler utilise réellement un ou plusieurs CPU.
+
+#################################################
+root@nr:/home/nr# mpstat -P ALL 1
+Linux 5.15.0-183-lowlatency (nr) 	12.07.2026 	_x86_64_	(12 CPU)
+
+11:37:56     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
+11:37:57     all    8,58    0,00    0,25    0,00    0,00    0,08    0,00    0,00    0,00   91,09
+11:37:57       0    1,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00   99,00
+11:37:57       1    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+11:37:57       2    0,98    0,00    0,98    0,00    0,00    0,98    0,00    0,00    0,00   97,06
+11:37:57       3    1,01    0,00    2,02    0,00    0,00    0,00    0,00    0,00    0,00   96,97
+11:37:57       4    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+11:37:57       5  100,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00
+11:37:57       6    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+11:37:57       7    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+11:37:57       8    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+11:37:57       9    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+11:37:57      10    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+11:37:57      11    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00    0,00  100,00
+
+***************************************
+La sortie `mpstat` confirme clairement le comportement :
+
+```
+CPU5    100%
+CPU4      0%
+CPU6      0%
+CPU7      0%
+```
+
+Donc **`stress-ng` a bien 4 workers, mais ils ne sont pas répartis sur les CPU 4-7**. Le scheduler les place tous sur CPU5.
+
+Maintenant il faut trouver pourquoi.
+
+### 1) Vérifie l'affinité de chaque worker stress-ng
+
+Pendant que `stress-ng` tourne, exécute :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+Tu devrais voir plusieurs lignes. Exemple problématique :
+
+```
+34971 34968 5 100 stress-ng
+34971 34969 5 100 stress-ng
+34971 34970 5 100 stress-ng
+34971 34971 5 100 stress-ng
+```
+
+Cela confirmerait que tous les threads restent sur CPU5.
+
+---
+
+### 2) La cause probable : tes CPU 4-7 sont isolés
+
+Comme tu as parlé d'isolation CPU, regarde :
+
+```bash
+cat /proc/cmdline
+```
+
+Je suspecte un paramètre du genre :
+
+```
+isolcpus=4-7
+nohz_full=4-7
+rcu_nocbs=4-7
+```
+
+Avec `isolcpus`, Linux ne fait plus l'équilibrage normal du scheduler sur ces CPU. C'est justement le but : réserver des CPU pour des applications temps réel. Dans ce mode, un processus peut rester sur un seul CPU même avec plusieurs threads.
+
+---
+
+### 3) Pour une machine SDR/UHD, c'est souvent préférable
+
+Pour UHD, on ne cherche généralement pas à ce que le scheduler équilibre automatiquement. On fait plutôt :
+
+* un thread → un CPU dédié
+* affinité par thread
+
+Par exemple :
+
+```bash
+taskset -c 4 ./programme_thread1 &
+taskset -c 6 ./programme_thread2 &
+taskset -c 8 ./programme_thread3 &
+taskset -c 10 ./programme_thread4 &
+```
+
+ou avec les API d'affinité dans le programme.
+
+---
+
+### 4) Test sans isolation
+
+Pour confirmer que l'isolation est responsable, teste temporairement :
+
+```bash
+taskset -c 0-3 stress-ng --cpu 4 --timeout 60s
+```
+
+Puis :
+
+```bash
+mpstat -P ALL 1
+```
+
+Si tu vois CPU0-3 chargés correctement, alors le problème vient bien de la configuration d'isolation.
+
+---
+
+Envoie-moi la sortie de :
+
+```bash
+cat /proc/cmdline
+```
+
+C'est la prochaine information nécessaire.
+############################################################################################
+mais pourquoi avec system Monitor de linux ca dit le contraire?
+**************************************************************
+
+Bonne remarque. Si **System Monitor affiche CPU6 à 100 %** alors que `mpstat` affiche **CPU5 à 100 %**, il y a plusieurs explications possibles.
+
+### 1) System Monitor et `mpstat` ne mesurent pas exactement de la même façon
+
+`mpstat` lit directement les compteurs CPU du noyau Linux (`/proc/stat`) et affiche une mesure par CPU logique. C'est généralement la référence pour ce diagnostic.
+
+System Monitor (GNOME System Monitor ou équivalent) :
+
+* rafraîchit à intervalle régulier ;
+* peut afficher une valeur légèrement décalée dans le temps ;
+* peut parfois numéroter les CPU différemment selon l'interface graphique ou la configuration.
+
+Donc un décalage CPU5 ↔ CPU6 peut arriver dans l'affichage.
+
+---
+
+### 2) Le thread peut migrer entre deux mesures
+
+Le scheduler Linux peut déplacer un thread :
+
+```
+seconde 1 : CPU5 = 100 %
+seconde 2 : CPU6 = 100 %
+seconde 3 : CPU5 = 100 %
+```
+
+`mpstat -P ALL 1` capture une fenêtre précise de 1 seconde. System Monitor peut capturer une autre fenêtre.
+
+Pour vérifier en temps réel :
+
+```bash
+watch -n 0.5 'ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng'
+```
+
+La colonne `PSR` montrera le CPU actuel de chaque thread.
+
+---
+
+### 3) Vérifie aussi la numérotation dans System Monitor
+
+Dans Linux, les CPU sont numérotés par le noyau :
+
+```
+CPU0 CPU1 CPU2 ... CPU11
+```
+
+Mais certaines interfaces affichent les cœurs physiques ou réordonnent l'affichage. Avec ton `lscpu`, tu as :
+
+```
+CPU4 + CPU5 = même cœur physique
+CPU6 + CPU7 = même cœur physique
+```
+
+Donc un affichage "cœur 3" dans une interface graphique ne correspond pas forcément à "CPU3".
+
+---
+
+Pour ton cas précis, je ferais confiance à :
+
+```bash
+mpstat -P ALL 1
+```
+
+et à :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+Le second te dira exactement **quel thread tourne sur quel CPU logique**.
+
+Peux-tu donner la sortie de :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+pendant que `stress-ng` tourne ? C'est elle qui permettra de trancher entre un problème d'affichage et un vrai problème de placement des threads.
+
+
+#####################################################################################################################################
+
+Every 10,0s: ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng                                                                                                                     nr: Sun Jul 12 11:40:23 2026
+
+  34967   34967   5  0.0 stress-ng
+  34968   34968   5 24.9 stress-ng
+  34969   34969   5 24.9 stress-ng
+  34970   34970   5 24.9 stress-ng
+  34971   34971   5 24.9 stress-ng
+  
+  *****************************************
+  
+  Cette sortie explique exactement ce qui se passe :
+
+```text
+PID     TID     PSR   %CPU
+34968   34968    5    24.9
+34969   34969    5    24.9
+34970   34970    5    24.9
+34971   34971    5    24.9
+```
+
+Les 4 workers de `stress-ng` sont **tous sur le CPU logique 5**. Ils se partagent donc ce CPU :
+
+* worker 1 → ~25 %
+* worker 2 → ~25 %
+* worker 3 → ~25 %
+* worker 4 → ~25 %
+
+Au total :
+
+```
+CPU5 ≈ 100 %
+```
+
+Donc le problème n'est pas System Monitor : `mpstat` et `ps` confirment que le scheduler place tout sur CPU5.
+
+---
+
+### Pourquoi Linux ne répartit pas les 4 threads ?
+
+Avec :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+tu donnes une **liste autorisée** :
+
+```
+CPU possibles : 4,5,6,7
+```
+
+mais tu ne demandes pas :
+
+```
+thread 1 → CPU4
+thread 2 → CPU5
+thread 3 → CPU6
+thread 4 → CPU7
+```
+
+Le scheduler est libre de choisir.
+
+Normalement, il devrait équilibrer, mais dans ton cas il ne le fait pas probablement à cause de ta configuration CPU isolés (`isolcpus`) ou d'un réglage temps réel.
+
+---
+
+### Vérification importante maintenant
+
+Donne :
+
+```bash
+cat /proc/cmdline
+```
+
+Je pense qu'on va trouver quelque chose comme :
+
+```text
+isolcpus=4-7
+nohz_full=4-7
+rcu_nocbs=4-7
+```
+
+Ces options désactivent l'équilibrage automatique du scheduler sur ces CPU.
+
+---
+
+### Test rapide pour confirmer
+
+Lance sans les CPU isolés :
+
+```bash
+taskset -c 0-3 stress-ng --cpu 4 --timeout 60s
+```
+
+Puis :
+
+```bash
+ps -eLo pid,tid,psr,pcpu,comm | grep stress-ng
+```
+
+Si tu obtiens par exemple :
+
+```
+CPU0
+CPU1
+CPU2
+CPU3
+```
+
+alors l'isolation est bien la cause.
+
+---
+
+### Pour UHD
+
+En environnement SDR/temps réel, ce comportement peut être recherché : on réserve les CPU et on affecte les threads manuellement.
+
+Par exemple :
+
+```bash
+taskset -c 4 ./rx_thread &
+taskset -c 6 ./tx_thread &
+```
+
+ou avec une application qui permet de régler l'affinité de ses threads.
+
+Mais si ton objectif est simplement d'utiliser `make -j4` pour compiler UHD, il vaut mieux compiler sur des CPU non isolés ou désactiver temporairement l'isolation pendant la compilation.
+
+
+###############################################################
+n'est t il pas possible de bien equilibré les process dans cpu4-7?
+*********************************************
+Oui, c'est possible, mais dans ton cas il faut d'abord comprendre pourquoi l'équilibrage automatique ne se fait pas.
+
+`taskset -c 4-7` crée un **cpuset d'autorisation**, pas un mécanisme de distribution. Normalement, le scheduler Linux devrait répartir les threads entre CPU4-7. Le fait que tes 4 threads restent tous sur CPU5 indique probablement que ces CPU ont un réglage spécial (isolation, affinité héritée, politique temps réel, etc.).
+
+### 1) Vérifier si les CPU 4-7 sont isolés
+
+Exécute :
+
+```bash
+cat /proc/cmdline
+```
+
+Si tu vois par exemple :
+
+```text
+isolcpus=4-7
+nohz_full=4-7
+rcu_nocbs=4-7
+```
+
+alors c'est la raison : ces CPU sont volontairement retirés de l'équilibrage normal du scheduler.
+
+---
+
+### 2) Forcer une répartition manuelle avec `taskset`
+
+`taskset` ne répartit pas les threads automatiquement. Pour tester, lance 4 workers séparés :
+
+```bash
+taskset -c 4 stress-ng --cpu 1 &
+taskset -c 5 stress-ng --cpu 1 &
+taskset -c 6 stress-ng --cpu 1 &
+taskset -c 7 stress-ng --cpu 1 &
+```
+
+Là tu forces :
+
+```
+worker 1 → CPU4
+worker 2 → CPU5
+worker 3 → CPU6
+worker 4 → CPU7
+```
+
+Tu devrais voir les 4 CPU chargés.
+
+---
+
+### 3) Utiliser `numactl` (si disponible)
+
+Pour certaines charges, tu peux aussi essayer :
+
+```bash
+numactl --physcpubind=4,5,6,7 stress-ng --cpu 4
+```
+
+Mais si les CPU sont isolés, cela ne garantit pas une distribution.
+
+---
+
+### 4) Pour un programme réel (comme UHD)
+
+La meilleure méthode est souvent de fixer chaque thread :
+
+* thread réception → CPU4
+* thread émission → CPU6
+* thread traitement → CPU8
+* etc.
+
+Avec UHD, on peut aussi utiliser les paramètres d'affinité des threads selon l'application.
+
+---
+
+Envoie-moi la sortie de :
+
+```bash
+cat /proc/cmdline
+```
+
+C'est l'information clé. Si `isolcpus` est présent, on pourra voir comment garder l'isolation tout en permettant un équilibrage contrôlé.
+
+
+##################################################################
+all numbers and ranges can be made cpuset-relative with +
+the old --cpubind argument is deprecated.
+use --cpunodebind or --physcpubind instead
+<length> can have g (GB), m (MB) or k (KB) suffixes
+root@nr:/home/nr# numactl -C 4,5,6,7 stress-ng --cpu 4
+libnuma: Warning: cpu argument 4,5,6,7 is out of range
+
+<4,5,6,7> is invalid
+usage: numactl [--all | -a] [--interleave= | -i <nodes>] [--preferred= | -p <node>]
+               [--physcpubind= | -C <cpus>] [--cpunodebind= | -N <nodes>]
+               [--membind= | -m <nodes>] [--localalloc | -l] command args ...
+       numactl [--show | -s]
+       numactl [--hardware | -H]
+       numactl [--length | -l <length>] [--offset | -o <offset>] [--shmmode | -M <shmmode>]
+               [--strict | -t]
+               [--shmid | -I <id>] --shm | -S <shmkeyfile>
+               [--shmid | -I <id>] --file | -f <tmpfsfile>
+               [--huge | -u] [--touch | -T] 
+               memory policy | --dump | -d | --dump-nodes | -D
+
+memory policy is --interleave | -i, --preferred | -p, --membind | -m, --localalloc | -l
+<nodes> is a comma delimited list of node numbers or A-B ranges or all.
+Instead of a number a node can also be:
+  netdev:DEV the node connected to network device DEV
+  file:PATH  the node the block device of path is connected to
+  ip:HOST    the node of the network device host routes through
+  block:PATH the node of block device path
+  pci:[seg:]bus:dev[:func] The node of a PCI device
+<cpus> is a comma delimited list of cpu numbers or A-B ranges or all
+all ranges can be inverted with !
+all numbers and ranges can be made cpuset-relative with +
+the old --cpubind argument is deprecated.
+use --cpunodebind or --physcpubind instead
+<length> can have g (GB), m (MB) or k (KB) suffixes
+root@nr:/home/nr# 
+*****************************************************************
+Le message de `numactl` est une information importante :
+
+```text
+libnuma: Warning: cpu argument 4,5,6,7 is out of range
+```
+
+Cela veut dire que **pour `numactl`, les CPU disponibles dans ton contexte ne sont pas 0-11**. Il voit probablement seulement un sous-ensemble de CPU (à cause de ton isolation, d'un cpuset/cgroup, ou d'une configuration système).
+
+Commence par vérifier ce que `numactl` voit :
+
+```bash
+numactl --hardware
+```
+
+Regarde la ligne :
+
+```text
+available: X nodes (0-X)
+node 0 cpus: ...
+```
+
+et aussi :
+
+```bash
+numactl --show
+```
+
+---
+
+Pour utiliser les CPU physiques 4-7 avec `numactl`, la syntaxe correcte est :
+
+```bash
+numactl --physcpubind=4,5,6,7 stress-ng --cpu 4
+```
+
+mais seulement si ces CPU sont réellement visibles par numactl.
+
+---
+
+Vu ton historique, il y a un indice fort : tu as probablement isolé des CPU. Vérifie :
+
+```bash
+cat /proc/cmdline
+```
+
+et aussi :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus
+```
+
+---
+
+Pour répondre à ta question initiale : **oui, on peut équilibrer les charges sur CPU4-7**, mais il faut que le scheduler ait le droit de faire de l'équilibrage sur ces CPU.
+
+Si tu as par exemple :
+
+```text
+isolcpus=4-7
+```
+
+alors `taskset -c 4-7` donne l'autorisation d'utiliser ces CPU, mais Linux évite volontairement d'y faire du load balancing.
+
+Dans ce cas, les solutions sont :
+
+1. **Retirer temporairement l'isolation** pour les tâches normales (compilation, tests) ;
+2. Garder l'isolation mais **affecter chaque thread manuellement** ;
+3. Utiliser des cgroups/cpuset configurés correctement.
+
+Pour voir ta situation exacte, donne-moi :
+
+```bash
+cat /proc/cmdline
+numactl --hardware
+cat /sys/fs/cgroup/cpuset.cpus
+```
+
+Avec ces trois sorties on saura pourquoi `numactl` ne voit pas CPU4-7 et comment forcer l'équilibrage.
+
+#################################################################################################################
+root@nr:/home/nr# numactl --show
+policy: default
+preferred node: current
+physcpubind: 0 1 2 3 
+cpubind: 0 
+nodebind: 0 
+membind: 0 
+root@nr:/home/nr# 
+
+***********************************************************************************************************
+Cette sortie explique pourquoi tu observes ce comportement :
+
+```text
+numactl --show
+
+physcpubind: 0 1 2 3
+```
+
+Dans ton environnement actuel, **numactl ne voit que les CPU 0-3 comme disponibles**. Les CPU 4-11 sont probablement masqués par une configuration de **cpuset/cgroup** ou une isolation CPU.
+
+C'est aussi cohérent avec ton test précédent :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+qui arrive à utiliser CPU5, donc le noyau connaît encore ces CPU, mais `numactl` et probablement certains mécanismes d'équilibrage ne les considèrent pas comme faisant partie du domaine normal.
+
+---
+
+### Vérifie la restriction cpuset
+
+Exécute :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus
+```
+
+et :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus.effective
+```
+
+Sur un système normal tu devrais voir quelque chose comme :
+
+```text
+0-11
+```
+
+Si tu vois :
+
+```text
+0-3
+```
+
+alors ton shell actuel est limité aux CPU 0-3 par un cgroup.
+
+---
+
+### Vérifie aussi l'isolation kernel
+
+Donne :
+
+```bash
+cat /proc/cmdline
+```
+
+On cherche des paramètres comme :
+
+```text
+isolcpus=4-11
+nohz_full=4-11
+rcu_nocbs=4-11
+```
+
+---
+
+### Pourquoi `taskset` arrive quand même à utiliser CPU5 ?
+
+Parce que `taskset` agit directement sur l'affinité du processus avec `sched_setaffinity()`. Il peut demander au noyau d'autoriser certains CPU si le cgroup le permet.
+
+Mais `numactl` utilise les informations NUMA/cpuset visibles dans son contexte, et il voit seulement :
+
+```text
+CPU0 CPU1 CPU2 CPU3
+```
+
+---
+
+### Pour ton objectif : équilibrer CPU4-7
+
+La première étape est de rendre ces CPU visibles dans le cpuset. Après correction, cette commande :
+
+```bash
+numactl --physcpubind=4,5,6,7 stress-ng --cpu 4
+```
+
+devrait fonctionner.
+
+Actuellement, la sortie :
+
+```text
+<4,5,6,7> is invalid
+```
+
+est normale puisque `numactl` ne les voit pas.
+
+Envoie-moi les sorties de :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus
+cat /sys/fs/cgroup/cpuset.cpus.effective
+cat /proc/cmdline
+```
+
+et on pourra identifier exactement ce qui bloque l'équilibrage.
+
+
+###############################################################################
+cat: /sys/fs/cgroup/cpuset.cpus: No such file or directory
+root@nr:/home/nr# cat /sys/fs/cgroup/cpuset.cpus.effective
+0-11
+root@nr:/home/nr# 
+***************************************************************
+Cette sortie change le diagnostic :
+
+```bash id="4q7m3a"
+cat /sys/fs/cgroup/cpuset.cpus.effective
+0-11
+```
+
+Donc **ce n'est pas un problème de cgroup/cpuset**. Ton processus a bien accès aux 12 CPU.
+
+Le comportement :
+
+```text
+stress-ng --cpu 4
+→ 4 threads
+→ tous sur CPU5
+```
+
+vient donc probablement du **scheduler + ta configuration d'isolation CPU** ou d'une affinité héritée.
+
+Il faut maintenant vérifier l'isolation.
+
+Donne :
+
+```bash id="k9m1xs"
+cat /proc/cmdline
+```
+
+---
+
+Une autre vérification utile :
+
+```bash id="4m6k9z"
+cat /sys/devices/system/cpu/isolated
+```
+
+Si tu obtiens par exemple :
+
+```text
+4-11
+```
+
+cela signifie que ces CPU sont isolés.
+
+---
+
+### Test pour confirmer le rôle de l'isolation
+
+Lance le même stress sur des CPU non isolés :
+
+```bash id="1lq5m8"
+taskset -c 0-3 stress-ng --cpu 4 --timeout 60s
+```
+
+Puis :
+
+```bash id="qj4m5a"
+mpstat -P ALL 1
+```
+
+Si CPU0-3 se répartissent correctement alors que CPU4-7 restent sur un seul CPU, l'isolation est bien la cause.
+
+---
+
+### Pour ton cas UHD
+
+Comme tu utilises un kernel :
+
+```text
+5.15.0-183-lowlatency
+```
+
+il est très probable que tu aies configuré une machine temps réel avec des CPU réservés. Dans ce contexte, Linux évite volontairement de déplacer les tâches entre les CPU isolés.
+
+La solution n'est pas forcément de supprimer l'isolation : pour UHD on peut garder des CPU dédiés et faire une **affinité par thread**.
+
+Mais avant de choisir la méthode, il faut voir :
+
+```bash id="8q0y1s"
+cat /proc/cmdline
+cat /sys/devices/system/cpu/isolated
+```
+
+Ces deux sorties vont montrer exactement comment tes CPU4-11 sont configurés.
+#######################################################################
+root@nr:/home/nr# cat /sys/devices/system/cpu/isolated
+4-11
+root@nr:/home/nr# 
+ j'ai isoler pour lancer seulement le programme de numactl
+ *******************************************************************
+ 
+ Voilà l'explication. Tu as :
+
+```bash id="9c4x6t"
+cat /sys/devices/system/cpu/isolated
+4-11
+```
+
+Donc les CPU **4 à 11 sont isolés**.
+
+Quand tu lances :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+tu dis au noyau :
+
+> "Ce programme peut utiliser uniquement les CPU 4,5,6,7."
+
+Mais ces CPU sont isolés. Le scheduler Linux **ne fait plus l'équilibrage automatique normal de charge sur ces CPU**. Il ne va donc pas forcément répartir les 4 threads entre CPU4-7. Résultat :
+
+```
+CPU5 = 100 %
+CPU4 = 0 %
+CPU6 = 0 %
+CPU7 = 0 %
+```
+
+Ce comportement est attendu avec une configuration d'isolation.
+
+---
+
+### Si ton objectif est d'avoir un programme sur les CPU isolés
+
+C'est généralement ce qu'on veut en temps réel : on réserve des CPU et on place soi-même les threads.
+
+Par exemple, pour tester une répartition manuelle :
+
+```bash
+taskset -c 4 stress-ng --cpu 1 &
+taskset -c 5 stress-ng --cpu 1 &
+taskset -c 6 stress-ng --cpu 1 &
+taskset -c 7 stress-ng --cpu 1 &
+```
+
+Là tu imposes :
+
+```
+worker 1 → CPU4
+worker 2 → CPU5
+worker 3 → CPU6
+worker 4 → CPU7
+```
+
+Tu verras les quatre CPU chargés.
+
+---
+
+### Si tu veux que Linux équilibre automatiquement
+
+Il faut enlever l'isolation de ces CPU.
+
+Tu as probablement un paramètre dans GRUB comme :
+
+```text
+isolcpus=4-11
+```
+
+Après suppression (puis redémarrage), le scheduler pourra équilibrer normalement.
+
+---
+
+### Pour UHD / USRP
+
+Dans ton cas, je ne supprimerais pas forcément l'isolation. La pratique habituelle est :
+
+* CPU isolés → threads temps réel UHD
+* CPU non isolés (0-3) → système, compilation, services
+
+Mais il faut ensuite fixer les threads UHD sur les CPU voulus.
+
+Pour connaître exactement tes paramètres actuels :
+
+```bash
+cat /proc/cmdline
+```
+
+et on pourra voir si tu as aussi :
+
+* `nohz_full=4-11`
+* `rcu_nocbs=4-11`
+
+qui sont souvent utilisés avec `isolcpus`.
+
+##################################################################################################
+mais je veux que le systeme n'utilise pas ses cpu pour l'interface graphique et autres du systéme rélle. comment ca l'ordonnanceur est bien regroupé. comment je fais?
+************************************************************************************************
+
+Tu veux en fait le comportement classique d'une machine temps réel :
+
+* **CPU isolés (ex: 4-11)** → réservés aux applications temps réel (UHD, SDR, calcul)
+* **CPU système (ex: 0-3)** → GNOME, services, interruptions, tâches normales
+* mais tu veux quand même que **ton application répartisse ses threads entre les CPU isolés**.
+
+C'est possible, mais il faut distinguer deux choses :
+
+1. **Isolation du scheduler** : empêcher le système d'envahir les CPU réservés.
+2. **Affinité des threads de ton application** : décider où tes threads tournent.
+
+`isolcpus` fait surtout le premier point. Il **désactive volontairement une partie de l'équilibrage automatique** sur ces CPU. Il ne crée pas un "scheduler équilibré dédié" pour ton groupe isolé.
+
+---
+
+### La méthode recommandée
+
+Garde :
+
+```text
+isolcpus=4-11
+```
+
+Puis lance ton application avec une affinité :
+
+```bash
+taskset -c 4-11 ./mon_programme
+```
+
+Mais si ton programme crée plusieurs threads, il faut que **chaque thread soit distribué**.
+
+Pour tester, tu peux utiliser :
+
+```bash
+taskset -c 4 ./thread1 &
+taskset -c 5 ./thread2 &
+taskset -c 6 ./thread3 &
+taskset -c 7 ./thread4 &
+```
+
+Là aucun service système ne viendra sur ces CPU, et chaque charge est séparée.
+
+---
+
+### Pour UHD
+
+La bonne approche est souvent :
+
+* réserver par exemple :
+
+  * CPU 0-3 : système
+  * CPU 4-7 : RX/TX UHD
+  * CPU 8-11 : traitement DSP
+
+Puis affecter les threads.
+
+Tu peux aussi utiliser les paramètres noyau complémentaires :
+
+```
+isolcpus=4-11
+nohz_full=4-11
+rcu_nocbs=4-11
+```
+
+qui réduisent encore les interruptions/ticks sur les CPU temps réel.
+
+---
+
+### Vérifier que le système reste hors des CPU isolés
+
+Pendant que ton application tourne :
+
+```bash
+watch -n1 'ps -eo pid,psr,comm | grep -v "\["'
+```
+
+ou :
+
+```bash
+htop
+```
+
+Tu dois voir les processus système principalement sur CPU0-3.
+
+---
+
+### Pour le cas `stress-ng`
+
+Ton test n'est pas représentatif d'une application temps réel. `stress-ng --cpu 4` crée 4 threads, mais ne leur attribue pas chacun un CPU. Avec des CPU isolés, le scheduler ne va pas forcément les disperser.
+
+Pour tester ton objectif, utilise plutôt :
+
+```bash
+taskset -c 4 stress-ng --cpu 1 &
+taskset -c 5 stress-ng --cpu 1 &
+taskset -c 6 stress-ng --cpu 1 &
+taskset -c 7 stress-ng --cpu 1 &
+```
+
+Tu obtiendras bien 4 CPU réservés chargés, sans toucher au système.
+
+---
+
+Donc la réponse courte : **tu as déjà fait la partie "protéger les CPU". Pour avoir un équilibrage sur ces CPU isolés, il faut le faire au niveau des threads de l'application (ou avec un outil d'orchestration), car `isolcpus` désactive justement l'équilibrage automatique global.**
+
+
+############################################################################
+en lacant avec taskset -c 4 stress-ng --cpu 1 &
+taskset -c 5 stress-ng --cpu 1 &
+taskset -c 6 stress-ng --cpu 1 &
+taskset -c 7 stress-ng --cpu 1 & ca marche , ca repartie les charge à100% sur tout les processeurs mais en faisant taskset -c 4-7 ca marche pas
+
+**********************************************************************************
+Oui, ton observation est exactement le comportement attendu avec des CPU isolés.
+
+Quand tu fais :
+
+```bash
+taskset -c 4 stress-ng --cpu 1 &
+taskset -c 5 stress-ng --cpu 1 &
+taskset -c 6 stress-ng --cpu 1 &
+taskset -c 7 stress-ng --cpu 1 &
+```
+
+tu imposes explicitement :
+
+```
+processus 1 → CPU4
+processus 2 → CPU5
+processus 3 → CPU6
+processus 4 → CPU7
+```
+
+Donc la charge est répartie.
+
+Par contre :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+fait seulement :
+
+```
+processus 1
+ ├─ thread 1
+ ├─ thread 2
+ ├─ thread 3
+ └─ thread 4
+
+affinité autorisée : CPU4,5,6,7
+```
+
+Le scheduler a le droit de mettre les 4 threads n'importe où dans ce masque. Avec `isolcpus=4-11`, il ne fait pas le load balancing normal sur ces CPU. Il peut donc laisser les 4 threads sur un seul CPU (CPU5 dans ton test).
+
+---
+
+### Pour obtenir le comportement que tu veux
+
+Il faut un mécanisme qui distribue les threads.
+
+Quelques possibilités :
+
+#### 1) Le faire dans l'application (meilleure solution pour UHD)
+
+Chaque thread reçoit sa propre affinité CPU avec `pthread_setaffinity_np()`.
+
+Exemple logique :
+
+```
+thread RX  → CPU4
+thread DSP → CPU6
+thread TX  → CPU8
+thread IO  → CPU10
+```
+
+C'est la méthode utilisée pour les applications temps réel.
+
+---
+
+#### 2) Utiliser `taskset` plusieurs fois (comme ton test)
+
+Pour un programme qui accepte plusieurs instances :
+
+```bash
+taskset -c 4 programme &
+taskset -c 5 programme &
+taskset -c 6 programme &
+taskset -c 7 programme &
+```
+
+---
+
+#### 3) Désactiver seulement l'isolation sur ces CPU
+
+Si ton but est plutôt "je veux que le scheduler Linux répartisse automatiquement", alors il faut enlever :
+
+```
+isolcpus=4-11
+```
+
+Après redémarrage :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+devrait se répartir beaucoup mieux.
+
+---
+
+Pour UHD, je garderais l'isolation. Le but n'est pas d'avoir un équilibrage automatique, mais d'avoir des CPU **réservés et prévisibles**. La bonne solution est alors de fixer les threads UHD sur des CPU précis plutôt que de compter sur le scheduler.
+
+#######################################################################################################
+je veux pas de isolcpu, je veux que le noyau utilise par defaut seulement cpu 0-3 pour l'interface graphique et l'os en generale et cpu 4-11 pour lancer gnb
+
+***********************************************************
+D'accord, dans ce cas ton objectif est différent : tu ne veux **pas isoler les CPU 4-11**, tu veux plutôt faire une **séparation de charge par défaut** :
+
+* CPU **0-3** → système, interface graphique, services Linux
+* CPU **4-11** → application `gNB` (5G NR)
+* et tu veux que le scheduler puisse équilibrer les threads du gNB sur 4-11.
+
+Dans ce cas, **`isolcpus` n'est pas le bon outil**. `isolcpus` retire justement ces CPU de l'équilibrage normal.
+
+La méthode adaptée est d'utiliser les **cpusets/cgroups**.
+
+---
+
+## 1) Supprimer l'isolation CPU
+
+Dans ton GRUB tu dois enlever :
+
+```text
+isolcpus=4-11
+```
+
+Vérifie d'abord :
+
+```bash
+cat /proc/cmdline
+```
+
+Puis modifie :
+
+```bash
+nano /etc/default/grub
+```
+
+Cherche :
+
+```text
+GRUB_CMDLINE_LINUX_DEFAULT="..."
+```
+
+Supprime les paramètres :
+
+```text
+isolcpus=4-11
+nohz_full=4-11
+rcu_nocbs=4-11
+```
+
+Puis :
+
+```bash
+update-grub
+reboot
+```
+
+Après redémarrage :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+doit être vide.
+
+---
+
+## 2) Créer un groupe CPU pour le gNB
+
+Avec cgroup v2 (ton système semble être en v2), crée un groupe :
+
+```bash
+mkdir -p /sys/fs/cgroup/gnb
+```
+
+Affecte les CPU :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+Lance ton gNB dans ce groupe :
+
+```bash
+echo $$ > /sys/fs/cgroup/gnb/cgroup.procs
+```
+
+ou directement avec systemd :
+
+```bash
+systemd-run --unit=gnb --property=AllowedCPUs=4-11 ./gnb
+```
+
+---
+
+## 3) Garder le système sur CPU 0-3
+
+Tu peux aussi créer un groupe système :
+
+```bash
+mkdir -p /sys/fs/cgroup/system
+echo 0-3 > /sys/fs/cgroup/system/cpuset.cpus
+```
+
+Les services graphiques peuvent rester dessus.
+
+---
+
+## Résultat attendu
+
+Après ça :
+
+* Le scheduler fonctionne normalement.
+* Les threads gNB avec plusieurs workers seront répartis sur CPU4-11.
+* GNOME et les services restent principalement sur CPU0-3.
+* Tu n'auras plus le problème observé :
+
+```text
+CPU5 100%
+CPU4 0%
+CPU6 0%
+CPU7 0%
+```
+
+---
+
+Pour une station 5G avec gNB, c'est généralement une meilleure approche que `isolcpus` si tu veux garder un système utilisable tout en réservant une partie des ressources.
+
+Vu ton kernel :
+
+```text
+5.15.0-183-lowlatency
+```
+
+et ta machine 12 threads, cette approche cgroup/systemd est bien adaptée.
+
+##################################################################################
+
+
+^C
+root@nr:/home/nr# cat /sys/fs/cgroup/system/cpuset.cpus
+cat: /sys/fs/cgroup/system/cpuset.cpus: No such file or directory
+root@nr:/home/nr# 
+
+
+
+***************************************************************************
+
+L'erreur :
+
+```bash
+cat: /sys/fs/cgroup/system/cpuset.cpus: No such file or directory
+```
+
+est normale dans ton cas. Tu es sur un système **cgroup v2**, et dans cgroup v2 les fichiers ne sont pas forcément créés comme dans l'ancien cgroup v1.
+
+On a déjà vu :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus.effective
+0-11
+```
+
+Donc ton système voit bien tous les CPU.
+
+Pour créer une séparation **CPU 0-3 pour le système / CPU 4-11 pour gNB**, il faut d'abord activer le contrôleur cpuset dans cgroup v2.
+
+Vérifie :
+
+```bash
+cat /sys/fs/cgroup/cgroup.controllers
+```
+
+Tu dois voir quelque chose comme :
+
+```text
+cpuset cpu memory io pids ...
+```
+
+Puis regarde le groupe racine :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus
+```
+
+(s'il n'existe pas, c'est parce qu'aucune valeur n'est définie explicitement au niveau racine)
+
+Crée ton groupe gNB :
+
+```bash
+mkdir /sys/fs/cgroup/gnb
+```
+
+Puis configure :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+Vérifie :
+
+```bash
+cat /sys/fs/cgroup/gnb/cpuset.cpus
+```
+
+Tu dois obtenir :
+
+```text
+4-11
+```
+
+Ensuite lance ton gNB dans ce groupe :
+
+```bash
+echo $$ > /sys/fs/cgroup/gnb/cgroup.procs
+```
+
+ou pour un lancement direct :
+
+```bash
+systemd-run --scope -p AllowedCPUs=4-11 ./ton_gnb
+```
+
+---
+
+Mais avant tout, il faut enlever `isolcpus=4-11`, sinon tu garderas le comportement que tu as observé avec `stress-ng`.
+
+Vérifie :
+
+```bash
+cat /proc/cmdline
+```
+
+Si tu as :
+
+```text
+isolcpus=4-11
+```
+
+supprime-le de `/etc/default/grub`, puis :
+
+```bash
+update-grub
+reboot
+```
+
+Après redémarrage :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+doit afficher vide.
+
+Ensuite :
+
+```bash
+taskset -c 4-11 stress-ng --cpu 4
+```
+
+devrait pouvoir être équilibré par le scheduler, contrairement à ton test actuel.
+
+
+
+###################################################################################
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems ca veut dire quoi echo 0 ?
+
+*****************************************************************************
+
+La ligne :
+
+```bash
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+sert à définir **le nœud mémoire NUMA** auquel le groupe `gnb` peut accéder.
+
+Explication :
+
+* `cpuset.cpus` → définit **quels CPU** le groupe peut utiliser.
+* `cpuset.mems` → définit **quels nœuds mémoire NUMA** le groupe peut utiliser.
+
+Dans ton cas, ta commande :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+```
+
+signifie :
+
+> Les processus dans le groupe `gnb` peuvent être exécutés uniquement sur les CPU 4 à 11.
+
+Et :
+
+```bash
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+signifie :
+
+> Les allocations mémoire de ces processus doivent venir du nœud NUMA 0.
+
+---
+
+Dans ta machine, `lscpu` a montré :
+
+```
+CPU NODE
+0-11   0
+```
+
+Donc tu as :
+
+* un seul nœud NUMA : **node 0**
+* tous les CPU appartiennent au même nœud mémoire
+
+Donc `echo 0` est correct.
+
+Tu peux vérifier avec :
+
+```bash
+numactl --hardware
+```
+
+Tu devrais voir quelque chose comme :
+
+```
+available: 1 nodes (0)
+node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11
+```
+
+---
+
+Si tu avais une machine avec deux sockets CPU, par exemple :
+
+```
+node 0 : CPU 0-15
+node 1 : CPU 16-31
+```
+
+alors il faudrait choisir le bon nœud mémoire :
+
+```bash
+echo 1 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+pour garder les données proches des CPU.
+
+Dans ta machine actuelle, `cpuset.mems=0` ne limite pas vraiment la mémoire, car il n'y a qu'un seul nœud NUMA.
+
+
+##########################################################*
+signifie :
+
+Les allocations mémoire de ces processus doivent venir du nœud NUMA 0.  c'est quoi NUMA 0?
+
+***************************************************************
+
+**NUMA 0** désigne le **nœud mémoire numéro 0** dans l'architecture NUMA de la machine.
+
+NUMA signifie **Non-Uniform Memory Access** (accès mémoire non uniforme). C'est une architecture où les CPU sont regroupés avec des zones de mémoire qui leur sont physiquement proches.
+
+Sur une grosse machine avec plusieurs sockets CPU, on peut avoir par exemple :
+
+```
+        Socket 0                 Socket 1
+     CPU 0-15                  CPU 16-31
+        |                         |
+     RAM locale 0              RAM locale 1
+     NUMA node 0               NUMA node 1
+```
+
+Un CPU du **nœud NUMA 0** accède plus rapidement à sa mémoire locale qu'à la mémoire du nœud NUMA 1.
+
+---
+
+Dans **ta machine**, d'après ton `lscpu -e` :
+
+```
+CPU NODE
+0    0
+1    0
+2    0
+...
+11   0
+```
+
+Tous les CPU appartiennent à :
+
+```
+NUMA node 0
+```
+
+Donc ta machine n'a qu'un seul domaine mémoire :
+
+```
+              NUMA node 0
+        +----------------------+
+        | RAM                  |
+        |                      |
+        | CPU0 CPU1 ... CPU11  |
+        +----------------------+
+```
+
+Il n'y a pas de différence de distance mémoire entre CPU4 et CPU10.
+
+Donc cette commande :
+
+```bash
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+veut simplement dire :
+
+> "Le groupe gNB utilise la mémoire disponible du seul nœud mémoire existant."
+
+Elle est nécessaire pour que le cpuset soit valide, mais elle n'apporte pas de gain de performance sur ta machine.
+
+Pour ton cas (gNB 5G), les réglages importants sont plutôt :
+
+* `cpuset.cpus = 4-11` → réserver les CPU pour gNB
+* affinité des threads gNB
+* éviter que l'interface graphique utilise ces CPU
+* éventuellement régler les IRQ réseau/USRP sur les CPU dédiés
+
+Le NUMA devient surtout important sur des serveurs à **2 sockets ou plus**.
+
+
+##########################################################################
+
+NUMA 0 veut dire barette numero 1?
+
+*********************************************
+
+Non. **NUMA 0 ne veut pas dire "barrette mémoire numéro 1".**
+
+Un **nœud NUMA** est une **zone logique d'architecture mémoire/CPU**, pas une barrette RAM individuelle.
+
+Dans ton cas, avec ta sortie :
+
+```text
+CPU NODE
+0    0
+1    0
+2    0
+...
+11   0
+```
+
+cela veut dire :
+
+* Tous tes CPU appartiennent au **nœud NUMA 0**
+* Toute ta RAM est attachée à ce même nœud NUMA 0
+* Le système ne distingue pas tes barrettes RAM une par une
+
+Schéma simplifié de ta machine :
+
+```
+             NUMA node 0
+        +--------------------+
+        |                    |
+        | CPU0 ... CPU11     |
+        |                    |
+        | RAM totale         |
+        | DIMM1 DIMM2 ...    |
+        +--------------------+
+```
+
+Les barrettes DIMM sont des modules physiques branchés sur la carte mère. Le BIOS et le contrôleur mémoire les regroupent derrière un ou plusieurs nœuds NUMA selon l'architecture.
+
+Sur une machine bi-socket, on pourrait avoir :
+
+```
+NUMA node 0              NUMA node 1
+
+CPU0-15                  CPU16-31
+RAM proche               RAM proche
+(DIMM A,B)               (DIMM C,D)
+```
+
+Là, on pourrait parler de mémoire locale au NUMA 0 ou au NUMA 1.
+
+Pour voir comment ta RAM est organisée, tu peux regarder :
+
+```bash
+numactl --hardware
+```
+
+et éventuellement :
+
+```bash
+dmidecode -t memory
+```
+
+Mais avec ton processeur actuel, il est très probable que toutes tes barrettes soient dans **NUMA node 0**.
+
+
+#####################################################
+
+explique : root@nr:/home/nr# cat /sys/fs/cgroup/cpuset.cpus.effective
+0-11
+root@nr:/home/nr# 
+
+********************************************************************
+
+La commande :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus.effective
+```
+
+affiche :
+
+```text
+0-11
+```
+
+Cela signifie :
+
+> Le groupe cgroup dans lequel ton shell actuel se trouve a le droit d'utiliser les CPU logiques 0 à 11.
+
+Autrement dit, **aucun CPU n'est interdit par le cgroup**.
+
+Dans ton cas, ton processeur expose 12 CPU logiques :
+
+```text
+CPU0
+CPU1
+CPU2
+...
+CPU11
+```
+
+Donc :
+
+```text
+0-11
+```
+
+est équivalent à :
+
+```text
+0,1,2,3,4,5,6,7,8,9,10,11
+```
+
+Ton shell `root@nr` peut donc être exécuté sur n'importe lequel des 12 CPU.
+
+---
+
+Il faut bien distinguer plusieurs mécanismes :
+
+### 1) `cpuset.cpus.effective`
+
+C'est une **limitation par cgroup**.
+
+Exemple :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+```
+
+Un processus placé dans ce groupe verra :
+
+```bash
+cat /sys/fs/cgroup/gnb/cpuset.cpus.effective
+```
+
+donner :
+
+```text
+4-11
+```
+
+Il ne pourra tourner que sur ces CPU.
+
+---
+
+### 2) `taskset`
+
+C'est une **affinité d'un processus particulier**.
+
+Exemple :
+
+```bash
+taskset -c 4-7 programme
+```
+
+Le processus peut utiliser uniquement :
+
+```text
+CPU4 CPU5 CPU6 CPU7
+```
+
+Mais le reste du système n'est pas affecté.
+
+---
+
+### 3) `isolcpus`
+
+C'est une **option du noyau au démarrage**.
+
+Dans ton cas :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+retourne :
+
+```text
+4-11
+```
+
+Cela veut dire :
+
+* CPU4-11 sont isolés du scheduler général
+* les tâches normales du système évitent ces CPU
+* mais ils restent utilisables avec `taskset`
+
+C'est pour cela que tu as vu :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+donner :
+
+```
+CPU5 100%
+```
+
+Le cgroup autorise bien 0-11, mais l'isolation modifie le comportement du scheduler.
+
+---
+
+Dans ton objectif :
+
+```
+CPU0-3  → OS + interface graphique
+CPU4-11 → gNB
+```
+
+le plus propre est :
+
+* enlever `isolcpus=4-11`
+* créer un cgroup `gnb` avec `cpuset.cpus=4-11`
+* lancer le gNB dans ce cgroup
+
+Ainsi :
+
+```
+Scheduler normal actif
+        |
+        +-- OS → CPU0-3
+        |
+        +-- gNB → CPU4-11
+```
+
+et le scheduler pourra équilibrer les threads du gNB entre CPU4-11.
+
+
+#####################################################################
+
+quel cgroup?
+
+**************************************************************
+
+Dans ton cas, il faut utiliser le **cgroup v2 avec le contrôleur `cpuset`**.
+
+Tu l'as déjà confirmé avec :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus.effective
+```
+
+qui retourne :
+
+```text
+0-11
+```
+
+Cela indique que tu es dans l'arborescence **cgroup v2** (`/sys/fs/cgroup/`).
+
+Le cgroup à créer serait par exemple un groupe nommé **gnb** :
+
+```bash
+mkdir /sys/fs/cgroup/gnb
+```
+
+Ce groupe sera un "conteneur CPU" pour ton application gNB.
+
+Ensuite :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+```
+
+signifie :
+
+> Les processus placés dans le groupe `gnb` peuvent seulement utiliser les CPU 4 à 11.
+
+Et :
+
+```bash
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+signifie :
+
+> Utiliser le nœud mémoire NUMA 0 (dans ton cas il n'y en a qu'un).
+
+Ensuite tu lances ton gNB dans ce groupe.
+
+Exemple simple :
+
+```bash
+echo $$ > /sys/fs/cgroup/gnb/cgroup.procs
+```
+
+Cela déplace **ton shell actuel** dans le groupe `gnb`. Tous les programmes lancés depuis ce shell hériteront de cette restriction.
+
+Pour un seul lancement, il vaut mieux faire :
+
+```bash
+systemd-run --scope -p AllowedCPUs=4-11 ./ton_gnb
+```
+
+ou si ton gNB est lancé par un service systemd, mettre :
+
+```ini
+[Service]
+AllowedCPUs=4-11
+```
+
+---
+
+Par contre, avant de faire cela, il faut retirer :
+
+```text
+isolcpus=4-11
+```
+
+car actuellement tu as :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+qui donne :
+
+```text
+4-11
+```
+
+Avec `isolcpus`, le scheduler n'équilibrera pas correctement les threads du gNB entre CPU4-11. Le cgroup limite les CPU disponibles, mais **ne remplace pas l'équilibrage du scheduler**.
+
+Donc l'ordre correct pour ton objectif est :
+
+1. Supprimer `isolcpus=4-11` dans GRUB.
+2. Redémarrer.
+3. Vérifier :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+→ doit être vide.
+
+4. Créer le cgroup `gnb` avec `cpuset.cpus=4-11`.
+5. Lancer le gNB dans ce cgroup.
+
+Ainsi tu obtiens exactement :
+
+```
+CPU0-3   : système + interface graphique
+CPU4-11  : gNB uniquement
+```
+
+avec équilibrage normal des threads gNB.
+
+
+########################################################################################################
+
+si je veux que l'interface graphique et tout ce qui est par rapport au usespace de OS sois ordonnancé seulement par cpu0àcpu3 comment je fais?
+
+********************************************************
+
+Si ton objectif est :
+
+* **CPU 0-3** → uniquement le système (interface graphique, services, applications utilisateur normales)
+* **CPU 4-11** → uniquement le gNB
+
+alors il faut faire l'inverse d'une simple limitation du gNB : il faut **placer les tâches système dans un groupe CPU 0-3** et le gNB dans un groupe CPU 4-11.
+
+Mais il faut savoir une chose importante : **Linux ne fournit pas un bouton "tout l'espace utilisateur va sur CPU0-3" par défaut**. Il faut le configurer avec des **cgroups cpuset** (ou systemd qui utilise les cgroups).
+
+La méthode propre est :
+
+---
+
+### 1) Ne pas utiliser `isolcpus`
+
+Enlève :
+
+```text
+isolcpus=4-11
+```
+
+car cela empêche le scheduler de faire son équilibrage normal.
+
+Après redémarrage :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+doit être vide.
+
+---
+
+### 2) Créer un groupe pour le gNB
+
+```bash
+mkdir /sys/fs/cgroup/gnb
+```
+
+Puis :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+Le gNB sera lancé dans ce groupe.
+
+---
+
+### 3) Créer un groupe pour les tâches système
+
+Créer un groupe :
+
+```bash
+mkdir /sys/fs/cgroup/system
+```
+
+Puis :
+
+```bash
+echo 0-3 > /sys/fs/cgroup/system/cpuset.cpus
+echo 0 > /sys/fs/cgroup/system/cpuset.mems
+```
+
+---
+
+### 4) Déplacer les services système dans CPU0-3
+
+Avec systemd, on peut créer une politique globale.
+
+Par exemple créer :
+
+```bash
+mkdir -p /etc/systemd/system/system.slice.d/
+nano /etc/systemd/system/system.slice.d/cpu.conf
+```
+
+Mettre :
+
+```ini
+[Slice]
+AllowedCPUs=0-3
+```
+
+Puis :
+
+```bash
+systemctl daemon-reload
+systemctl restart system.slice
+```
+
+Les services système seront alors limités aux CPU0-3.
+
+---
+
+### 5) Lancer le gNB dans CPU4-11
+
+Exemple :
+
+```bash
+systemd-run --scope -p AllowedCPUs=4-11 ./gnb
+```
+
+ou dans un service :
+
+```ini
+[Service]
+AllowedCPUs=4-11
+```
+
+---
+
+### Vérification
+
+Pour voir où tourne un processus :
+
+```bash
+ps -eLo pid,psr,comm
+```
+
+Exemple attendu :
+
+```
+PID     PSR    COMMAND
+xxxx      2    gnome-shell
+xxxx      1    systemd
+xxxx      6    gnb
+xxxx      9    gnb
+```
+
+---
+
+Une remarque pour ton cas 5G : souvent on ne force pas **tout** l'OS sur CPU0-3, car certains éléments bas niveau (IRQ réseau, pilotes USRP, interruptions matérielles) peuvent être mieux placés sur les CPU réservés au gNB. On fait plutôt :
+
+* CPU0-3 : GUI + services non critiques
+* CPU4-11 : gNB + threads temps réel + IRQ associées
+
+Mais ta stratégie "OS sur 0-3, gNB sur 4-11" est réalisable avec les cgroups/systemd.
+
+
+######################################################################
+
+
+echo 0-3 > /sys/fs/cgroup/system/cpuset.cpus
+echo 0 > /sys/fs/cgroup/system/cpuset.mems
+
+**********************************************
+
+
+Ces deux commandes veulent dire :
+
+```bash
+echo 0-3 > /sys/fs/cgroup/system/cpuset.cpus
+```
+
+➡️ Dans le **cgroup nommé `system`**, on autorise uniquement les CPU logiques **0, 1, 2 et 3**.
+
+Autrement dit, tout processus placé dans ce cgroup pourra être exécuté seulement sur :
+
+```
+CPU0
+CPU1
+CPU2
+CPU3
+```
+
+---
+
+```bash
+echo 0 > /sys/fs/cgroup/system/cpuset.mems
+```
+
+➡️ On indique le **nœud mémoire NUMA autorisé**.
+
+Dans ta machine, tu as :
+
+```
+NUMA node 0
+```
+
+pour tous les CPU et toute la mémoire, donc :
+
+```
+0
+```
+
+est le seul choix possible.
+
+---
+
+Mais attention : **ces commandes seules ne déplacent pas les processus existants**.
+
+Créer :
+
+```
+/sys/fs/cgroup/system
+```
+
+et mettre :
+
+```
+cpuset.cpus = 0-3
+```
+
+crée seulement une "boîte" CPU. Il faut ensuite déplacer des processus dedans.
+
+Par exemple, pour un processus existant :
+
+```bash
+echo PID > /sys/fs/cgroup/system/cgroup.procs
+```
+
+Exemple :
+
+```bash
+echo 1234 > /sys/fs/cgroup/system/cgroup.procs
+```
+
+déplace le processus 1234 vers CPU0-3.
+
+---
+
+Autre point important dans ton cas : le cgroup racine a actuellement :
+
+```bash
+cat /sys/fs/cgroup/cpuset.cpus.effective
+```
+
+qui donne :
+
+```
+0-11
+```
+
+Donc par défaut, **tous les processus continuent d'avoir accès à tous les CPU**.
+
+Pour obtenir :
+
+```
+OS       → CPU0-3
+gNB      → CPU4-11
+```
+
+il faut organiser les cgroups de façon hiérarchique :
+
+```
+/sys/fs/cgroup/
+│
+├── system
+│     cpuset.cpus = 0-3
+│
+└── gnb
+      cpuset.cpus = 4-11
+```
+
+puis lancer les programmes dans le bon groupe.
+
+---
+
+Comme tu utilises Ubuntu avec systemd, la méthode la plus propre n'est généralement pas de déplacer tout l'OS manuellement, mais de créer un **service systemd pour le gNB** avec :
+
+```ini
+AllowedCPUs=4-11
+```
+
+et de laisser systemd gérer les services système.
+
+Avant de modifier ces cgroups, il faut vérifier une chose : tu es bien en **cgroup v2** et le contrôleur cpuset est activé. Donne :
+
+```bash
+cat /sys/fs/cgroup/cgroup.controllers
+```
+
+pour confirmer.
+
+
+
+
+
+#################################################################################################
+
+est ce seulement les user-space qui est cpu set 0-3?
+
+
+*************************************************************
+
+Non. Un **cpuset de cgroup ne s'applique pas uniquement au user-space**.
+
+Un cpuset s'applique aux **processus (tâches Linux)** placés dans ce cgroup, qu'ils soient :
+
+* des programmes user-space (`gnome-shell`, navigateur, gNB, applications...)
+* des services système (`systemd`, sshd, NetworkManager, etc.)
+* des démons en arrière-plan
+
+En revanche, il faut distinguer les **threads noyau (kernel threads)**.
+
+### Ce qui peut être limité par cpuset
+
+Exemple :
+
+```bash
+echo 0-3 > /sys/fs/cgroup/system/cpuset.cpus
+```
+
+Si un processus est placé dans ce cgroup :
+
+```
+processus
+ ├── thread 1
+ ├── thread 2
+ └── thread 3
+```
+
+tous ses threads seront limités à :
+
+```
+CPU0 CPU1 CPU2 CPU3
+```
+
+---
+
+### Ce qui n'est pas automatiquement déplacé
+
+Les threads noyau comme :
+
+```
+kworker
+rcu_preempt
+migration
+irq/*
+```
+
+ne sont pas simplement déplacés par un cpuset utilisateur.
+
+Pour un système temps réel (comme UHD/gNB), il faut aussi gérer :
+
+* les IRQ matérielles
+* les threads kernel
+* les timers
+* les services systemd
+
+par d'autres mécanismes.
+
+---
+
+Dans ton objectif :
+
+```
+CPU0-3  → OS + interface graphique
+CPU4-11 → gNB
+```
+
+un cgroup `gnb` avec :
+
+```bash
+cpuset.cpus = 4-11
+```
+
+garantit que **le gNB et ses threads restent sur 4-11**.
+
+Mais pour garantir que **GNOME et les applications utilisateur restent sur 0-3**, il faut aussi placer leurs cgroups systemd dans un groupe CPU0-3. Ce n'est pas automatique.
+
+---
+
+Une architecture plus réaliste serait :
+
+```
+CPU0-3
+ ├─ systemd
+ ├─ gnome-shell
+ ├─ NetworkManager
+ ├─ SSH
+ └─ services OS
+
+CPU4-11
+ ├─ gNB
+ ├─ threads DSP
+ └─ traitements radio
+```
+
+Pour une machine gNB, il faut aussi regarder les IRQ :
+
+```bash
+cat /proc/interrupts
+```
+
+car une carte réseau ou une USRP peut générer des interruptions sur les CPU que tu voulais réserver.
+
+Donc la réponse courte : **non, cpuset ne limite pas seulement le user-space ; il limite les processus placés dedans. Mais il ne transforme pas automatiquement tous les éléments du noyau en "CPU0-3 uniquement".**
+
+
+
+#########################################################################
+
+
+Une architecture plus réaliste serait :
+
+CPU0-3
+ ├─ systemd
+ ├─ gnome-shell
+ ├─ NetworkManager
+ ├─ SSH
+ └─ services OS
+
+CPU4-11
+ ├─ gNB
+ ├─ threads DSP
+ └─ traitements radio  comment on fait?
+ 
+ 
+ *****************************************************************
+ 
+ 
+ Pour obtenir cette architecture :
+
+```
+CPU0-3
+ ├─ systemd
+ ├─ gnome-shell
+ ├─ NetworkManager
+ ├─ SSH
+ └─ services OS
+
+CPU4-11
+ ├─ gNB
+ ├─ threads DSP
+ └─ traitements radio
+```
+
+la méthode moderne est d'utiliser **systemd + cgroups v2**, pas `isolcpus`.
+
+L'idée est :
+
+* ne pas isoler les CPU 4-11 ;
+* laisser le scheduler Linux fonctionner normalement ;
+* placer le **gNB** dans un cgroup limité à CPU4-11 ;
+* limiter les services système à CPU0-3.
+
+---
+
+## 1) Vérifier que `isolcpus` est supprimé
+
+Actuellement tu as :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+qui donne :
+
+```
+4-11
+```
+
+Donc il faut d'abord enlever l'isolation.
+
+Vérifie :
+
+```bash
+cat /proc/cmdline
+```
+
+Si tu vois :
+
+```
+isolcpus=4-11
+```
+
+édite :
+
+```bash
+nano /etc/default/grub
+```
+
+Supprime :
+
+```
+isolcpus=4-11
+```
+
+Puis :
+
+```bash
+update-grub
+reboot
+```
+
+Après redémarrage :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+doit être vide.
+
+---
+
+## 2) Créer un groupe CPU pour le gNB
+
+Créer un cgroup :
+
+```bash
+mkdir /sys/fs/cgroup/gnb
+```
+
+Définir ses CPU :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+```
+
+Définir la mémoire NUMA :
+
+```bash
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+Vérifier :
+
+```bash
+cat /sys/fs/cgroup/gnb/cpuset.cpus
+```
+
+Résultat :
+
+```
+4-11
+```
+
+---
+
+## 3) Lancer le gNB dans ce groupe
+
+Exemple :
+
+```bash
+systemd-run --scope -p AllowedCPUs=4-11 ./gnb
+```
+
+Le gNB et tous ses threads enfants resteront sur :
+
+```
+CPU4 CPU5 CPU6 CPU7 CPU8 CPU9 CPU10 CPU11
+```
+
+Le scheduler pourra alors équilibrer normalement les threads.
+
+---
+
+## 4) Limiter les services système à CPU0-3
+
+Avec systemd, on peut créer un slice système.
+
+Créer :
+
+```bash
+mkdir -p /etc/systemd/system/system.slice.d
+nano /etc/systemd/system/system.slice.d/cpu.conf
+```
+
+Mettre :
+
+```ini
+[Slice]
+AllowedCPUs=0-3
+```
+
+Puis :
+
+```bash
+systemctl daemon-reload
+systemctl daemon-reexec
+```
+
+Les services qui utilisent `system.slice` seront limités à CPU0-3.
+
+---
+
+## 5) Vérifier
+
+Pour voir où tournent les processus :
+
+```bash
+ps -eLo pid,psr,comm
+```
+
+Exemple attendu :
+
+```
+PID     PSR   COMMAND
+1200      1   gnome-shell
+1300      2   systemd
+1400      6   gnb
+1401      9   gnb
+1402     11   gnb
+```
+
+---
+
+## Pour un gNB 5G, il faut aussi penser aux IRQ
+
+Même avec les cgroups, une carte réseau ou une USRP peut envoyer ses interruptions sur les mauvais CPU.
+
+Vérification :
+
+```bash
+cat /proc/interrupts
+```
+
+Puis on peut répartir les IRQ réseau/radio vers CPU4-11 avec `irqbalance` ou manuellement.
+
+---
+
+Donc la séquence correcte pour ton cas est :
+
+1. Retirer `isolcpus=4-11`.
+2. Revenir à un scheduler normal.
+3. Utiliser systemd/cgroups :
+
+   * système → CPU0-3
+   * gNB → CPU4-11
+4. Régler les IRQ si nécessaire.
+
+C'est la configuration la plus proche d'un serveur 5G gNB avec séparation système/application.
+
+
+
+###########################################################################################
+
+Quand on isole , pas de repartition de charge , ce qui est encore plus mauvais
+
+
+******************************************************
+
+Oui, c'est exactement le point important.
+
+Avec **`isolcpus`**, on obtient une isolation, mais on perd une partie du comportement normal du scheduler Linux. Ce n'est pas une "réservation intelligente avec équilibrage automatique".
+
+Dans ton test :
+
+```bash
+taskset -c 4-7 stress-ng --cpu 4
+```
+
+avec :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+4-11
+```
+
+tu as observé :
+
+```
+CPU5 100%
+CPU4 0%
+CPU6 0%
+CPU7 0%
+```
+
+Cela arrive parce que :
+
+* les CPU 4-11 sont retirés du **load balancing général** ;
+* `taskset` donne seulement un **masque d'autorisation** (4-7), il ne dit pas "un thread par CPU" ;
+* le scheduler n'a plus la même liberté d'équilibrer la charge entre les CPU isolés.
+
+Donc oui, si ton objectif est :
+
+```
+CPU0-3   → OS
+CPU4-11  → gNB avec plusieurs threads répartis automatiquement
+```
+
+alors `isolcpus` n'est probablement pas le meilleur choix.
+
+Une approche plus adaptée est :
+
+```
+Pas de isolcpus
+        |
+        v
+Scheduler Linux normal
+        |
+        +---- cgroup/systemd CPU0-3  → OS
+        |
+        +---- cgroup/systemd CPU4-11 → gNB
+```
+
+Là, le scheduler garde son équilibrage interne sur CPU4-11.
+
+---
+
+Il faut aussi nuancer : `isolcpus` est utile dans certains cas temps réel, par exemple :
+
+* un thread critique unique affecté à un CPU précis ;
+* très faible latence déterministe ;
+* contrôle manuel complet des affinités.
+
+Mais pour une charge comme un **gNB 5G**, qui possède souvent beaucoup de threads (PHY, MAC, RLC, traitement DSP...), il est souvent préférable d'avoir :
+
+* des CPU dédiés au gNB ;
+* mais un scheduler actif à l'intérieur de ce groupe.
+
+Donc ton raisonnement est cohérent : tu cherches une **partition de ressources**, pas une **suppression de l'équilibrage du scheduler**.
+
+
+###############################################################################################################
+
+
+Pas de isolcpus
+        |
+        v
+Scheduler Linux normal
+        |
+        +---- cgroup/systemd CPU0-3  → OS
+        |
+        +---- cgroup/systemd CPU4-11 → gNB
+        
+**************************************************************************************************************
+
+
+Oui, c'est exactement l'architecture que tu recherches. Elle utilise le **scheduler Linux normal** tout en séparant les ressources CPU par groupes.
+
+Le principe :
+
+```
+                 Scheduler Linux normal
+                         |
+        +----------------+----------------+
+        |                                 |
+   CPU0-3                             CPU4-11
+   cgroup système                     cgroup gNB
+        |                                 |
+  GNOME, systemd,                  gNB, DSP,
+  services OS                      threads radio
+```
+
+La différence avec `isolcpus` :
+
+* **Pas de `isolcpus`** :
+
+  * le scheduler continue son équilibrage ;
+  * un programme avec plusieurs threads sur CPU4-11 peut être réparti sur CPU4,5,6...11 ;
+  * les CPU restent disponibles normalement mais avec des limites par cgroup.
+
+* **Avec `isolcpus`** :
+
+  * les CPU sont retirés du mécanisme d'équilibrage général ;
+  * il faut souvent gérer soi-même les affinités des threads.
+
+---
+
+Pour réaliser cette architecture :
+
+### 1) Enlever l'isolation CPU
+
+Vérifie d'abord :
+
+```bash
+cat /proc/cmdline
+```
+
+Supprime les paramètres du type :
+
+```text
+isolcpus=4-11
+nohz_full=4-11
+rcu_nocbs=4-11
+```
+
+Puis :
+
+```bash
+update-grub
+reboot
+```
+
+Après redémarrage :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+doit être vide.
+
+---
+
+### 2) Créer un groupe CPU pour le gNB
+
+Avec cgroup v2 :
+
+```bash
+mkdir /sys/fs/cgroup/gnb
+```
+
+Définir les CPU :
+
+```bash
+echo 4-11 > /sys/fs/cgroup/gnb/cpuset.cpus
+echo 0 > /sys/fs/cgroup/gnb/cpuset.mems
+```
+
+---
+
+### 3) Lancer le gNB dans ce groupe
+
+Avec systemd :
+
+```bash
+systemd-run --scope -p AllowedCPUs=4-11 ./gnb
+```
+
+Tous les threads créés par le gNB hériteront de cette contrainte.
+
+---
+
+### 4) Pour le système
+
+Le système reste dans le groupe racine par défaut, donc il aura encore accès à tous les CPU. Pour réellement limiter les services OS à 0-3, il faut appliquer une politique systemd/cgroup aux slices système.
+
+Par exemple :
+
+* `system.slice` → CPU0-3
+* `user.slice` → CPU0-3
+* service gNB → CPU4-11
+
+On peut vérifier les slices :
+
+```bash
+systemctl status
+```
+
+et :
+
+```bash
+systemd-cgls
+```
+
+---
+
+Une fois en place, ton test devrait changer :
+
+Avant (avec isolation) :
+
+```
+taskset -c 4-7 stress-ng --cpu 4
+
+CPU5 100%
+CPU4 0%
+CPU6 0%
+CPU7 0%
+```
+
+Après (sans isolation + cgroup) :
+
+```
+gNB/stress-ng CPU4-11
+
+CPU4 █████
+CPU5 █████
+CPU6 █████
+CPU7 █████
+...
+```
+
+Le scheduler garde alors sa capacité de répartition **à l'intérieur du domaine CPU4-11**. C'est généralement plus adapté pour un gNB multi-thread.
+
+
+
+################################################
+
+
+tu montre pas comment on fait pour system.slice → CPU0-3
+user.slice → CPU0-3 ?
+
+******************************************************
+
+Tu as raison, il manquait la partie importante : **comment limiter les slices systemd**.
+
+Sur une distribution moderne (Ubuntu avec cgroup v2), les services sont organisés dans des **slices systemd** :
+
+* `system.slice` → services système (`NetworkManager`, SSH, services divers)
+* `user.slice` → sessions utilisateurs, applications graphiques (`gnome-shell`, navigateur, etc.)
+* `app.slice` → applications lancées par certains mécanismes
+
+L'objectif est :
+
+```text
+CPU0-3
+ ├── system.slice
+ └── user.slice
+
+CPU4-11
+ └── gNB.service
+```
+
+---
+
+## 1) Vérifier que systemd utilise bien cgroup v2
+
+```bash
+stat -fc %T /sys/fs/cgroup
+```
+
+Résultat attendu :
+
+```text
+cgroup2fs
+```
+
+---
+
+## 2) Limiter `system.slice` à CPU0-3
+
+Créer un override :
+
+```bash
+mkdir -p /etc/systemd/system/system.slice.d
+nano /etc/systemd/system/system.slice.d/cpu.conf
+```
+
+Mettre :
+
+```ini
+[Slice]
+AllowedCPUs=0-3
+```
+
+---
+
+## 3) Limiter `user.slice` à CPU0-3
+
+Créer :
+
+```bash
+mkdir -p /etc/systemd/system/user.slice.d
+nano /etc/systemd/system/user.slice.d/cpu.conf
+```
+
+Mettre :
+
+```ini
+[Slice]
+AllowedCPUs=0-3
+```
+
+---
+
+## 4) Recharger systemd
+
+```bash
+systemctl daemon-reload
+```
+
+Puis redémarrer les services concernés :
+
+```bash
+systemctl restart system.slice
+```
+
+Pour `user.slice`, le plus propre est de se déconnecter/reconnecter (ou redémarrer la machine), car les sessions utilisateurs existantes gardent leur cgroup.
+
+---
+
+## 5) Créer le service gNB sur CPU4-11
+
+Exemple :
+
+```bash
+mkdir -p /etc/systemd/system
+nano /etc/systemd/system/gnb.service
+```
+
+Contenu :
+
+```ini
+[Unit]
+Description=gNB
+
+[Service]
+ExecStart=/chemin/vers/gnb
+AllowedCPUs=4-11
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Puis :
+
+```bash
+systemctl daemon-reload
+systemctl enable gnb
+systemctl start gnb
+```
+
+---
+
+## 6) Vérifier
+
+Voir les CPU autorisés pour les slices :
+
+```bash
+systemctl show system.slice -p AllowedCPUs
+systemctl show user.slice -p AllowedCPUs
+```
+
+Résultat attendu :
+
+```text
+AllowedCPUs=0-3
+```
+
+Pour le gNB :
+
+```bash
+systemctl show gnb -p AllowedCPUs
+```
+
+Résultat :
+
+```text
+AllowedCPUs=4-11
+```
+
+---
+
+## Attention dans ton cas
+
+Avant tout, enlève :
+
+```text
+isolcpus=4-11
+```
+
+Sinon tu auras encore le comportement observé avec `stress-ng`.
+
+La combinaison correcte pour ton objectif est :
+
+```
+Pas de isolcpus
+        |
+        |
+Scheduler normal
+        |
+        +-- system.slice  → CPU0-3
+        |
+        +-- user.slice    → CPU0-3
+        |
+        +-- gnb.service   → CPU4-11
+```
+
+C'est une séparation par **cgroup**, pas une isolation noyau. C'est beaucoup plus proche de ce que tu cherches pour une machine gNB.
+
+
+
+########################################################################
+
+root@nr:/home/nr# cat etc/systemd/system/system.slice.d/cpu.conf
+cat: etc/systemd/system/system.slice.d/cpu.conf: No such file or directory
+root@nr:/home/nr# 
+
+
+**********************************************************************
+
+L'erreur vient simplement du chemin. Tu as écrit :
+
+```bash
+cat etc/systemd/system/system.slice.d/cpu.conf
+```
+
+Il manque le `/` au début.
+
+Le chemin absolu est :
+
+```bash
+cat /etc/systemd/system/system.slice.d/cpu.conf
+```
+
+---
+
+Mais si tu n'as pas encore créé ce fichier, tu auras aussi une erreur. Vérifie d'abord si le dossier existe :
+
+```bash
+ls -l /etc/systemd/system/system.slice.d/
+```
+
+S'il n'existe pas, crée-le :
+
+```bash
+mkdir -p /etc/systemd/system/system.slice.d
+```
+
+Puis crée le fichier :
+
+```bash
+nano /etc/systemd/system/system.slice.d/cpu.conf
+```
+
+Avec :
+
+```ini
+[Slice]
+AllowedCPUs=0-3
+```
+
+Sauvegarde, puis :
+
+```bash
+systemctl daemon-reload
+```
+
+Vérifie ensuite :
+
+```bash
+systemctl show system.slice -p AllowedCPUs
+```
+
+Tu devrais obtenir :
+
+```text
+AllowedCPUs=0-3
+```
+
+---
+
+Petite correction importante : pour systemd, `AllowedCPUs=` est une propriété de **slice** (cgroup v2). Il n'est pas nécessaire de manipuler directement :
+
+```bash
+/sys/fs/cgroup/system.slice/
+```
+
+systemd s'en charge.
+
+Après modification, les **nouveaux processus** lancés dans `system.slice` seront limités à CPU0-3. Les processus déjà en cours peuvent nécessiter un redémarrage du service ou un redémarrage système pour être replacés correctement.
+
+
+######################################################################
+
+
+root@nr:/home/nr# cat /etc/systemd/system/system.slice.d/cpu.conf
+cat: /etc/systemd/system/system.slice.d/cpu.conf: No such file or directory
+root@nr:/home/nr# cat etc/systemd/system/system.slice.d/cpu.conf
+cat: etc/systemd/system/system.slice.d/cpu.conf: No such file or directory
+root@nr:/home/nr# 
+
+
+*********************************************************
+
+C'est normal : le fichier **n'existe pas encore**. La commande `cat` ne crée pas le fichier, elle affiche seulement un fichier déjà présent.
+
+Tu as actuellement :
+
+```bash
+cat /etc/systemd/system/system.slice.d/cpu.conf
+```
+
+→ erreur car tu n'as pas encore créé :
+
+```text
+/etc/systemd/system/system.slice.d/cpu.conf
+```
+
+Fais ceci :
+
+### 1) Créer le dossier
+
+```bash
+mkdir -p /etc/systemd/system/system.slice.d
+```
+
+Vérifie :
+
+```bash
+ls -ld /etc/systemd/system/system.slice.d
+```
+
+---
+
+### 2) Créer le fichier de configuration
+
+```bash
+nano /etc/systemd/system/system.slice.d/cpu.conf
+```
+
+Mets dedans :
+
+```ini
+[Slice]
+AllowedCPUs=0-3
+```
+
+Sauvegarde (`Ctrl+O`, Entrée), puis quitte (`Ctrl+X`).
+
+---
+
+### 3) Recharger systemd
+
+```bash
+systemctl daemon-reload
+```
+
+---
+
+### 4) Vérifier
+
+```bash
+systemctl show system.slice -p AllowedCPUs
+```
+
+Tu devrais voir :
+
+```text
+AllowedCPUs=0-3
+```
+
+---
+
+Pour `user.slice`, même principe :
+
+```bash
+mkdir -p /etc/systemd/system/user.slice.d
+nano /etc/systemd/system/user.slice.d/cpu.conf
+```
+
+Contenu :
+
+```ini
+[Slice]
+AllowedCPUs=0-3
+```
+
+Puis :
+
+```bash
+systemctl daemon-reload
+```
+
+---
+
+Une remarque importante dans ton cas : tu es actuellement connecté en **root** :
+
+```text
+root@nr:/home/nr#
+```
+
+Donc ta session n'est probablement pas dans `user.slice` comme un utilisateur graphique normal. Pour tester l'effet sur GNOME, il faudra regarder avec :
+
+```bash
+systemd-cgls
+```
+
+Tu verras où se trouvent `gnome-shell`, `gdm`, tes services, etc.
+
+
+
+##############################################################################################
+
+je pense pas que c'est une bonne idée de créer une configuration qui ne suit pas ubuntu, cherche comment on fait les system slice et user slice de processus
+*****************************************************
+Tu as raison de remettre en question la création manuelle de fichiers dans `/etc/systemd/system/*.d/`. Ce n'est pas une mauvaise méthode (c'est supporté par systemd), mais **Ubuntu recommande plutôt de piloter ces réglages avec `systemctl set-property`**, car systemd est le gestionnaire des cgroups v2. ([Ubuntu Documentation][1])
+
+Pour ton objectif :
+
+```
+CPU0-3  → système (init, services, utilisateurs, interface graphique)
+CPU4-11 → gNB
+```
+
+la méthode Ubuntu est :
+
+### 1) Limiter le système
+
+Il faut limiter **trois groupes importants** :
+
+* `init.scope` → systemd lui-même
+* `system.slice` → services système
+* `user.slice` → sessions utilisateurs (GNOME, applications utilisateur)
+
+Ubuntu documente cette approche avec `AllowedCPUs=`. ([Ubuntu Documentation][1])
+
+Fais :
+
+```bash
+systemctl set-property --runtime init.scope AllowedCPUs=0-3
+systemctl set-property --runtime system.slice AllowedCPUs=0-3
+systemctl set-property --runtime user.slice AllowedCPUs=0-3
+```
+
+Le paramètre `--runtime` signifie : valable jusqu'au prochain redémarrage.
+
+---
+
+### 2) Créer une slice dédiée au gNB
+
+Créer une nouvelle slice :
+
+```bash
+systemctl set-property --runtime gnb.slice AllowedCPUs=4-11
+```
+
+Vérifie :
+
+```bash
+systemctl show gnb.slice -p AllowedCPUs
+```
+
+Tu dois avoir :
+
+```
+AllowedCPUs=4-11
+```
+
+---
+
+### 3) Lancer le gNB dans cette slice
+
+Exemple :
+
+```bash
+systemd-run --scope -p Slice=gnb.slice ./gnb
+```
+
+Le gNB sera alors dans :
+
+```
+/gnb.slice
+```
+
+avec accès seulement à :
+
+```
+CPU4-CPU11
+```
+
+Cette méthode est celle prévue par systemd pour associer une application à une slice. ([Ubuntu Documentation][1])
+
+---
+
+### 4) Vérification
+
+Voir les slices :
+
+```bash
+systemd-cgls
+```
+
+Tu devrais voir quelque chose comme :
+
+```
+/
+├─ init.scope
+│   └─ systemd
+│
+├─ system.slice
+│   ├─ NetworkManager
+│   ├─ sshd
+│   └─ ...
+│
+├─ user.slice
+│   └─ gnome-shell
+│
+└─ gnb.slice
+    └─ gnb
+```
+
+Puis :
+
+```bash
+systemctl show system.slice -p AllowedCPUs
+systemctl show user.slice -p AllowedCPUs
+systemctl show gnb.slice -p AllowedCPUs
+```
+
+Résultat attendu :
+
+```
+system.slice → 0-3
+user.slice   → 0-3
+gnb.slice    → 4-11
+```
+
+---
+
+### Important dans ton cas actuel
+
+Tu as encore :
+
+```bash
+cat /sys/devices/system/cpu/isolated
+```
+
+qui retourne :
+
+```
+4-11
+```
+
+Il faut d'abord supprimer `isolcpus=4-11` du noyau, sinon tu mélanges deux mécanismes différents. Le but ici est :
+
+```
+Pas d'isolcpus
+        ↓
+scheduler normal actif
+        ↓
+cgroups systemd pour répartir les domaines CPU
+```
+
+C'est exactement le modèle adapté à ton besoin : le gNB garde 8 CPU disponibles et le scheduler peut équilibrer ses threads entre CPU4-11. ([Ubuntu Documentation][1])
+
+[1]: https://documentation.ubuntu.com/real-time/latest/how-to/isolate-workload-cpusets/?utm_source=chatgpt.com "How to isolate CPUs from general execution with cpusets - Real-time Ubuntu documentation"
+
+
+
+##############################################################################################
+
+Failed to find executable ./srsan_install.sh: Permission denied
+root@nr:/home/nr# systemd-run --scope -p Slice=gnb.slice ./srsan_install.sh 
+Failed to find executable ./srsan_install.sh: Permission denied
+root@nr:/home/nr# 
+
+
+*******************************************************************************
+
+L'erreur :
+
+```text
+Failed to find executable ./srsan_install.sh: Permission denied
+```
+
+ne vient pas du cgroup ni de `systemd-run`. Elle signifie que ton script **n'a pas le droit d'exécution**.
+
+Vérifie :
+
+```bash
+ls -l srsan_install.sh
+```
+
+Tu verras probablement quelque chose comme :
+
+```text
+-rw-r--r-- 1 root root ... srsan_install.sh
+```
+
+Le `x` (execute) manque.
+
+---
+
+### Solution 1 : rendre le script exécutable
+
+```bash
+chmod +x srsan_install.sh
+```
+
+Puis :
+
+```bash
+systemd-run --scope -p Slice=gnb.slice ./srsan_install.sh
+```
+
+---
+
+### Solution 2 : lancer avec bash (souvent préférable pour un script d'installation)
+
+Tu n'as pas besoin du bit d'exécution :
+
+```bash
+systemd-run --scope -p Slice=gnb.slice bash srsan_install.sh
+```
+
+---
+
+### Vérifier que le processus est bien dans la slice
+
+Pendant l'exécution :
+
+```bash
+systemd-cgls
+```
+
+Tu devrais voir :
+
+```text
+├─gnb.slice
+│ └─run-xxxx.scope
+│   └─bash srsan_install.sh
+```
+
+---
+
+Petite remarque : pour ton objectif de séparation CPU, `srsan_install.sh` est un **script d'installation/compilation**, pas le gNB lui-même. La slice `gnb.slice` devrait plutôt être utilisée au moment de lancer :
+
+* `gnb`
+* `srsenb`
+* `nr-gnb`
+* ou le binaire radio final
+
+Pendant une compilation (`make -j`), limiter à CPU4-11 peut être utile, mais ce n'est pas la charge temps réel que tu cherches à protéger.
+
+
+
+
+
