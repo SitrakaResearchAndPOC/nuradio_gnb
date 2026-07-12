@@ -1,0 +1,33 @@
+Dans ton cas, tu veux découper une machine 12 CPU logiques en 3 zones fixes :
+
+CPU 0-3   → OS uniquement (ne pas toucher)
+CPU 4-7   → srsEPC
+CPU 8-11  → srsENB
+
+La bonne approche est de créer deux cpusets cset séparés, puis d'ajouter taskset pour verrouiller l'affinité.
+
+1) Créer le groupe srsEPC (CPU 4-7)
+sudo cset set --cpu=4-7 --set=srsepc
+2) Créer le groupe srsENB (CPU 8-11)
+sudo cset set --cpu=8-11 --set=srsenb
+
+Vérifier :
+
+sudo cset set --list
+
+Tu dois avoir :
+
+srsepc   CPU 4-7
+srsenb   CPU 8-11
+3) Lancer srsEPC dans son groupe + taskset
+sudo cset proc --set=srsepc --exec -- taskset -c 4-7 srsepc
+
+ou avec le fichier de configuration :
+
+sudo cset proc --set=srsepc --exec -- taskset -c 4-7 srsepc /etc/srsran/epc.conf
+4) Lancer srsENB dans son groupe + taskset
+sudo cset proc --set=srsenb --exec -- taskset -c 8-11 srsenb
+
+ou :
+
+sudo cset proc --set=srsenb --exec -- taskset -c 8-11 srsenb /etc/srsran/enb.conf
