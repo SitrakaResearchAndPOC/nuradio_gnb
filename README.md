@@ -80,7 +80,7 @@ chmod +x install_uhd_v4.1.0.5.sh && bash install_uhd_v4.1.0.5.sh
 ```
 ### Install FW images
 ```
-sudo /usr/lib/uhd/utils/uhd_images_downloader.py
+sudo /usr/local/lib/uhd/utils/uhd_images_downloader.py
 ```
 or directly : 
 ```
