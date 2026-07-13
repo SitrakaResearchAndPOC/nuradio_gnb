@@ -52,6 +52,9 @@ Then, Ubuntu, with Linux Low latency
 ### Install by source 
 The installation is by source due to the GPSDO which need to be patched 
 ```
+cd nuradio
+```
+```
 [ -f "uhd_v4.1.0.5_install.sh" ] && sudo rm -rf uhd_v4.1.0.5_install.sh; wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/uhd_v4.1.0.5_install.sh
 ```
 ```
