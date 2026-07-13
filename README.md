@@ -209,13 +209,14 @@ node -v
 npm -v
 ```
 ```
-ls open5gs/webui/*
+ls open5gs/webui/
 ```
+THIS DIRECTORY SHOULD EXIST : BUILD_ID
 ```
-ls open5gs/webui/.next/*
+ls open5gs/webui/.next/
 ```
-THE DIRECTORY SHOULD EXIST server/  </br>
-THE DIRECTORY SHOULD EXIST static/  </br>
+THIS DIRECTORY SHOULD EXIST : server/  </br>
+THIS DIRECTORY SHOULD EXIST  : static/  </br>
 
 ### Lauching Mongodb & WEBUI
 
