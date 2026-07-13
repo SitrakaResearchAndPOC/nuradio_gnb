@@ -210,12 +210,13 @@ node -v
 npm -v
 ```
 10.8.2
+### Verification file of WEBUI
 ```
-ls open5gs/webui/
+ls open5gs/webui/.next/
 ```
 THIS DIRECTORY SHOULD EXIST : BUILD_ID
 ```
-ls open5gs/webui/.next/
+ls open5gs/webui/
 ```
 THIS DIRECTORY SHOULD EXIST : server/  </br>
 THIS DIRECTORY SHOULD EXIST  : static/  </br>
@@ -232,7 +233,7 @@ sudo systemctl status mongod
 sudo systemctl restart open5gs-webui
 ```
 ```
-sudo systemctl enable open5gs-webui
+sudo systemctl status open5gs-webui
 ```
 
 Tape on broswer :
