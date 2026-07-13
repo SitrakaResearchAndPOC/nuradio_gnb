@@ -86,6 +86,10 @@ uhd_config_info --version
 uhd_config_info --print-all
 ```
 ```
+sudo ls /usr/local/lib/uhd/utils/
+```
+
+```
 which uhd_find_devices
 ```
 ```
@@ -105,7 +109,7 @@ sudo uhd_images_downloader
 ```
 ### Verify FW is download completly
 ```
-ls /usr/lib/uhd/utils
+ls /usr/local/share/uhd/images
 ```
 ### Verify with pluging USRP
 ```
