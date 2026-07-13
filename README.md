@@ -30,12 +30,22 @@ sudo apt install  -y cpuset stress-ng
 ```
 ### To add menu mode
 ```
-sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
+sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
 ```
+### Verify mode menu
+```
+cat /etc/default/grub | grep GRUB_TIMEOUT_STYLE | grep menu
+```
+
 ### To have timeout in second
 ```
-sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=15/' /etc/default/grub
+sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=15/' /etc/default/grub
 ```
+## Verify timeout
+```
+cat /etc/default/grub | grep GRUB_TIMEOUT | grep 15
+```
+
 ### To upgrade GRUB 
 ```
 sudo update-grub
