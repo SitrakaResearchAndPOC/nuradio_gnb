@@ -56,27 +56,7 @@ cat /etc/default/grub | grep GRUB_DEFAULT | grep lowlatency
 ```
 sudo update-grub
 ```
-### On Reboot
-Choose : 
-```
-Advanced options for Ubuntu
-Then, Ubuntu, with Linux Low latency
-```
-## When system is started,  check low latency kernel :
-```
-uname -r | grep lowlatency
-```
-## If you want to choose lowlatency as default boot :
-```
-sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux '"$(uname -r)"'"/' /etc/default/grub
-```
-```
-sudo update-grub
-```
-```
-sudo reboot
-```
-
+### Reboot
 
 # STEP 1 : OPEN-SOURCE 5G NETWORK INSTALL
 ## Install UHD
