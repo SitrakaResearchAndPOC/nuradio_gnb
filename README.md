@@ -251,8 +251,41 @@ Password is :
 
 # STEP 3 : OPEN-SOURCE 5G NETWORK ADMIN
 ## Kill process on Open5Gs
+### Killing one by one
+```
+ps aux | grep open5gs
+```
+```
+sudo systemctl stop open5gs-pcrfd
+```
+```
+sudo systemctl stop open5gs-mmed
+```
+```
+sudo systemctl stop open5gs-hssd
+```
+```
+sudo systemctl stop open5gs-sgwud
+```
+```
+sudo systemctl stop open5gs-sgwcd
+```
+```
+ps aux | grep open5gs
+```
+### Killing all directly
+```
+sudo systemctl stop $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+```
+sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+```
+ps aux | grep open5gs
+```
 
 ## Create and Start script on Open5Gs
+
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
 ## Configuration OGSTUN
