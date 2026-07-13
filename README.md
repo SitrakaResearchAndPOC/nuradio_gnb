@@ -7,7 +7,7 @@ Download and install ubuntu 22.04
 ```
 ## Verify that the directory is at nuradio 
 ```
-pwd
+pwd | grep nuradio
 ```
 ## Installation utility
 ```
