@@ -41,12 +41,12 @@ sudo ldconfig
 
 # COPY USEFULL CONFIGURATION
 # DON'T USE THIS CONFIG : sudo cp -rf configs/open5gs/* /etc/open5gs/ USE INSTEAD  sudo cp -rf build/configs/open5gs/* /etc/open5gs/
-rm -rf /etc/open5gs/*
+sudo rm -rf /etc/open5gs/*
 sudo cp -rf build/configs/open5gs/* /etc/open5gs/
 sudo chown -R open5gs:open5gs /etc/open5gs/
 
 # CREATE DIRECTORY FOR LOGFILE 
-mkdir -p  /var/log/open5gs
+sudo mkdir -p  /var/log/open5gs
 sudo chown -R open5gs:open5gs /var/log/open5gs
 
 # CHANGE THE ADDRESS OF NRF TO PATCH THE CONFIGURATION
