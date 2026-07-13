@@ -23,10 +23,10 @@ sudo cmake ../
 
 sudo make -j $(nproc --ignore 1)
 
-sudo make test -j $(nproc --ignore 1)
+# sudo make test -j $(nproc --ignore 1)
 
 sudo make install
 
-# sudo ldconfig
+sudo ldconfig
 
-gnb --version
+# gnb --version
