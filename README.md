@@ -91,15 +91,96 @@ chmod +x srsran_50fe9623c_install.sh && bash srsran_50fe9623c_install.sh
 ### Verify srsRAN
 Verify 
 ```
-[ -d "srsRAN_Project" ]  && cd cd srsRAN_Project &&  sudo make test -j $(nproc --ignore 1)
+[ -d "srsRAN_Project" ]  && cd srsRAN_Project &&  sudo make test -j $(nproc --ignore 1)
 ```
 ```
 gnb --version
 ```
 ## Install Open5gs
 ### Install Mongodb
+```
+[ ! -f install_mongodb_6.0.sh ] && wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/main/files/install_mongodb_6.0.sh
+```
+```
+chmod +x install_mongodb_6.0.sh && bash install_mongodb_6.0.sh
+```
+
+### Verify MongoDB
+```
+mongodb --version
+```
+```
+sudo systemctl restart mongod
+```
+```
+sudo systemctl status mongod
+```
+
 ### Install Open5gs
+```
+[ ! -f install_open5gs_2.7.sh ] && \
+wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_open5gs_2.7.sh
+```
+```
+chmod +x install_open5gs_2.7.sh && bash install_open5gs_2.7.sh
+```
+### Verificaiton of Open5gs
+```
+ls /usr/bin/open5gs*
+```
+```
+systemctl list-unit-files | grep open5gs
+```
+```
+sudo systemctl enable $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+```
+sudo systemctl restart $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+```
+sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+```
+sudo systemctl stop $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+```
+which open5gs-amfd
+```
+```
+ldd $(which open5gs-amfd) | grep ogs
+```
+
 ### Install NodeJS (WEBUI)
+```
+[ ! -f install_webui.sh ] && \
+wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_webui.sh
+```
+```
+chmod +x install_webui.sh && bash install_webui.sh
+```
+
+### Verification NodeJS (WEBUI)
+```
+node -v
+```
+```
+npm -v
+```
+```
+ls open5gs/webui/*
+```
+```
+ls open5gs/webui/.next/*
+```
+THE DIRECTORY SHOULD EXIST server/  </br>
+THE DIRECTORY SHOULD EXIST static/  </br>
+```
+sudo systemctl restart open5gs-webui
+```
+```
+sudo systemctl enable open5gs-webui
+```
+
 
 
 
