@@ -88,7 +88,7 @@ sudo uhd_images_downloader
 ```
 ls /usr/lib/uhd/utils
 ```
-Close the terminal
+
 ## Install srsRAN
 ### Install srsRAN by source
 Open new terminal and make commad
