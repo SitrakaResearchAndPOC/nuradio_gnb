@@ -11,7 +11,7 @@ apt update
 sudo apt install linux-lowlatency linux-headers-lowlatency linux-tools-lowlatency linux-cloud-tools-lowlatency
 ```
 ```
-apt install cset stress-ng
+apt install cpuset stress-ng
 ```
 # CONFIGURING GRUB 
 ## To add menu on boot
