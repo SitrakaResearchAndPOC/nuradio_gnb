@@ -35,6 +35,7 @@ sudo make install
 sudo ldconfig
 
 sudo ln -s /usr/local/lib/uhd/utils/query_gpsdo_sensors /usr/local/bin/query_gpsdo_sensors
+# sudo ln -s  $(query_gpsdo_sensors) /usr/local/bin/query_gpsdo_sensors
 
 # NEED FOR VERIFICATION
 # sudo uhd_images_downloader 
