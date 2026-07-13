@@ -133,7 +133,7 @@ chmod +x srsran_50fe9623c_install.sh && bash srsran_50fe9623c_install.sh
 ### Verify srsRAN
 Verify 
 ```
-[ -d "srsRAN_Project" ]  && cd srsRAN_Project &&  sudo make test -j $(nproc --ignore 1)
+[ -d "srsRAN_Project/build" ] && sudo make -C srsRAN_Project/build test -j "$(nproc --ignore=1)"
 ```
 ```
 gnb --version
