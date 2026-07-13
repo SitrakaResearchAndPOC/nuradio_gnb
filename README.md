@@ -124,10 +124,6 @@ sudo query_gpsdo_sensors
 
 ## Install srsRAN
 ### Install srsRAN by source
-Open new terminal and make commad
-```
-cd nuradio
-```
 ```
 [ -f "srsran_50fe9623c_install.sh" ] && sudo rm -rf srsran_50fe9623c_install.sh; wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/srsran_50fe9623c_install.sh
 ```
