@@ -3,8 +3,8 @@ sudo apt update
  
 sudo apt install -y git cmake build-essential libboost-all-dev libusb-1.0-0-dev python3-dev python3-mako python3-numpy python3-requests python3-setuptools libfftw3-dev libcomedi-dev libgps-dev libgmp-dev swig pkg-config gedit
 
-sudo git clone https://github.com/EttusResearch/uhd.git
-
+# sudo git clone https://github.com/EttusResearch/uhd.git
+[ ! -d uhd ] && git clone https://github.com/EttusResearch/uhd.git
 sudo chown -R $USER:$USER ~/uhd
 
 cd uhd/
