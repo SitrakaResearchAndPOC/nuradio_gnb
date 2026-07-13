@@ -57,6 +57,10 @@ cat /etc/default/grub | grep GRUB_DEFAULT | grep lowlatency
 sudo update-grub
 ```
 ### Reboot
+Check : 
+```
+uname -r
+```
 
 # STEP 1 : OPEN-SOURCE 5G NETWORK INSTALL
 ## Install UHD
