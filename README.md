@@ -175,12 +175,39 @@ ls open5gs/webui/.next/*
 ```
 THE DIRECTORY SHOULD EXIST server/  </br>
 THE DIRECTORY SHOULD EXIST static/  </br>
+
+### Lauching Mongodb & WEBUI
+
+```
+sudo systemctl restart mongod
+```
+```
+sudo systemctl status mongod
+```
 ```
 sudo systemctl restart open5gs-webui
 ```
 ```
 sudo systemctl enable open5gs-webui
 ```
+
+Tape on broswer :
+```
+http://localhost:9999
+```
+Login is : 
+```
+admin
+```
+Password is : 
+```
+1423
+```
+
+# STEP 3 : OPEN-SOURCE 5G NETWORK ADMIN
+## Kill process on Open5Gs
+
+## Create and Start script on Open5Gs
 
 
 
