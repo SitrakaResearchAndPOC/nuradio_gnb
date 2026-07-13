@@ -78,9 +78,7 @@ chmod +x install_uhd_v4.1.0.5.sh && bash install_uhd_v4.1.0.5.sh
 ```
 ### Install FW images
 ```
-cd /usr/lib/uhd/utils && \
-ls && \
-sudo ./uhd_images_downloader.py
+sudo /usr/lib/uhd/utils/uhd_images_downloader.py
 ```
 or directly : 
 ```
@@ -88,8 +86,7 @@ sudo uhd_images_downloader
 ```
 ### Verify FW is download completly
 ```
-cd /usr/share/uhd/images && \
-ls
+ls /usr/lib/uhd/utils
 ```
 Close the terminal
 ## Install srsRAN
