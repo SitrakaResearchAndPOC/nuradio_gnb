@@ -149,7 +149,7 @@ chmod +x install_mongodb_6.0.sh && bash install_mongodb_6.0.sh
 
 ### Verify MongoDB
 ```
-mongodb --version
+mongod --version
 ```
 ```
 sudo systemctl restart mongod
