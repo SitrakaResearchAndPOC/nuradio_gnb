@@ -86,7 +86,7 @@ uhd_config_info --version
 uhd_config_info --print-all
 ```
 ```
-sudo ls /usr/local/lib/uhd/utils/
+ls /usr/local/lib/uhd/utils/
 ```
 
 ```
