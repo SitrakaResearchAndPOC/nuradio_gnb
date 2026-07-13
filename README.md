@@ -209,13 +209,16 @@ Password is :
 
 ## Create and Start script on Open5Gs
 
-# STEP 4 : OPEN-SOURCE 5G NETWORK CONFIGURATION
+# STEP 4 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
 ## Configuration OGSTUN
 ### scenario 1
 ### scenario 2
 ### scenario 3
 ## Configuration PLMN amf.conf
 
+# STEP 5 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
+
+# STEP 6 : OPEN-SOURCE 5G NETWORK  CONFIGURATION SRSRAN_GNB
 
 
 
