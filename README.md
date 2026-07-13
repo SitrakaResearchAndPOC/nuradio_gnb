@@ -90,5 +90,13 @@ Verify
 ```
 [ -d "srsRAN_Project" ]  && cd cd srsRAN_Project &&  sudo make test -j $(nproc --ignore 1)
 ```
+```
 gnb --version
 ```
+## Install Open5gs
+### Install Mongodb
+### Install Open5gs
+### Install NodeJS (WEBUI)
+
+
+
