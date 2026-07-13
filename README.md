@@ -39,13 +39,19 @@ cat /etc/default/grub | grep GRUB_TIMEOUT_STYLE | grep menu
 
 ### To have timeout in second
 ```
-sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=15/' /etc/default/grub
+sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/' /etc/default/grub
 ```
 ## Verify timeout
 ```
-cat /etc/default/grub | grep GRUB_TIMEOUT | grep 15
+cat /etc/default/grub | grep GRUB_TIMEOUT | grep 5
 ```
-
+## Change low latency as default Grub
+```
+sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux '"$(ls /boot/vmlinuz* | grep lowlatency | sed 's|^/boot/vmlinuz-||')"'"/' /etc/default/grub
+```
+```
+cat /etc/default/grub | grep GRUB_DEFAULT | grep lowlatency
+```
 ### To upgrade GRUB 
 ```
 sudo update-grub
