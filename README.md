@@ -26,7 +26,7 @@ neofetch
 sudo apt install -y linux-lowlatency linux-headers-lowlatency linux-tools-lowlatency linux-cloud-tools-lowlatency
 ```
 ```
-sudo apt install  -y cset stress-ng
+sudo apt install  -y cpuset stress-ng
 ```
 ### To add menu mode
 ```
@@ -46,7 +46,22 @@ Choose :
 Advanced options for Ubuntu
 Then, Ubuntu, with Linux Low latency
 ```
-## Configure CPU Optimization
+## When system is started,  check low latency kernel :
+```
+uname -r | grep lowlatency
+```
+## If you want to choose lowlatency as default boot :
+```
+sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux '"$(uname -r)"'"/' /etc/default/grub
+```
+```
+sudo update-grub
+```
+```
+sudo reboot
+```
+
+
 # STEP 1 : OPEN-SOURCE 5G NETWORK INSTALL
 ## Install UHD
 ### Install by source 
