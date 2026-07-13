@@ -205,9 +205,11 @@ chmod +x install_webui.sh && bash install_webui.sh
 ```
 node -v
 ```
+20.20.2
 ```
 npm -v
 ```
+10.8.2
 ```
 ls open5gs/webui/
 ```
