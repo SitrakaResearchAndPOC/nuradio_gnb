@@ -286,6 +286,191 @@ ps aux | grep open5gs
 
 ## Create and Start script on Open5Gs
 
+```
+sudo tee /usr/bin/stop_5gc > /dev/null <<'EOF'
+#!/usr/bin/zsh
+
+########################################
+# Clear Open5GS logs
+########################################
+sudo rm -f /var/log/open5gs/*
+
+########################################
+# Stop Open5GS 4G EPC
+########################################
+sudo systemctl stop open5gs-mmed
+sudo systemctl stop open5gs-sgwcd
+sudo systemctl stop open5gs-sgwud
+sudo systemctl stop open5gs-hssd
+sudo systemctl stop open5gs-pcrfd
+
+########################################
+# Stop Open5GS 5G Core
+########################################
+sudo systemctl stop open5gs-smfd
+sudo systemctl stop open5gs-amfd
+sudo systemctl stop open5gs-upfd
+sudo systemctl stop open5gs-nrfd
+sudo systemctl stop open5gs-scpd
+sudo systemctl stop open5gs-ausfd
+sudo systemctl stop open5gs-udmd
+sudo systemctl stop open5gs-pcfd
+sudo systemctl stop open5gs-nssfd
+sudo systemctl stop open5gs-bsfd
+sudo systemctl stop open5gs-udrd
+
+########################################
+# Stop Open5GS WebUI
+########################################
+sudo systemctl stop open5gs-webui
+EOF
+```
+
+```
+sudo chmod +x /usr/bin/stop_5gc
+```
+```
+sudo tee /usr/bin/start_5gc > /dev/null <<'EOF'
+#!/usr/bin/zsh
+
+########################################
+# Restart Open5GS 5GC Database
+########################################
+sudo systemctl restart open5gs-udrd
+sudo systemctl restart open5gs-udmd
+sudo systemctl restart open5gs-ausfd
+
+########################################
+# Restart Open5GS 5GC Service Discovery
+########################################
+sudo systemctl restart open5gs-nrfd
+sudo systemctl restart open5gs-scpd
+
+########################################
+# Restart Open5GS 5GC Policy Functions
+########################################
+sudo systemctl restart open5gs-nssfd
+sudo systemctl restart open5gs-bsfd
+sudo systemctl restart open5gs-pcfd
+
+########################################
+# Restart Open5GS 5GC AMF/SMF/UPF
+########################################
+sudo systemctl restart open5gs-amfd
+sudo systemctl restart open5gs-smfd
+sudo systemctl restart open5gs-upfd
+
+########################################
+# Restart Open5GS WebUI
+########################################
+sudo systemctl restart open5gs-webui
+EOF
+```
+
+```
+sudo chmod +x /usr/bin/start_5gc
+```
+
+```
+sudo tee /usr/bin/5gc > /dev/null <<'EOF'
+#!/usr/bin/zsh
+
+stop_5gc
+start_5gc
+EOF
+```
+
+```
+sudo chmod +x /usr/bin/5gc
+```
+
+```
+sudo tee /usr/bin/restart_5gc > /dev/null <<'EOF'
+#!/usr/bin/zsh
+
+stop_5gc
+start_5gc
+EOF
+```
+
+```
+sudo chmod +x /usr/bin/restart_5gc
+```
+
+#### A enlever  : 
+```
+#!/usr/bin/zsh
+
+########################################
+# Clear Open5GS logs
+########################################
+sudo rm -f /var/log/open5gs/*
+
+########################################
+# Stop Open5GS 4G EPC
+########################################
+sudo systemctl stop open5gs-mmed
+sudo systemctl stop open5gs-sgwcd
+sudo systemctl stop open5gs-sgwud
+sudo systemctl stop open5gs-hssd
+sudo systemctl stop open5gs-pcrfd
+
+########################################
+# Stop Open5GS 5G Core
+########################################
+sudo systemctl stop open5gs-smfd
+sudo systemctl stop open5gs-amfd
+sudo systemctl stop open5gs-upfd
+sudo systemctl stop open5gs-nrfd
+sudo systemctl stop open5gs-scpd
+sudo systemctl stop open5gs-ausfd
+sudo systemctl stop open5gs-udmd
+sudo systemctl stop open5gs-pcfd
+sudo systemctl stop open5gs-nssfd
+sudo systemctl stop open5gs-bsfd
+sudo systemctl stop open5gs-udrd
+
+########################################
+# Stop Open5GS WebUI
+########################################
+sudo systemctl stop open5gs-webui
+
+
+########################################
+# Restart Open5GS 5G Core
+########################################
+########################################
+# Restart Open5GS 5GC Database
+########################################
+sudo systemctl restart open5gs-udrd
+sudo systemctl restart open5gs-udmd
+sudo systemctl restart open5gs-ausfd
+
+########################################
+# Restart Open5GS 5GC Service Discovery
+########################################
+sudo systemctl restart open5gs-nrfd
+sudo systemctl restart open5gs-scpd
+
+########################################
+# Restart Open5GS 5GC Policy Functions
+########################################
+sudo systemctl restart open5gs-nssfd
+sudo systemctl restart open5gs-bsfd
+sudo systemctl restart open5gs-pcfd
+
+########################################
+# Restart Open5GS 5GC AMF/SMF/UPF
+########################################
+sudo systemctl restart open5gs-amfd
+sudo systemctl restart open5gs-smfd
+sudo systemctl restart open5gs-upfd
+
+########################################
+# Restart Open5GS WebUI
+########################################
+sudo systemctl restart open5gs-webui
+```
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
 ## Configuration OGSTUN
