@@ -54,8 +54,8 @@ sudo sed -i 's/address: 127.0.0.10/address: 127.0.0.200/' /etc/open5gs/nrf.yaml
 
 
 # COPY ALL SYSTEMD FILES
+sudo cp /build/configs/systemd/*.service /etc/systemd/system/
 cd ..
-sudo cp open5gs/build/configs/systemd/*.service /etc/systemd/system/
 
 
 
