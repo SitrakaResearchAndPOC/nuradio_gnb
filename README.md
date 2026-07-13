@@ -78,6 +78,23 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 chmod +x install_uhd_v4.1.0.5.sh && bash install_uhd_v4.1.0.5.sh
 ```
+### Verify UHD
+```
+uhd_config_info --version
+```
+```
+uhd_config_info --print-all
+```
+```
+which uhd_find_devices
+```
+```
+which uhd_usrp_probe
+```
+```
+which uhd_images_downloader
+```
+
 ### Install FW images
 ```
 sudo /usr/local/lib/uhd/utils/uhd_images_downloader.py
@@ -89,6 +106,16 @@ sudo uhd_images_downloader
 ### Verify FW is download completly
 ```
 ls /usr/lib/uhd/utils
+```
+### Verify with pluging USRP
+```
+uhd_find_devices
+```
+```
+uhd_usrp_probe
+```
+```
+sudo query_gpsdo_sensors 
 ```
 
 ## Install srsRAN
