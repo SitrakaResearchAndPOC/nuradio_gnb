@@ -13,6 +13,7 @@ sudo git checkout v4.1.0.5
 
 ls
 
+# PATCH OF GPSDO 
  ( grep -qF 'static const std::regex gp_msg_regex("^\\$G.*$");' host/lib/usrp/gps_ctrl.cpp ||   sed -i '/static const std::regex gp_msg_regex/{s|^|// |;a\
 static const std::regex gp_msg_regex("^\\\\$G.*$");
 }' host/lib/usrp/gps_ctrl.cpp ) && ( grep -qF 'if(msg.substr(1,2) == "GN"){ msg.replace(1, 2, "GP");}' host/lib/usrp/gps_ctrl.cpp ||   sed -i '/msgs\[msg\.substr(1, 5)\] = msg;/i\
@@ -27,7 +28,7 @@ cd build/
 
 sudo cmake .. 
 
-sudo make -j $(nproc --ignore 2)
+sudo make -j $(nproc --ignore 1)
 
 sudo make install
 
@@ -35,6 +36,6 @@ sudo ldconfig
 
 sudo ln -s /usr/local/lib/uhd/utils/query_gpsdo_sensors /usr/local/bin/query_gpsdo_sensors
 
-sudo uhd_images_downloader 
+# sudo uhd_images_downloader 
 
 sudo query_gpsdo_sensors 
