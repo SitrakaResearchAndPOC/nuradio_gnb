@@ -55,10 +55,10 @@ The installation is by source due to the GPSDO which need to be patched
 cd nuradio
 ```
 ```
-[ -f "uhd_v4.1.0.5_install.sh" ] && sudo rm -rf uhd_v4.1.0.5_install.sh; wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/uhd_v4.1.0.5_install.sh
+[ -f "install_uhd_v4.1.0.5.sh" ] && sudo rm -rf install_uhd_v4.1.0.5.sh; wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_uhd_v4.1.0.5.sh
 ```
 ```
-chmod +x uhd_v4.1.0.5_install.sh && bash uhd_v4.1.0.5_install.sh
+chmod +x install_uhd_v4.1.0.5.sh && bash install_uhd_v4.1.0.5.sh
 ```
 ### Install FW images
 ```
