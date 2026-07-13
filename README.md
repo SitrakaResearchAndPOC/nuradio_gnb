@@ -11,7 +11,7 @@ pwd | grep nuradio
 ```
 ## Installation utility
 ```
-sudo apt update && apt install -y wget curl neofetch
+sudo apt update && sudo apt install -y wget curl neofetch
 ```
 
 ## Verification of installation of utility
@@ -23,10 +23,10 @@ neofetch
 ```
 ## Installation CPU optimization
 ```
-sudo apt install linux-lowlatency linux-headers-lowlatency linux-tools-lowlatency linux-cloud-tools-lowlatency
+sudo apt install -y linux-lowlatency linux-headers-lowlatency linux-tools-lowlatency linux-cloud-tools-lowlatency
 ```
 ```
-apt install cset stress-ng
+sudo apt install  -y cset stress-ng
 ```
 ### To add menu mode
 ```
