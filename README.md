@@ -1,6 +1,8 @@
 # STEP 0 : PREPARING SYSTEM
 ## Install Ubuntu 22.04
-Download and install ubuntu 22.04
+* Download and install ubuntu 22.04
+* Use RAM >= 4Gio
+
 ## Creation repository
 ```
 [ -d "nuradio" ] && sudo rm -rf nuradio; mkdir nuradio && cd nuradio
