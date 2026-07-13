@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt update
 sudo apt install -y cmake make gcc g++ pkg-config libfftw3-dev libmbedtls-dev libsctp-dev libyaml-cpp-dev libgtest-dev 
 
 # sudo git clone https://github.com/srsRAN/srsRAN_project
@@ -20,9 +21,9 @@ cd build || exit 1
 
 sudo cmake ../
 
-sudo make -j $(nproc --ignore 2)
+sudo make -j $(nproc --ignore 1)
 
-sudo make test -j $(nproc --ignore 2)
+sudo make test -j $(nproc --ignore 1)
 
 sudo make install
 
