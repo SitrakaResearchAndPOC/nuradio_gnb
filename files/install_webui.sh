@@ -17,8 +17,8 @@ if id open5gs >/dev/null 2>&1; then
     fi
 fi
 
-[ ! -d open5gs ] && git clone https://github.com/open5gs/open5gs
-cd open5gs/
+[ ! -d open5gs-webui ] && git clone https://github.com/open5gs/open5gs open5gs-webui
+cd open5gs-webui/
 git checkout v2.7.0
 
 ############################### INSTALLLATION WEBUI ###########################################################
