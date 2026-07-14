@@ -491,14 +491,16 @@ The goal is to have schenario 3,
 
 * scenario 2 : OGSTUN Interface is not with no IP Address
 1. ifconfig  </br>
+
 <table border="1">
-  <tr>
-    <th>Configuration de l'interface</th>
-  </tr>
-  <tr>
-    <td>
+<tr>
+<th> Scenario 2 </th>
+</tr>
+<tr>
+<td>
+
 <pre>
-<span style="color:green"><b>ogstun</b></span>: flags=4241&lt;UP,POINTOPOINT,NOARP,MULTICAST&gt; mtu 1400
+<font color="green"><b>ogstun</b></font>: flags=4241&lt;UP,POINTOPOINT,NOARP,MULTICAST&gt; mtu 1400
         inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20&lt;link&gt;
         unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
         RX packets 772 bytes 50678 (49.4 KiB)
@@ -506,8 +508,9 @@ The goal is to have schenario 3,
         TX packets 213 bytes 10776 (10.5 KiB)
         TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0
 </pre>
-    </td>
-  </tr>
+
+</td>
+</tr>
 </table>
 
 2. sudo ip addr add 10.45.0.1/16 dev ogstun
