@@ -492,9 +492,11 @@ The goal is to have schenario 3,
 * scenario 2 : OGSTUN Interface is not with no IP Address
 1. ifconfig  </br>
 
-<table border="1">
+<div align="center">
+
+<table border="1" align="center">
 <tr>
-<th> Scenario 2 </th>
+<th align="center">Scenario 2</th>
 </tr>
 <tr>
 <td>
@@ -513,6 +515,7 @@ The goal is to have schenario 3,
 </tr>
 </table>
 
+</div>
 2. sudo ip addr add 10.45.0.1/16 dev ogstun
 
 scenario 3 :  OGSTUN Interface is configured with IP Address </br>
