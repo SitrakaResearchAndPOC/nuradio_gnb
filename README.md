@@ -434,7 +434,6 @@ The goal is to have schenario 3,
 
 * Scenario 2 : OGSTUN Interface is not with no IP Address
 1. ifconfig  </br>
-
 <div align="center">
 
 <table border="1" align="center">
@@ -445,9 +444,8 @@ The goal is to have schenario 3,
 <td>
 
 <pre>
-<font color="green"><b>ogstun</b></font>: flags=430&lt;UP,POINTOPOINT,RUNNING,NOARP,MULTICAST&gt; mtu 1400
+<font color="green"><b>ogstun</b></font>: flags=4241&lt;UP,POINTOPOINT,NOARP,MULTICAST&gt; mtu 1400
         inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20&lt;link&gt;
-        <font color="green"><b>inet</b></font> 2001:db8:ca0e::1 prefixlen 48 scopeid 0x0&lt;global&gt;
         unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
         RX packets 772 bytes 50678 (49.4 KiB)
         RX errors 0 dropped 0 overruns 0 frame 0
