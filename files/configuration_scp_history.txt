@@ -1,0 +1,34 @@
+
+sudo su
+cd nuradio/
+sudo modprobe tun
+lsmod | grep tun
+modinfo tun
+ls -l /dev/net/tun
+sudo ss -ltnp | grep 7777
+sudo lsof -i :7777
+grep -n "127.0.0.200" /etc/open5gs/scp.yaml
+grep -n "127.0.0.200" /etc/open5gs/nrf.yaml
+ip link show ogstun
+ip addr show ogstun
+sudo ip tuntap add dev ogstun mode tun
+sudo ip addr add 10.45.0.1/16 dev ogstun
+sudo ip link set ogstun up
+
+ip link show ogstun
+# sudo sed -n '1,80p' /etc/open5gs/scp.yaml
+# sudo sed -n '1,80p' /etc/open5gs/nrf.yaml
+sudo ss -ltnp | grep 127.0.0.10:7777
+sudo lsof -iTCP@127.0.0.10:7777 -sTCP:LISTEN
+sudo sed -i 's/127\.0\.0\.200/127.0.1.10/' /etc/open5gs/scp.yaml
+
+grep -n "address:" /etc/open5gs/scp.yaml
+
+sudo sed -i 's|http://127\.0\.0\.10:7777|http://127.0.0.200:7777|' /etc/open5gs/scp.yaml
+grep -A2 "client:" /etc/open5gs/scp.yaml
+
+sudo systemctl restart open5gs-scpd
+sudo systemctl status open5gs-scpd
+
+
+

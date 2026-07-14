@@ -1,0 +1,1655 @@
+sudo systemctl restart open5gs-scpd et sudo systemctl restart open5gs-upfd
+ ne demarre pas 
+ ***************************************
+ Si ces commandes :
+
+```bash
+sudo systemctl restart open5gs-scpd
+sudo systemctl restart open5gs-upfd
+```
+
+ne démarrent pas les services, il faut vérifier la cause exacte. Commence par exécuter les commandes suivantes et partage leur sortie :
+
+```bash
+sudo systemctl status open5gs-scpd
+```
+
+et
+
+```bash
+sudo systemctl status open5gs-upfd
+```
+
+Ensuite, consulte les journaux :
+
+```bash
+sudo journalctl -u open5gs-scpd -n 50 --no-pager
+```
+
+```bash
+sudo journalctl -u open5gs-upfd -n 50 --no-pager
+```
+
+Tu peux également vérifier si les fichiers de configuration sont valides :
+
+```bash
+ls -l /etc/open5gs/
+```
+
+Vérifie notamment que les fichiers suivants existent :
+
+```text
+/etc/open5gs/scp.yaml
+/etc/open5gs/upf.yaml
+```
+
+Enfin, assure-toi que les services existent bien :
+
+```bash
+systemctl list-unit-files | grep open5gs
+```
+
+ou
+
+```bash
+systemctl | grep open5gs
+```
+
+### Causes fréquentes
+
+* Erreur de syntaxe dans `scp.yaml` ou `upf.yaml`.
+* Adresse IP configurée qui n'existe pas sur la machine.
+* Port déjà utilisé par un autre processus.
+* Les paquets Open5GS installés ne contiennent pas `scpd` (certaines versions n'incluent pas le SCP).
+
+Peux-tu me fournir le résultat de :
+
+```bash
+sudo systemctl status open5gs-scpd
+sudo systemctl status open5gs-upfd
+sudo journalctl -u open5gs-scpd -n 20 --no-pager
+sudo journalctl -u open5gs-upfd -n 20 --no-pager
+```
+
+Avec ces informations, je pourrai identifier précisément pourquoi ils ne démarrent pas.
+
+
+
+
+#####################################################"""""""
+root@nuradio:/home/nuradio/nuradio# sudo systemctl status open5gs-scpd
+● open5gs-scpd.service - Open5GS SCP Daemon
+     Loaded: loaded (/etc/systemd/system/open5gs-scpd.service; enabled; vendor preset: enabled)
+     Active: activating (auto-restart) (Result: exit-code) since Tue 2026-07-14 04:11:39 EAT; 1s ago
+    Process: 5612 ExecStart=/usr/bin/open5gs-scpd -c /etc/open5gs/scp.yaml (code=exited, status=255/EXCEPTION)
+   Main PID: 5612 (code=exited, status=255/EXCEPTION)
+        CPU: 16ms
+root@nuradio:/home/nuradio/nuradio# sudo systemctl status open5gs-upfd
+× open5gs-upfd.service - Open5GS UPF Daemon
+     Loaded: loaded (/etc/systemd/system/open5gs-upfd.service; enabled; vendor preset: enabled)
+     Active: failed (Result: exit-code) since Tue 2026-07-14 04:11:43 EAT; 3s ago
+    Process: 5620 ExecStart=/usr/bin/open5gs-upfd -c /etc/open5gs/upf.yaml (code=exited, status=255/EXCEPTION)
+   Main PID: 5620 (code=exited, status=255/EXCEPTION)
+        CPU: 29ms
+
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 139.
+Jol 14 04:11:43 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Start request repeated too quickly.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:43 nuradio systemd[1]: Failed to start Open5GS UPF Daemon.
+root@nuradio:/home/nuradio/nuradio# sudo journalctl -u open5gs-scpd -n 50 --no-pager
+Jol 14 04:11:34 nuradio open5gs-scpd[5602]: 07/14 04:11:34.999: [sock] ERROR: tcp_server() [127.0.0.200]:7777 failed (98:Address already in use) (../lib/core/ogs-tcp.c:72)
+Jol 14 04:11:35 nuradio open5gs-scpd[5602]: 07/14 04:11:34.999: [sbi] ERROR: Cannot start SBI server (../lib/sbi/nghttp2-server.c:389)
+Jol 14 04:11:35 nuradio open5gs-scpd[5602]: 07/14 04:11:34.999: [app] ERROR: Failed to initialize SCP (../src/scp/app.c:28)
+Jol 14 04:11:35 nuradio open5gs-scpd[5602]: 07/14 04:11:34.999: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:35 nuradio systemd[1]: open5gs-scpd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:35 nuradio systemd[1]: open5gs-scpd.service: Failed with result 'exit-code'.
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-scpd.service: Scheduled restart job, restart counter is at 139.
+Jol 14 04:11:37 nuradio systemd[1]: Stopped Open5GS SCP Daemon.
+Jol 14 04:11:37 nuradio systemd[1]: Started Open5GS SCP Daemon.
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: Open5GS daemon v2.7.0
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: 07/14 04:11:37.138: [app] INFO: Configuration: '/etc/open5gs/scp.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: 07/14 04:11:37.138: [app] INFO: File Logging: '/var/log/open5gs/scp.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: 07/14 04:11:37.140: [sock] ERROR: socket bind(2) [127.0.0.200]:7777 failed (98:Address already in use) (../lib/core/ogs-socket.c:114)
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: 07/14 04:11:37.140: [sock] ERROR: tcp_server() [127.0.0.200]:7777 failed (98:Address already in use) (../lib/core/ogs-tcp.c:72)
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: 07/14 04:11:37.140: [sbi] ERROR: Cannot start SBI server (../lib/sbi/nghttp2-server.c:389)
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: 07/14 04:11:37.140: [app] ERROR: Failed to initialize SCP (../src/scp/app.c:28)
+Jol 14 04:11:37 nuradio open5gs-scpd[5609]: 07/14 04:11:37.140: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-scpd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-scpd.service: Failed with result 'exit-code'.
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-scpd.service: Scheduled restart job, restart counter is at 140.
+Jol 14 04:11:39 nuradio systemd[1]: Stopped Open5GS SCP Daemon.
+Jol 14 04:11:39 nuradio systemd[1]: Started Open5GS SCP Daemon.
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: Open5GS daemon v2.7.0
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: 07/14 04:11:39.392: [app] INFO: Configuration: '/etc/open5gs/scp.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: 07/14 04:11:39.392: [app] INFO: File Logging: '/var/log/open5gs/scp.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: 07/14 04:11:39.397: [sock] ERROR: socket bind(2) [127.0.0.200]:7777 failed (98:Address already in use) (../lib/core/ogs-socket.c:114)
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: 07/14 04:11:39.397: [sock] ERROR: tcp_server() [127.0.0.200]:7777 failed (98:Address already in use) (../lib/core/ogs-tcp.c:72)
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: 07/14 04:11:39.397: [sbi] ERROR: Cannot start SBI server (../lib/sbi/nghttp2-server.c:389)
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: 07/14 04:11:39.397: [app] ERROR: Failed to initialize SCP (../src/scp/app.c:28)
+Jol 14 04:11:39 nuradio open5gs-scpd[5612]: 07/14 04:11:39.397: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-scpd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-scpd.service: Failed with result 'exit-code'.
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-scpd.service: Scheduled restart job, restart counter is at 141.
+Jol 14 04:11:41 nuradio systemd[1]: Stopped Open5GS SCP Daemon.
+Jol 14 04:11:41 nuradio systemd[1]: Started Open5GS SCP Daemon.
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: Open5GS daemon v2.7.0
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: 07/14 04:11:41.637: [app] INFO: Configuration: '/etc/open5gs/scp.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: 07/14 04:11:41.637: [app] INFO: File Logging: '/var/log/open5gs/scp.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: 07/14 04:11:41.638: [sock] ERROR: socket bind(2) [127.0.0.200]:7777 failed (98:Address already in use) (../lib/core/ogs-socket.c:114)
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: 07/14 04:11:41.638: [sock] ERROR: tcp_server() [127.0.0.200]:7777 failed (98:Address already in use) (../lib/core/ogs-tcp.c:72)
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: 07/14 04:11:41.638: [sbi] ERROR: Cannot start SBI server (../lib/sbi/nghttp2-server.c:389)
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: 07/14 04:11:41.638: [app] ERROR: Failed to initialize SCP (../src/scp/app.c:28)
+Jol 14 04:11:41 nuradio open5gs-scpd[5619]: 07/14 04:11:41.638: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-scpd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-scpd.service: Failed with result 'exit-code'.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-scpd.service: Scheduled restart job, restart counter is at 142.
+Jol 14 04:11:43 nuradio systemd[1]: Stopped Open5GS SCP Daemon.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-scpd.service: Start request repeated too quickly.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-scpd.service: Failed with result 'exit-code'.
+Jol 14 04:11:43 nuradio systemd[1]: Failed to start Open5GS SCP Daemon.
+root@nuradio:/home/nuradio/nuradio# sudo journalctl -u open5gs-upfd -n 50 --no-pager
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 136.
+Jol 14 04:11:37 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:37 nuradio systemd[1]: Started Open5GS UPF Daemon.
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: Open5GS daemon v2.7.0
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.139: [app] INFO: Configuration: '/etc/open5gs/upf.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.139: [app] INFO: File Logging: '/var/log/open5gs/upf.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [metrics] INFO: metrics_server() [http://127.0.0.7]:9090 (../lib/metrics/prometheus/context.c:299)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [pfcp] INFO: pfcp_server() [127.0.0.7]:8805 (../lib/pfcp/path.c:30)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [gtp] INFO: gtp_server() [127.0.0.7]:2152 (../lib/gtp/path.c:30)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [sock] ERROR: ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted) (../lib/tun/linux-setup.c:62)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [upf] ERROR: tun_open(dev:ogstun) failed (../src/upf/gtp-path.c:793)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [app] ERROR: Failed to initialize UPF (../src/upf/app.c:28)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-upfd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 137.
+Jol 14 04:11:39 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:39 nuradio systemd[1]: Started Open5GS UPF Daemon.
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: Open5GS daemon v2.7.0
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.394: [app] INFO: Configuration: '/etc/open5gs/upf.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.394: [app] INFO: File Logging: '/var/log/open5gs/upf.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [metrics] INFO: metrics_server() [http://127.0.0.7]:9090 (../lib/metrics/prometheus/context.c:299)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [pfcp] INFO: pfcp_server() [127.0.0.7]:8805 (../lib/pfcp/path.c:30)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [gtp] INFO: gtp_server() [127.0.0.7]:2152 (../lib/gtp/path.c:30)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [sock] ERROR: ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted) (../lib/tun/linux-setup.c:62)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [upf] ERROR: tun_open(dev:ogstun) failed (../src/upf/gtp-path.c:793)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [app] ERROR: Failed to initialize UPF (../src/upf/app.c:28)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-upfd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 138.
+Jol 14 04:11:41 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:41 nuradio systemd[1]: Started Open5GS UPF Daemon.
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: Open5GS daemon v2.7.0
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.637: [app] INFO: Configuration: '/etc/open5gs/upf.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.637: [app] INFO: File Logging: '/var/log/open5gs/upf.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [metrics] INFO: metrics_server() [http://127.0.0.7]:9090 (../lib/metrics/prometheus/context.c:299)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [pfcp] INFO: pfcp_server() [127.0.0.7]:8805 (../lib/pfcp/path.c:30)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [gtp] INFO: gtp_server() [127.0.0.7]:2152 (../lib/gtp/path.c:30)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [sock] ERROR: ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted) (../lib/tun/linux-setup.c:62)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [upf] ERROR: tun_open(dev:ogstun) failed (../src/upf/gtp-path.c:793)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [app] ERROR: Failed to initialize UPF (../src/upf/app.c:28)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-upfd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 139.
+Jol 14 04:11:43 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Start request repeated too quickly.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:43 nuradio systemd[1]: Failed to start Open5GS UPF Daemon.
+root@nuradio:/home/nuradio/nuradio# sudo journalctl -u open5gs-upfd -n 50 --no-pager
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 136.
+Jol 14 04:11:37 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:37 nuradio systemd[1]: Started Open5GS UPF Daemon.
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: Open5GS daemon v2.7.0
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.139: [app] INFO: Configuration: '/etc/open5gs/upf.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.139: [app] INFO: File Logging: '/var/log/open5gs/upf.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [metrics] INFO: metrics_server() [http://127.0.0.7]:9090 (../lib/metrics/prometheus/context.c:299)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [pfcp] INFO: pfcp_server() [127.0.0.7]:8805 (../lib/pfcp/path.c:30)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [gtp] INFO: gtp_server() [127.0.0.7]:2152 (../lib/gtp/path.c:30)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [sock] ERROR: ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted) (../lib/tun/linux-setup.c:62)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [upf] ERROR: tun_open(dev:ogstun) failed (../src/upf/gtp-path.c:793)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [app] ERROR: Failed to initialize UPF (../src/upf/app.c:28)
+Jol 14 04:11:37 nuradio open5gs-upfd[5610]: 07/14 04:11:37.161: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-upfd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:37 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 137.
+Jol 14 04:11:39 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:39 nuradio systemd[1]: Started Open5GS UPF Daemon.
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: Open5GS daemon v2.7.0
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.394: [app] INFO: Configuration: '/etc/open5gs/upf.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.394: [app] INFO: File Logging: '/var/log/open5gs/upf.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [metrics] INFO: metrics_server() [http://127.0.0.7]:9090 (../lib/metrics/prometheus/context.c:299)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [pfcp] INFO: pfcp_server() [127.0.0.7]:8805 (../lib/pfcp/path.c:30)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [gtp] INFO: gtp_server() [127.0.0.7]:2152 (../lib/gtp/path.c:30)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [sock] ERROR: ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted) (../lib/tun/linux-setup.c:62)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [upf] ERROR: tun_open(dev:ogstun) failed (../src/upf/gtp-path.c:793)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [app] ERROR: Failed to initialize UPF (../src/upf/app.c:28)
+Jol 14 04:11:39 nuradio open5gs-upfd[5613]: 07/14 04:11:39.422: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-upfd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:39 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 138.
+Jol 14 04:11:41 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:41 nuradio systemd[1]: Started Open5GS UPF Daemon.
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: Open5GS daemon v2.7.0
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.637: [app] INFO: Configuration: '/etc/open5gs/upf.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.637: [app] INFO: File Logging: '/var/log/open5gs/upf.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [metrics] INFO: metrics_server() [http://127.0.0.7]:9090 (../lib/metrics/prometheus/context.c:299)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [pfcp] INFO: pfcp_server() [127.0.0.7]:8805 (../lib/pfcp/path.c:30)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [gtp] INFO: gtp_server() [127.0.0.7]:2152 (../lib/gtp/path.c:30)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [sock] ERROR: ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted) (../lib/tun/linux-setup.c:62)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [upf] ERROR: tun_open(dev:ogstun) failed (../src/upf/gtp-path.c:793)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [app] ERROR: Failed to initialize UPF (../src/upf/app.c:28)
+Jol 14 04:11:41 nuradio open5gs-upfd[5620]: 07/14 04:11:41.661: [app] FATAL: Open5GS initialization failed. Aborted (../src/main.c:219)
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-upfd.service: Main process exited, code=exited, status=255/EXCEPTION
+Jol 14 04:11:41 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Scheduled restart job, restart counter is at 139.
+Jol 14 04:11:43 nuradio systemd[1]: Stopped Open5GS UPF Daemon.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Start request repeated too quickly.
+Jol 14 04:11:43 nuradio systemd[1]: open5gs-upfd.service: Failed with result 'exit-code'.
+Jol 14 04:11:43 nuradio systemd[1]: Failed to start Open5GS UPF Daemon.
+root@nuradio:/home/nuradio/nuradio# 
+
+************************************************************
+
+Les journaux montrent deux problèmes distincts.
+
+## 1. SCP : le port 7777 est déjà utilisé
+
+L'erreur est explicite :
+
+```text
+socket bind(2) [127.0.0.200]:7777 failed (98: Address already in use)
+```
+
+Cela signifie qu'un autre processus écoute déjà sur **127.0.0.200:7777**.
+
+Vérifie lequel :
+
+```bash
+sudo ss -ltnp | grep 7777
+```
+
+ou
+
+```bash
+sudo lsof -i :7777
+```
+
+Selon le résultat :
+
+* si c'est un autre `open5gs-scpd` lancé manuellement, termine-le :
+
+```bash
+sudo pkill -9 open5gs-scpd
+sudo systemctl restart open5gs-scpd
+```
+
+* si c'est un autre service (par exemple NRF ou une autre instance SCP), il faudra modifier le port dans `/etc/open5gs/scp.yaml` ou arrêter le service qui occupe ce port.
+
+---
+
+## 2. UPF : problème avec l'interface TUN
+
+L'erreur est :
+
+```text
+ioctl() failed : dev[/dev/net/tun] flags[0x1000] (Operation not permitted)
+
+tun_open(dev:ogstun) failed
+```
+
+Ce n'est **pas un problème Open5GS**, mais un problème d'accès au périphérique **/dev/net/tun**.
+
+### Vérifie d'abord :
+
+```bash
+ls -l /dev/net/tun
+```
+
+puis
+
+```bash
+lsmod | grep tun
+```
+
+Si rien n'apparaît :
+
+```bash
+sudo modprobe tun
+```
+
+Puis :
+
+```bash
+lsmod | grep tun
+```
+
+---
+
+## 3. Vérifie si tu es dans une machine virtuelle ou un conteneur
+
+Exécute :
+
+```bash
+systemd-detect-virt
+```
+
+Si la réponse est par exemple :
+
+```
+docker
+lxc
+openvz
+```
+
+alors c'est probablement la raison de l'erreur **Operation not permitted** : le conteneur n'a pas accès au périphérique TUN.
+
+---
+
+## 4. Vérifie que l'interface `ogstun` existe
+
+```bash
+ip link show ogstun
+```
+
+Si elle n'existe pas, crée-la :
+
+```bash
+sudo ip tuntap add name ogstun mode tun
+sudo ip addr add 10.45.0.1/16 dev ogstun
+sudo ip link set ogstun up
+```
+
+---
+
+### J'ai besoin de ces quatre commandes
+
+Peux-tu exécuter :
+
+```bash
+sudo ss -ltnp | grep 7777
+
+ls -l /dev/net/tun
+
+lsmod | grep tun
+
+systemd-detect-virt
+```
+
+Avec leur sortie, on pourra déterminer précisément :
+
+* pourquoi le SCP ne peut pas utiliser le port 7777 ;
+* pourquoi le UPF n'a pas l'autorisation d'ouvrir `ogstun`.
+
+
+################################################################"""
+
+nuradio@nuradio:~$ cd nuradio/
+nuradio@nuradio:~/nuradio$ sudo modeprob tun
+sudo: modeprob: command not found
+nuradio@nuradio:~/nuradio$ sudo modeprobe tun
+sudo: modeprobe: command not found
+nuradio@nuradio:~/nuradio$ sudo modprobe tun
+nuradio@nuradio:~/nuradio$ lsmod | grep tun
+ip6_udp_tunnel         16384  1 sctp
+udp_tunnel             20480  1 sctp
+nuradio@nuradio:~/nuradio$ sudo systemctl status mongod^C
+nuradio@nuradio:~/nuradio$  sudo systemctl restart open5gs-scpd
+nuradio@nuradio:~/nuradio$ lsmod | grep tu^C
+nuradio@nuradio:~/nuradio$  sudo systemctl status open5gs-scpd
+● open5gs-scpd.service - Open5GS SCP Daemon
+     Loaded: loaded (/etc/systemd/system/open5gs-scpd.service; enabled; vendor preset: enabled)
+     Active: activating (auto-restart) (Result: exit-code) since Tue 2026-07-14 04:13:50 EAT; 60ms ago
+    Process: 5733 ExecStart=/usr/bin/open5gs-scpd -c /etc/open5gs/scp.yaml (code=exited, status=255/EXCEPTION)
+   Main PID: 5733 (code=exited, status=255/EXCEPTION)
+        CPU: 7ms
+nuradio@nuradio:~/nuradio$ 
+
+*************************************************************
+
+Le fait que `modprobe tun` ne produise aucune erreur est bon signe, mais le fait que :
+
+```bash
+lsmod | grep tun
+```
+
+ne montre pas le module `tun` est inhabituel. Les lignes :
+
+```text
+ip6_udp_tunnel
+udp_tunnel
+```
+
+ne correspondent pas au module **tun**.
+
+Il faut vérifier quelques points.
+
+1. Vérifie que le module est disponible :
+
+```bash
+modinfo tun
+```
+
+2. Vérifie que le périphérique TUN existe :
+
+```bash
+ls -l /dev/net/tun
+```
+
+3. Vérifie si tu es dans une machine virtuelle ou un conteneur :
+
+```bash
+systemd-detect-virt
+```
+
+4. Pour le SCP, identifie ce qui occupe le port 7777 :
+
+```bash
+sudo ss -ltnp | grep 7777
+```
+
+ou
+
+```bash
+sudo lsof -i :7777
+```
+
+### Ce que l'on sait déjà
+
+Tu as **deux problèmes indépendants** :
+
+* **SCP** : il ne démarre pas parce que le port `127.0.0.200:7777` est déjà utilisé.
+* **UPF** : il ne démarre pas parce qu'il ne peut pas ouvrir `/dev/net/tun`.
+
+Pour aller plus loin, j'ai besoin des sorties des quatre commandes ci-dessus.
+
+J'aimerais également savoir sur quel environnement Open5GS est installé. Est-ce :
+
+* Ubuntu installé directement sur un PC (bare metal) ?
+* une machine virtuelle (VMware, VirtualBox, KVM, etc.) ?
+* un conteneur Docker ou LXC ?
+* WSL sous Windows ?
+
+Cette information est importante, car l'erreur `Operation not permitted` sur `/dev/net/tun` est fréquente dans certains environnements virtualisés.
+
+
+#############################################################"""
+
+Je suis dans une machine réelle : nuradio@nuradio:~/nuradio$  sudo systemctl status open5gs-scpd
+● open5gs-scpd.service - Open5GS SCP Daemon
+     Loaded: loaded (/etc/systemd/system/open5gs-scpd.service; enabled; vendor preset: enabled)
+     Active: activating (auto-restart) (Result: exit-code) since Tue 2026-07-14 04:13:50 EAT; 60ms ago
+    Process: 5733 ExecStart=/usr/bin/open5gs-scpd -c /etc/open5gs/scp.yaml (code=exited, status=255/EXCEPTION)
+   Main PID: 5733 (code=exited, status=255/EXCEPTION)
+        CPU: 7ms
+nuradio@nuradio:~/nuradio$ modinfo tun
+name:           tun
+filename:       (builtin)
+alias:          devname:net/tun
+alias:          char-major-10-200
+license:        GPL
+file:           drivers/net/tun
+author:         (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+description:    Universal TUN/TAP device driver
+nuradio@nuradio:~/nuradio$ ls -l /dev/net/tun
+crw-rw-rw- 1 root root 10, 200 Jol 14 04:09 /dev/net/tun
+nuradio@nuradio:~/nuradio$ sudo ss -ltnp | grep 7777
+LISTEN 0      5         127.0.0.20:7777       0.0.0.0:*    users:(("open5gs-udrd",pid=3681,fd=9))   
+LISTEN 0      5          127.0.0.4:7777       0.0.0.0:*    users:(("open5gs-smfd",pid=3735,fd=19))  
+LISTEN 0      5          127.0.0.5:7777       0.0.0.0:*    users:(("open5gs-amfd",pid=3728,fd=9))   
+LISTEN 0      5         127.0.0.12:7777       0.0.0.0:*    users:(("open5gs-udmd",pid=3686,fd=8))   
+LISTEN 0      5         127.0.0.13:7777       0.0.0.0:*    users:(("open5gs-pcfd",pid=3723,fd=10))  
+LISTEN 0      5         127.0.0.11:7777       0.0.0.0:*    users:(("open5gs-ausfd",pid=3694,fd=8))  
+LISTEN 0      5         127.0.0.14:7777       0.0.0.0:*    users:(("open5gs-nssfd",pid=3711,fd=8))  
+LISTEN 0      5         127.0.0.15:7777       0.0.0.0:*    users:(("open5gs-bsfd",pid=3717,fd=8))   
+LISTEN 0      5        127.0.0.200:7777       0.0.0.0:*    users:(("open5gs-nrfd",pid=3700,fd=6))   
+nuradio@nuradio:~/nuradio$ sudo lsof -i :7777
+COMMAND    PID    USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+open5gs-u 3681 open5gs    9u  IPv4  61463      0t0  TCP localhost:7777 (LISTEN)
+open5gs-u 3681 open5gs   10u  IPv4  61562      0t0  TCP localhost:56854->localhost:7777 (ESTABLISHED)
+open5gs-u 3686 open5gs    8u  IPv4  41772      0t0  TCP localhost:7777 (LISTEN)
+open5gs-u 3686 open5gs    9u  IPv4  41876      0t0  TCP localhost:56856->localhost:7777 (ESTABLISHED)
+open5gs-a 3694 open5gs    8u  IPv4  41785      0t0  TCP localhost:7777 (LISTEN)
+open5gs-a 3694 open5gs    9u  IPv4  61152      0t0  TCP localhost:56866->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs    6u  IPv4  46826      0t0  TCP localhost:7777 (LISTEN)
+open5gs-n 3700 open5gs    7u  IPv4  53699      0t0  TCP localhost:7777->localhost:37376 (ESTABLISHED)
+open5gs-n 3700 open5gs   12u  IPv4  46868      0t0  TCP localhost:7777->localhost:37386 (ESTABLISHED)
+open5gs-n 3700 open5gs   17u  IPv4  53729      0t0  TCP localhost:7777->localhost:37392 (ESTABLISHED)
+open5gs-n 3700 open5gs   22u  IPv4  61518      0t0  TCP localhost:7777->localhost:37406 (ESTABLISHED)
+open5gs-n 3700 open5gs   27u  IPv4  53763      0t0  TCP localhost:7777->localhost:37422 (ESTABLISHED)
+open5gs-n 3700 open5gs   32u  IPv4  53770      0t0  TCP localhost:42214->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs   33u  IPv4  53835      0t0  TCP localhost:7777->localhost:56854 (ESTABLISHED)
+open5gs-n 3700 open5gs   38u  IPv4  53842      0t0  TCP localhost:50468->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs   39u  IPv4  53843      0t0  TCP localhost:7777->localhost:56856 (ESTABLISHED)
+open5gs-n 3700 open5gs   44u  IPv4  53850      0t0  TCP localhost:37272->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs   45u  IPv4  53851      0t0  TCP localhost:7777->localhost:56866 (ESTABLISHED)
+open5gs-n 3711 open5gs    8u  IPv4  46850      0t0  TCP localhost:7777 (LISTEN)
+open5gs-n 3711 open5gs    9u  IPv4  41828      0t0  TCP localhost:37376->localhost:7777 (ESTABLISHED)
+open5gs-b 3717 open5gs    8u  IPv4  61072      0t0  TCP localhost:7777 (LISTEN)
+open5gs-b 3717 open5gs    9u  IPv4  54328      0t0  TCP localhost:37386->localhost:7777 (ESTABLISHED)
+open5gs-p 3723 open5gs   10u  IPv4  41842      0t0  TCP localhost:7777 (LISTEN)
+open5gs-p 3723 open5gs   11u  IPv4  61515      0t0  TCP localhost:37392->localhost:7777 (ESTABLISHED)
+open5gs-p 3723 open5gs   12u  IPv4  61563      0t0  TCP localhost:7777->localhost:50468 (ESTABLISHED)
+open5gs-a 3728 open5gs    9u  IPv4  61106      0t0  TCP localhost:7777 (LISTEN)
+open5gs-a 3728 open5gs   11u  IPv4  46898      0t0  TCP localhost:37406->localhost:7777 (ESTABLISHED)
+open5gs-a 3728 open5gs   12u  IPv4  46908      0t0  TCP localhost:7777->localhost:42214 (ESTABLISHED)
+open5gs-s 3735 open5gs   19u  IPv4  53762      0t0  TCP localhost:7777 (LISTEN)
+open5gs-s 3735 open5gs   21u  IPv4  61537      0t0  TCP localhost:37422->localhost:7777 (ESTABLISHED)
+open5gs-s 3735 open5gs   22u  IPv4  61570      0t0  TCP localhost:7777->localhost:37272 (ESTABLISHED)
+nuradio@nuradio:~/nuradio$ 
+
+
+*******************************************************************
+
+Merci, ces informations permettent de cerner les deux problèmes.
+
+## 1. Pourquoi `open5gs-scpd` ne démarre pas
+
+Le point important est celui-ci :
+
+```text
+LISTEN 127.0.0.200:7777 users:(("open5gs-nrfd",pid=3700,...))
+```
+
+Or, dans les logs du SCP, on voit :
+
+```text
+socket bind() [127.0.0.200]:7777 failed (98: Address already in use)
+```
+
+Cela signifie que **le NRF (`open5gs-nrfd`) écoute déjà sur la même adresse IP et le même port que le SCP**.
+
+Les deux services ne peuvent pas partager `127.0.0.200:7777`.
+
+### Vérifie les fichiers de configuration
+
+Exécute :
+
+```bash
+grep -n "127.0.0.200" /etc/open5gs/scp.yaml
+grep -n "127.0.0.200" /etc/open5gs/nrf.yaml
+```
+
+Je souhaite voir les lignes contenant `127.0.0.200`.
+
+---
+
+## 2. Pourquoi `open5gs-upfd` ne démarre pas
+
+Le module TUN est intégré au noyau (`filename: (builtin)`), et `/dev/net/tun` existe, donc ce n'est pas un problème de module.
+
+Le message :
+
+```text
+ioctl() failed : dev[/dev/net/tun] flags[0x1000] (Operation not permitted)
+```
+
+fait penser à un problème avec l'interface `ogstun`.
+
+Vérifie son état :
+
+```bash
+ip link show ogstun
+```
+
+et
+
+```bash
+ip addr show ogstun
+```
+
+Si elle n'existe pas, essaie de la créer :
+
+```bash
+sudo ip tuntap add dev ogstun mode tun
+sudo ip addr add 10.45.0.1/16 dev ogstun
+sudo ip link set ogstun up
+```
+
+Puis affiche :
+
+```bash
+ip link show ogstun
+```
+
+---
+
+## 3. J'aimerais également voir le contenu des sections concernées
+
+Peux-tu envoyer le résultat de :
+
+```bash
+grep -A15 "server:" /etc/open5gs/scp.yaml
+```
+
+et
+
+```bash
+grep -A20 "gtpu:" /etc/open5gs/upf.yaml
+```
+
+### Ce que je soupçonne
+
+* **SCP** : `scp.yaml` et `nrf.yaml` sont configurés avec la même adresse (`127.0.0.200:7777`). Le SCP devrait avoir sa propre adresse (par exemple `127.0.1.10:7777`) ou le NRF devrait être configuré pour communiquer avec le SCP plutôt que d'utiliser la même adresse.
+* **UPF** : il y a probablement un problème lié à la création ou à l'accès à l'interface `ogstun`, qu'on pourra confirmer avec les commandes ci-dessus.
+
+
+####################################################################
+
+nuradio@nuradio:~/nuradio$  sudo systemctl restart open5gs-scpd
+nuradio@nuradio:~/nuradio$ lsmod | grep tu^C
+nuradio@nuradio:~/nuradio$  sudo systemctl status open5gs-scpd
+● open5gs-scpd.service - Open5GS SCP Daemon
+     Loaded: loaded (/etc/systemd/system/open5gs-scpd.service; enabled; vendor preset: enabled)
+     Active: activating (auto-restart) (Result: exit-code) since Tue 2026-07-14 04:13:50 EAT; 60ms ago
+    Process: 5733 ExecStart=/usr/bin/open5gs-scpd -c /etc/open5gs/scp.yaml (code=exited, status=255/EXCEPTION)
+   Main PID: 5733 (code=exited, status=255/EXCEPTION)
+        CPU: 7ms
+nuradio@nuradio:~/nuradio$ modinfo tun
+name:           tun
+filename:       (builtin)
+alias:          devname:net/tun
+alias:          char-major-10-200
+license:        GPL
+file:           drivers/net/tun
+author:         (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+description:    Universal TUN/TAP device driver
+nuradio@nuradio:~/nuradio$ ls -l /dev/net/tun
+crw-rw-rw- 1 root root 10, 200 Jol 14 04:09 /dev/net/tun
+nuradio@nuradio:~/nuradio$ sudo ss -ltnp | grep 7777
+LISTEN 0      5         127.0.0.20:7777       0.0.0.0:*    users:(("open5gs-udrd",pid=3681,fd=9))   
+LISTEN 0      5          127.0.0.4:7777       0.0.0.0:*    users:(("open5gs-smfd",pid=3735,fd=19))  
+LISTEN 0      5          127.0.0.5:7777       0.0.0.0:*    users:(("open5gs-amfd",pid=3728,fd=9))   
+LISTEN 0      5         127.0.0.12:7777       0.0.0.0:*    users:(("open5gs-udmd",pid=3686,fd=8))   
+LISTEN 0      5         127.0.0.13:7777       0.0.0.0:*    users:(("open5gs-pcfd",pid=3723,fd=10))  
+LISTEN 0      5         127.0.0.11:7777       0.0.0.0:*    users:(("open5gs-ausfd",pid=3694,fd=8))  
+LISTEN 0      5         127.0.0.14:7777       0.0.0.0:*    users:(("open5gs-nssfd",pid=3711,fd=8))  
+LISTEN 0      5         127.0.0.15:7777       0.0.0.0:*    users:(("open5gs-bsfd",pid=3717,fd=8))   
+LISTEN 0      5        127.0.0.200:7777       0.0.0.0:*    users:(("open5gs-nrfd",pid=3700,fd=6))   
+nuradio@nuradio:~/nuradio$ sudo lsof -i :7777
+COMMAND    PID    USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+open5gs-u 3681 open5gs    9u  IPv4  61463      0t0  TCP localhost:7777 (LISTEN)
+open5gs-u 3681 open5gs   10u  IPv4  61562      0t0  TCP localhost:56854->localhost:7777 (ESTABLISHED)
+open5gs-u 3686 open5gs    8u  IPv4  41772      0t0  TCP localhost:7777 (LISTEN)
+open5gs-u 3686 open5gs    9u  IPv4  41876      0t0  TCP localhost:56856->localhost:7777 (ESTABLISHED)
+open5gs-a 3694 open5gs    8u  IPv4  41785      0t0  TCP localhost:7777 (LISTEN)
+open5gs-a 3694 open5gs    9u  IPv4  61152      0t0  TCP localhost:56866->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs    6u  IPv4  46826      0t0  TCP localhost:7777 (LISTEN)
+open5gs-n 3700 open5gs    7u  IPv4  53699      0t0  TCP localhost:7777->localhost:37376 (ESTABLISHED)
+open5gs-n 3700 open5gs   12u  IPv4  46868      0t0  TCP localhost:7777->localhost:37386 (ESTABLISHED)
+open5gs-n 3700 open5gs   17u  IPv4  53729      0t0  TCP localhost:7777->localhost:37392 (ESTABLISHED)
+open5gs-n 3700 open5gs   22u  IPv4  61518      0t0  TCP localhost:7777->localhost:37406 (ESTABLISHED)
+open5gs-n 3700 open5gs   27u  IPv4  53763      0t0  TCP localhost:7777->localhost:37422 (ESTABLISHED)
+open5gs-n 3700 open5gs   32u  IPv4  53770      0t0  TCP localhost:42214->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs   33u  IPv4  53835      0t0  TCP localhost:7777->localhost:56854 (ESTABLISHED)
+open5gs-n 3700 open5gs   38u  IPv4  53842      0t0  TCP localhost:50468->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs   39u  IPv4  53843      0t0  TCP localhost:7777->localhost:56856 (ESTABLISHED)
+open5gs-n 3700 open5gs   44u  IPv4  53850      0t0  TCP localhost:37272->localhost:7777 (ESTABLISHED)
+open5gs-n 3700 open5gs   45u  IPv4  53851      0t0  TCP localhost:7777->localhost:56866 (ESTABLISHED)
+open5gs-n 3711 open5gs    8u  IPv4  46850      0t0  TCP localhost:7777 (LISTEN)
+open5gs-n 3711 open5gs    9u  IPv4  41828      0t0  TCP localhost:37376->localhost:7777 (ESTABLISHED)
+open5gs-b 3717 open5gs    8u  IPv4  61072      0t0  TCP localhost:7777 (LISTEN)
+open5gs-b 3717 open5gs    9u  IPv4  54328      0t0  TCP localhost:37386->localhost:7777 (ESTABLISHED)
+open5gs-p 3723 open5gs   10u  IPv4  41842      0t0  TCP localhost:7777 (LISTEN)
+open5gs-p 3723 open5gs   11u  IPv4  61515      0t0  TCP localhost:37392->localhost:7777 (ESTABLISHED)
+open5gs-p 3723 open5gs   12u  IPv4  61563      0t0  TCP localhost:7777->localhost:50468 (ESTABLISHED)
+open5gs-a 3728 open5gs    9u  IPv4  61106      0t0  TCP localhost:7777 (LISTEN)
+open5gs-a 3728 open5gs   11u  IPv4  46898      0t0  TCP localhost:37406->localhost:7777 (ESTABLISHED)
+open5gs-a 3728 open5gs   12u  IPv4  46908      0t0  TCP localhost:7777->localhost:42214 (ESTABLISHED)
+open5gs-s 3735 open5gs   19u  IPv4  53762      0t0  TCP localhost:7777 (LISTEN)
+open5gs-s 3735 open5gs   21u  IPv4  61537      0t0  TCP localhost:37422->localhost:7777 (ESTABLISHED)
+open5gs-s 3735 open5gs   22u  IPv4  61570      0t0  TCP localhost:7777->localhost:37272 (ESTABLISHED)
+nuradio@nuradio:~/nuradio$ 
+nuradio@nuradio:~/nuradio$ grep -n "127.0.0.200" /etc/open5gs/scp.yaml
+13:      - address: 127.0.0.200
+nuradio@nuradio:~/nuradio$ grep -n "127.0.0.200" /etc/open5gs/nrf.yaml
+17:      - address: 127.0.0.200
+nuradio@nuradio:~/nuradio$ ip link show ogstun
+Device "ogstun" does not exist.
+nuradio@nuradio:~/nuradio$ ip addr show ogstun
+Device "ogstun" does not exist.
+nuradio@nuradio:~/nuradio$ sudo ip tuntap add dev ogstun mode tun
+sudo ip addr add 10.45.0.1/16 dev ogstun
+sudo ip link set ogstun up
+nuradio@nuradio:~/nuradio$ cd nuradio/^C
+nuradio@nuradio:~/nuradio$ sudo systemctl restart open5gs-scpd
+nuradio@nuradio:~/nuradio$ sudo systemctl status open5gs-scpd
+× open5gs-scpd.service - Open5GS SCP Daemon
+     Loaded: loaded (/etc/systemd/system/open5gs-scpd.service; enabled; vendor preset: enabled)
+     Active: failed (Result: exit-code) since Tue 2026-07-14 04:16:57 EAT; 282ms ago
+    Process: 5953 ExecStart=/usr/bin/open5gs-scpd -c /etc/open5gs/scp.yaml (code=exited, status=255/EXCEPTION)
+   Main PID: 5953 (code=exited, status=255/EXCEPTION)
+        CPU: 8ms
+
+Jol 14 04:16:57 nuradio systemd[1]: open5gs-scpd.service: Scheduled restart job, restart counter is at 2.
+Jol 14 04:16:57 nuradio systemd[1]: Stopped Open5GS SCP Daemon.
+Jol 14 04:16:57 nuradio systemd[1]: open5gs-scpd.service: Start request repeated too quickly.
+Jol 14 04:16:57 nuradio systemd[1]: open5gs-scpd.service: Failed with result 'exit-code'.
+Jol 14 04:16:57 nuradio systemd[1]: Failed to start Open5GS SCP Daemon.
+nuradio@nuradio:~/nuradio$ ip link show ogstun
+4: ogstun: <NO-CARRIER,POINTOPOINT,MULTICAST,NOARP,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 500
+    link/none 
+nuradio@nuradio:~/nuradio$ 
+
+
+******************************************************************
+Les nouvelles informations sont très utiles. Les deux problèmes sont maintenant plus clairs.
+
+## 1. Le problème du SCP est identifié
+
+Tu as confirmé que :
+
+```text
+/etc/open5gs/scp.yaml  -> 127.0.0.200
+/etc/open5gs/nrf.yaml  -> 127.0.0.200
+```
+
+Et on voit que **le NRF écoute déjà sur `127.0.0.200:7777`**.
+
+Le SCP essaie d'écouter sur **la même adresse et le même port**, ce qui provoque :
+
+```text
+Address already in use
+```
+
+### Il faut voir le contenu des deux fichiers
+
+Exécute :
+
+```bash
+sudo sed -n '1,80p' /etc/open5gs/scp.yaml
+```
+
+et
+
+```bash
+sudo sed -n '1,80p' /etc/open5gs/nrf.yaml
+```
+
+Je veux vérifier si le SCP a été configuré correctement.
+
+---
+
+## 2. Le problème du UPF progresse
+
+Tu as créé `ogstun` avec succès :
+
+```text
+ogstun: <NO-CARRIER,POINTOPOINT,MULTICAST,NOARP,UP>
+```
+
+C'est normal qu'il soit en `state DOWN` tant qu'aucun trafic ne passe.
+
+Maintenant, essaie de redémarrer le UPF :
+
+```bash
+sudo systemctl restart open5gs-upfd
+sudo systemctl status open5gs-upfd
+```
+
+Si ça échoue encore, affiche les derniers journaux :
+
+```bash
+sudo journalctl -u open5gs-upfd -n 20 --no-pager
+```
+
+---
+
+## 3. Une question importante
+
+As-tu **activé le SCP volontairement** ?
+
+Sur beaucoup de déploiements Open5GS, on lance simplement :
+
+* NRF
+* AMF
+* SMF
+* UDM
+* UDR
+* AUSF
+* PCF
+* NSSF
+* BSF
+* UPF
+
+**sans démarrer le SCP**.
+
+Le SCP est utilisé dans une architecture SBA avec proxy. Si tu suis un tutoriel qui ne l'utilise pas, il est normal qu'il ne soit pas nécessaire.
+
+Dis-moi aussi :
+
+```bash
+open5gs-amfd -v
+```
+
+ou
+
+```bash
+dpkg -l | grep open5gs
+```
+
+Cela permettra de confirmer la version exacte d'Open5GS et de vérifier si la configuration est cohérente avec cette version.
+
+
+#####################################################################################"
+
+nuradio@nuradio:~/nuradio$ sudo sed -n '1,80p' /etc/open5gs/scp.yaml
+logger:
+  file: /var/log/open5gs/scp.log
+#  level: info   # fatal|error|warn|info(default)|debug|trace
+
+global:
+  max:
+    ue: 1024  # The number of UE can be increased depending on memory size.
+#    peer: 64
+
+scp:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+    client:
+      nrf:
+        - uri: http://127.0.0.10:7777
+
+################################################################################
+# SCP Info
+################################################################################
+#  o SCP port number(s) WITHOUT SCP Domain
+#   - If no SCP port information is present in ScpInfo or
+#     in ScpDomainInfo for a specific SCP domain,
+#     the HTTP client shall use the default HTTP port number,
+#     i.e. TCP port 80 for "http" URIs or TCP port 443
+#     for "https" URIs as specified in IETF RFC 7540 [9]
+#     when sending a request to the SCP within the specific SCP domain.
+#  info:
+#    port:
+#      http: 7777
+#      https: 8888
+#
+#  o SCP port number(s) WITH SCP Domain
+#   - If this attribute is present,
+#     it has precedence over the scpPorts attribute of ScpInfo.
+#  info:
+#    domain:
+#      - name: SCP_Domain_1
+#        fqdn: scp.localdomain
+#        port:
+#          http: 7777
+#          https: 8888
+#
+#  o Complex Example
+#  info:
+#    port:
+#      http: 7777
+#      https: 8888
+#    domain:
+#      - name: SCP_Domain_1
+#        fqdn: scp.hplmndomain
+#        port:
+#          http: 3333
+#          https: 4444
+#      - name: SCP_Domain_2
+#        fqdn: scp.vplmndomain
+#        port:
+#          http: 5555
+#          https: 6666
+#
+################################################################################
+# SBI Server
+################################################################################
+#  o Override SBI address to be advertised to NRF
+#  sbi:
+#    server:
+#      - dev: eth0
+#        advertise: open5gs-scp.svc.local
+#
+#  sbi:
+#    server:
+#      - address: localhost
+#        advertise:
+#          - 127.0.0.99
+#          - ::1
+#
+################################################################################
+# SBI Client
+################################################################################
+nuradio@nuradio:~/nuradio$ sudo sed -n '1,80p' /etc/open5gs/nrf.yaml
+logger:
+  file: /var/log/open5gs/nrf.log
+#  level: info   # fatal|error|warn|info(default)|debug|trace
+
+global:
+  max:
+    ue: 1024  # The number of UE can be increased depending on memory size.
+#    peer: 64
+
+nrf:
+  serving:  # 5G roaming requires PLMN in NRF
+    - plmn_id:
+        mcc: 999
+        mnc: 70
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+
+################################################################################
+# SBI Server
+################################################################################
+#  o Override SBI address to be advertised to NRF
+#  sbi:
+#    server:
+#      - dev: eth0
+#        advertise: open5gs-nrf.svc.local
+#
+#  sbi:
+#    server:
+#      - address: localhost
+#        advertise:
+#          - 127.0.0.99
+#          - ::1
+#
+################################################################################
+# HTTPS scheme with TLS
+################################################################################
+#  o Set as default if not individually set
+#  default:
+#    tls:
+#      server:
+#        scheme: https
+#        private_key: /etc/open5gs/tls/nrf.key
+#        cert: /etc/open5gs/tls/nrf.crt
+#      client:
+#        scheme: https
+#        cacert: /etc/open5gs/tls/ca.crt
+#  sbi:
+#    server:
+#      - address: nrf.localdomain
+#
+#  o Add client TLS verification
+#  default:
+#    tls:
+#      server:
+#        scheme: https
+#        private_key: /etc/open5gs/tls/nrf.key
+#        cert: /etc/open5gs/tls/nrf.crt
+#        verify_client: true
+#        verify_client_cacert: /etc/open5gs/tls/ca.crt
+#      client:
+#        scheme: https
+#        cacert: /etc/open5gs/tls/ca.crt
+#        client_private_key: /etc/open5gs/tls/nrf.key
+#        client_cert: /etc/open5gs/tls/nrf.crt
+#  sbi:
+#    server:
+#      - address: nrf.localdomain
+nuradio@nuradio:~/nuradio$ 
+
+
+*************************************************************************
+
+Merci. Le problème est maintenant identifié.
+
+## Cause du problème SCP
+
+Tes fichiers montrent :
+
+**`/etc/open5gs/nrf.yaml`**
+
+```yaml
+nrf:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+```
+
+**`/etc/open5gs/scp.yaml`**
+
+```yaml
+scp:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+```
+
+Les deux services essaient donc d'écouter sur **la même adresse IP et le même port**, ce qui est impossible. C'est exactement pourquoi tu obtiens :
+
+```text
+Address already in use
+```
+
+## Deux possibilités
+
+### Cas 1 : Tu n'as pas besoin du SCP
+
+Si tu suis le tutoriel Open5GS classique (avec gNB + AMF + SMF + UPF), **le SCP n'est généralement pas utilisé**.
+
+Dans ce cas, il suffit de le désactiver :
+
+```bash
+sudo systemctl disable --now open5gs-scpd
+```
+
+Et laisse le NRF fonctionner sur `127.0.0.200:7777`.
+
+---
+
+### Cas 2 : Tu veux utiliser le SCP
+
+Dans ce cas, **le SCP et le NRF doivent avoir des adresses SBI différentes**.
+
+Par exemple :
+
+Dans `scp.yaml` :
+
+```yaml
+scp:
+  sbi:
+    server:
+      - address: 127.0.1.10
+        port: 7777
+```
+
+ou une autre adresse libre de la boucle locale.
+
+Ensuite, le NRF doit être configuré pour utiliser le SCP comme proxy SBI (selon l'architecture Open5GS que tu souhaites déployer). Il ne suffit pas de changer l'adresse du SCP ; les autres fonctions réseau doivent aussi être configurées pour communiquer via le SCP.
+
+---
+
+## Pour le UPF
+
+Tu as réussi à créer `ogstun`, donc refais maintenant :
+
+```bash
+sudo systemctl restart open5gs-upfd
+sudo systemctl status open5gs-upfd
+```
+
+S'il échoue encore :
+
+```bash
+sudo journalctl -u open5gs-upfd -n 20 --no-pager
+```
+
+## Une question importante
+
+Quel tutoriel suis-tu ?
+
+* le tutoriel officiel Open5GS ;
+* un tutoriel srsRAN 5G + Open5GS ;
+* un tutoriel UERANSIM + Open5GS ;
+* ou un autre guide ?
+
+Donne-moi le lien ou le nom du tutoriel. Cela permettra de vérifier si le SCP est réellement requis dans cette configuration et d'adapter les réglages en conséquence.
+
+
+#############################################################################""""
+
+comment verifie que .10 n'est pas utilisé aussi
+
+**********************************************************
+
+Tu peux vérifier de plusieurs façons.
+
+### 1. Vérifier si `127.0.0.10:7777` est déjà utilisé
+
+C'est la méthode la plus simple :
+
+```bash
+sudo ss -ltnp | grep 127.0.0.10:7777
+```
+
+ou
+
+```bash
+sudo lsof -iTCP@127.0.0.10:7777 -sTCP:LISTEN
+```
+
+S'il n'y a **aucune sortie**, cela signifie que rien n'écoute sur `127.0.0.10:7777`.
+
+---
+
+### 2. Vérifier toutes les adresses 127.0.0.x utilisées par Open5GS
+
+Exécute :
+
+```bash
+sudo ss -ltnp | grep 7777
+```
+
+Tu obtiendras une liste comme :
+
+```text
+127.0.0.4:7777
+127.0.0.5:7777
+127.0.0.11:7777
+127.0.0.12:7777
+...
+127.0.0.200:7777
+```
+
+Tu peux alors choisir une adresse absente de cette liste, par exemple `127.0.0.30`, `127.0.0.100` ou `127.0.1.10`.
+
+---
+
+### 3. Vérifier la configuration de tous les services Open5GS
+
+Pour voir quelles adresses sont configurées dans tous les fichiers YAML :
+
+```bash
+grep -R "address:" /etc/open5gs/*.yaml
+```
+
+Ou seulement les adresses de boucle locale :
+
+```bash
+grep -R "127.0." /etc/open5gs/*.yaml
+```
+
+Cela te montrera quelles adresses sont déjà attribuées aux différents services.
+
+### Attention
+
+Dans ton `scp.yaml`, tu as :
+
+```yaml
+client:
+  nrf:
+    - uri: http://127.0.0.10:7777
+```
+
+Or, dans le `nrf.yaml` que tu as partagé, le NRF écoute sur :
+
+```yaml
+127.0.0.200:7777
+```
+
+Il y a donc une incohérence :
+
+* le SCP cherche le NRF sur `127.0.0.10:7777` ;
+* le NRF écoute sur `127.0.0.200:7777`.
+
+Avant de modifier les adresses, il faut clarifier l'architecture souhaitée. Le plus sûr est de voir **toutes** les adresses configurées.
+
+Peux-tu exécuter :
+
+```bash
+grep -R "address:" /etc/open5gs/*.yaml
+```
+
+et partager le résultat ? On pourra alors identifier les conflits et proposer une configuration cohérente.
+
+
+
+##################################################################""
+
+utilise sed pour modifier l'adresse de scp en .10; on n'a pas besoin de changer d'autre configuration .yaml en .10?
+
+*******************************************************************
+
+Tu peux utiliser `sed` pour modifier l'adresse, mais **je ne te recommande pas de mettre le SCP sur `127.0.0.10`**.
+
+En effet, dans ton `scp.yaml`, le SCP est configuré comme client du NRF :
+
+```yaml
+client:
+  nrf:
+    - uri: http://127.0.0.10:7777
+```
+
+Si tu fais écouter le SCP sur `127.0.0.10:7777`, il essaiera de contacter le NRF sur **sa propre adresse**, ce qui créera une mauvaise configuration.
+
+### Si tu veux simplement éviter le conflit
+
+Choisis une adresse libre, par exemple `127.0.1.10`.
+
+Modification avec `sed` :
+
+```bash
+sudo sed -i 's/127\.0\.0\.200/127.0.1.10/' /etc/open5gs/scp.yaml
+```
+
+Vérifie ensuite :
+
+```bash
+grep -n "address:" /etc/open5gs/scp.yaml
+```
+
+Tu devrais voir :
+
+```yaml
+address: 127.0.1.10
+```
+
+Puis redémarre :
+
+```bash
+sudo systemctl restart open5gs-scpd
+sudo systemctl status open5gs-scpd
+```
+
+### Faut-il modifier d'autres fichiers `.yaml` ?
+
+Oui, **si tu veux réellement utiliser le SCP**.
+
+Le fait que le SCP écoute sur une nouvelle adresse ne suffit pas. Les autres fonctions réseau (AMF, SMF, AUSF, UDM, etc.) doivent être configurées pour utiliser le SCP comme proxy SBI. Sinon, elles continueront à communiquer directement avec le NRF.
+
+En revanche, **si ton objectif est seulement de faire démarrer `open5gs-scpd` pour un test**, changer uniquement `scp.yaml` suffit à supprimer le conflit de port.
+
+Peux-tu préciser ton objectif :
+
+* tu veux simplement que tous les services démarrent ;
+* ou tu souhaites déployer une architecture Open5GS **avec SCP** comme proxy SBI ?
+
+
+##########################################################################################"
+
+nuradio@nuradio:~/nuradio$ sudo systemctl status open5gs-scpd
+● open5gs-scpd.service - Open5GS SCP Daemon
+     Loaded: loaded (/etc/systemd/system/open5gs-scpd.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2026-07-14 04:21:44 EAT; 4s ago
+   Main PID: 6107 (open5gs-scpd)
+      Tasks: 2 (limit: 38052)
+     Memory: 4.6M
+        CPU: 11ms
+     CGroup: /system.slice/open5gs-scpd.service
+             └─6107 /usr/bin/open5gs-scpd -c /etc/open5gs/scp.yaml
+
+Jol 14 04:21:44 nuradio systemd[1]: Started Open5GS SCP Daemon.
+Jol 14 04:21:44 nuradio open5gs-scpd[6107]: Open5GS daemon v2.7.0
+Jol 14 04:21:44 nuradio open5gs-scpd[6107]: 07/14 04:21:44.059: [app] INFO: Configuration: '/etc/open5gs/scp.yaml' (../lib/app/ogs-init.c:130)
+Jol 14 04:21:44 nuradio open5gs-scpd[6107]: 07/14 04:21:44.059: [app] INFO: File Logging: '/var/log/open5gs/scp.log' (../lib/app/ogs-init.c:133)
+Jol 14 04:21:44 nuradio open5gs-scpd[6107]: 07/14 04:21:44.064: [sbi] INFO: nghttp2_server() [http://127.0.1.10]:7777 (../lib/sbi/nghttp2-server.c:414)
+Jol 14 04:21:44 nuradio open5gs-scpd[6107]: 07/14 04:21:44.065: [app] INFO: SCP initialize...done (../src/scp/app.c:31)
+Jol 14 04:21:44 nuradio open5gs-scpd[6107]: 07/14 04:21:44.065: [sbi] WARNING: [7] Failed to connect to 127.0.0.10 port 7777 after 0 ms: Connection refused (../lib/sbi/client.c:698)
+Jol 14 04:21:44 nuradio open5gs-scpd[6107]: 07/14 04:21:44.065: [sbi] WARNING: ogs_sbi_client_handler() failed [-1] (../lib/sbi/path.c:62)
+nuradio@nuradio:~/nuradio$ 
+  pourquoi connexion rfused?
+  
+  **********************************************************
+  
+  Le SCP démarre maintenant correctement. La ligne importante est :
+
+```text
+[sbi] INFO: nghttp2_server() [http://127.0.1.10]:7777
+```
+
+Le problème restant est :
+
+```text
+Failed to connect to 127.0.0.10 port 7777: Connection refused
+```
+
+Cela signifie que le SCP essaie de joindre un **NRF à l'adresse `127.0.0.10:7777`**, mais **aucun service n'écoute à cette adresse**.
+
+Or, d'après ton `nrf.yaml`, le NRF écoute sur :
+
+```yaml
+nrf:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+```
+
+Il y a donc une incohérence entre la configuration du SCP et celle du NRF.
+
+Dans `scp.yaml`, tu as encore :
+
+```yaml
+client:
+  nrf:
+    - uri: http://127.0.0.10:7777
+```
+
+alors que le NRF est sur `127.0.0.200:7777`.
+
+## Corrige `scp.yaml`
+
+Remplace `127.0.0.10` par `127.0.0.200` :
+
+```bash
+sudo sed -i 's|http://127\.0\.0\.10:7777|http://127.0.0.200:7777|' /etc/open5gs/scp.yaml
+```
+
+Vérifie :
+
+```bash
+grep -A2 "client:" /etc/open5gs/scp.yaml
+```
+
+Tu devrais obtenir :
+
+```yaml
+client:
+  nrf:
+    - uri: http://127.0.0.200:7777
+```
+
+Puis redémarre le SCP :
+
+```bash
+sudo systemctl restart open5gs-scpd
+sudo journalctl -u open5gs-scpd -n 20 --no-pager
+```
+
+Si le NRF fonctionne bien, l'avertissement `Connection refused` devrait disparaître.
+
+## Vérifie aussi que le NRF est bien actif
+
+Exécute :
+
+```bash
+sudo systemctl status open5gs-nrfd
+```
+
+S'il est `active (running)` et qu'il écoute sur `127.0.0.200:7777`, le SCP pourra s'y connecter après cette modification.
+
+
+
+#######################################################################
+
+upf aussi ne demarre pas
+
+*****************************************************************
+
+Oui. Le SCP est maintenant quasiment résolu. Concentrons-nous sur le **UPF**.
+
+Tu avais auparavant cette erreur :
+
+```text
+ioctl() failed : dev[/dev/net/tun] flags[0x1000] (1:Operation not permitted)
+tun_open(dev:ogstun) failed
+```
+
+Depuis, tu as créé `ogstun`, donc il faut voir si l'erreur a changé.
+
+Peux-tu exécuter les commandes suivantes et partager leur sortie ?
+
+```bash
+sudo systemctl restart open5gs-upfd
+sudo systemctl status open5gs-upfd
+```
+
+Puis :
+
+```bash
+sudo journalctl -u open5gs-upfd -n 30 --no-pager
+```
+
+Et vérifie également la configuration de `ogstun` :
+
+```bash
+ip addr show ogstun
+```
+
+Enfin, affiche le début du fichier de configuration du UPF :
+
+```bash
+sudo sed -n '1,120p' /etc/open5gs/upf.yaml
+```
+
+### Ce que je veux vérifier
+
+* si l'erreur est toujours `Operation not permitted` ou si elle a changé ;
+* si `ogstun` possède bien une adresse IP (par exemple `10.45.0.1/16`) ;
+* si `upf.yaml` est cohérent avec cette interface.
+
+Avec ces quatre sorties, on pourra identifier précisément pourquoi `open5gs-upfd` refuse encore de démarrer.
+
+
+#######################################################################################"
+
+c'est quoi la difference : root@nuradio:/home/nuradio/nuradio# cat open5gs/build/configs/open5gs/scp.yaml
+logger:
+  file: /var/log/open5gs/scp.log
+#  level: info   # fatal|error|warn|info(default)|debug|trace
+
+global:
+  max:
+    ue: 1024  # The number of UE can be increased depending on memory size.
+#    peer: 64
+
+scp:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+    client:
+      nrf:
+        - uri: http://127.0.0.10:7777
+
+################################################################################
+# SCP Info
+################################################################################
+#  o SCP port number(s) WITHOUT SCP Domain
+#   - If no SCP port information is present in ScpInfo or
+#     in ScpDomainInfo for a specific SCP domain,
+#     the HTTP client shall use the default HTTP port number,
+#     i.e. TCP port 80 for "http" URIs or TCP port 443
+#     for "https" URIs as specified in IETF RFC 7540 [9]
+#     when sending a request to the SCP within the specific SCP domain.
+#  info:
+#    port:
+#      http: 7777
+#      https: 8888
+#
+#  o SCP port number(s) WITH SCP Domain
+#   - If this attribute is present,
+#     it has precedence over the scpPorts attribute of ScpInfo.
+#  info:
+#    domain:
+#      - name: SCP_Domain_1
+#        fqdn: scp.localdomain
+#        port:
+#          http: 7777
+#          https: 8888
+#
+#  o Complex Example
+#  info:
+#    port:
+#      http: 7777
+#      https: 8888
+#    domain:
+#      - name: SCP_Domain_1
+#        fqdn: scp.hplmndomain
+#        port:
+#          http: 3333
+#          https: 4444
+#      - name: SCP_Domain_2
+#        fqdn: scp.vplmndomain
+#        port:
+#          http: 5555
+#          https: 6666
+#
+################################################################################
+# SBI Server
+################################################################################
+#  o Override SBI address to be advertised to NRF
+#  sbi:
+#    server:
+#      - dev: eth0
+#        advertise: open5gs-scp.svc.local
+#
+#  sbi:
+#    server:
+#      - address: localhost
+#        advertise:
+#          - 127.0.0.99
+#          - ::1
+#
+################################################################################
+# SBI Client
+################################################################################
+#  o Direct communication with NRF interaction
+#  sbi:
+#    client:
+#      nrf:
+#        - uri: http://127.0.0.10:7777
+root@nuradio:/home/nuradio/nuradio# 
+ et nuradio@nuradio:~/nuradio$ cat /etc/open5gs/scp.yaml 
+logger:
+  file: /var/log/open5gs/scp.log
+#  level: info   # fatal|error|warn|info(default)|debug|trace
+
+global:
+  max:
+    ue: 1024  # The number of UE can be increased depending on memory size.
+#    peer: 64
+
+scp:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+    client:
+      nrf:
+        - uri: http://127.0.0.10:7777
+
+################################################################################
+# SCP Info
+################################################################################
+#  o SCP port number(s) WITHOUT SCP Domain
+#   - If no SCP port information is present in ScpInfo or
+#     in ScpDomainInfo for a specific SCP domain,
+#     the HTTP client shall use the default HTTP port number,
+#     i.e. TCP port 80 for "http" URIs or TCP port 443
+#     for "https" URIs as specified in IETF RFC 7540 [9]
+#     when sending a request to the SCP within the specific SCP domain.
+#  info:
+#    port:
+#      http: 7777
+#      https: 8888
+#
+#  o SCP port number(s) WITH SCP Domain
+#   - If this attribute is present,
+#     it has precedence over the scpPorts attribute of ScpInfo.
+#  info:
+#    domain:
+#      - name: SCP_Domain_1
+#        fqdn: scp.localdomain
+#        port:
+#          http: 7777
+#          https: 8888
+#
+#  o Complex Example
+#  info:
+#    port:
+#      http: 7777
+#      https: 8888
+#    domain:
+#      - name: SCP_Domain_1
+#        fqdn: scp.hplmndomain
+#        port:
+#          http: 3333
+#          https: 4444
+#      - name: SCP_Domain_2
+#        fqdn: scp.vplmndomain
+#        port:
+#          http: 5555
+#          https: 6666
+#
+################################################################################
+# SBI Server
+################################################################################
+#  o Override SBI address to be advertised to NRF
+#  sbi:
+#    server:
+#      - dev: eth0
+#        advertise: open5gs-scp.svc.local
+#
+#  sbi:
+#    server:
+#      - address: localhost
+#        advertise:
+#          - 127.0.0.99
+#          - ::1
+#
+################################################################################
+# SBI Client
+################################################################################
+#  o Direct communication with NRF interaction
+#  sbi:
+#    client:
+#      nrf:
+#        - uri: http://127.0.0.10:7777
+nuradio@nuradio:~/nuradio$ cat /etc/open5gs/scp.yaml 
+
+
+****************************************************************
+
+Dans ce que tu as montré, **il n'y a aucune différence**.
+
+Les deux fichiers contiennent exactement la même configuration :
+
+* `open5gs/build/configs/open5gs/scp.yaml`
+* `/etc/open5gs/scp.yaml`
+
+La différence est **leur rôle** :
+
+* `open5gs/build/configs/open5gs/scp.yaml` est un **fichier modèle** généré lors de la compilation d'Open5GS. Il sert de référence et n'est généralement pas utilisé par les services.
+* `/etc/open5gs/scp.yaml` est le **fichier réellement utilisé** par `open5gs-scpd`, comme on le voit dans les logs :
+
+```text
+Configuration: '/etc/open5gs/scp.yaml'
+```
+
+C'est donc **uniquement** `/etc/open5gs/scp.yaml` qu'il faut modifier pour changer le comportement du service.
+
+### En revanche, il y a une incohérence dans ces fichiers
+
+Ils indiquent :
+
+```yaml
+scp:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+    client:
+      nrf:
+        - uri: http://127.0.0.10:7777
+```
+
+Alors que ton `nrf.yaml` indique :
+
+```yaml
+nrf:
+  sbi:
+    server:
+      - address: 127.0.0.200
+        port: 7777
+```
+
+Le SCP cherche donc le NRF sur **127.0.0.10**, tandis que le NRF écoute sur **127.0.0.200**. Cette incohérence explique les messages `Connection refused`.
+
+### Une question importante
+
+Tu avais indiqué précédemment avoir modifié l'adresse du SCP en `127.0.1.10` et le service avait démarré.
+
+Or le contenu de `/etc/open5gs/scp.yaml` que tu viens d'afficher montre de nouveau :
+
+```yaml
+address: 127.0.0.200
+```
+
+Peux-tu vérifier ce que contient actuellement le fichier avec :
+
+```bash
+grep -n "address:" /etc/open5gs/scp.yaml
+```
+
+et aussi :
+
+```bash
+sudo ss -ltnp | grep open5gs-scpd
+```
+
+Je voudrais vérifier si le fichier a été remis à son état initial ou si le service utilise une configuration différente.
+
