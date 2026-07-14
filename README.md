@@ -1,5 +1,5 @@
 # STEP 0 : PREPARING SYSTEM
-## Install Ubuntu 22.04
+## Installation Ubuntu 22.04
 * Download and install ubuntu 22.04
 * Use RAM >= 4Gio
 
@@ -7,7 +7,7 @@
 ```
 [ -d "nuradio" ] && sudo rm -rf nuradio; mkdir nuradio && cd nuradio
 ```
-## Verify that the directory is at nuradio 
+## Checking the nuradio directory  
 ```
 pwd | grep nuradio
 ```
@@ -16,7 +16,7 @@ pwd | grep nuradio
 sudo apt update && sudo apt install -y wget curl neofetch zsh net-tools
 ```
 
-## Checking of installation of utility
+## Checking installation of utility
 ```
 wget --version
 ```
@@ -34,43 +34,42 @@ sudo apt install -y linux-lowlatency linux-headers-lowlatency linux-tools-lowlat
 ```
 sudo apt install  -y cpuset stress-ng
 ```
-### To add menu mode
+### Configuring grub adding menu mode
 ```
 sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
 ```
-### Verify mode menu
+### Checking grub for mode menu
 ```
 cat /etc/default/grub | grep GRUB_TIMEOUT_STYLE | grep menu
 ```
-
-### To have timeout in second
+### Configuring grub timeout in second
 ```
 sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/' /etc/default/grub
 ```
-## Verify timeout
+## Checking grub timeout in second
 ```
 cat /etc/default/grub | grep GRUB_TIMEOUT | grep 5
 ```
-## Change low latency as default Grub
+## Changing low latency as default Grub
 ```
 sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux '"$(ls /boot/vmlinuz* | grep lowlatency | sed 's|^/boot/vmlinuz-||')"'"/' /etc/default/grub
 ```
 ```
 cat /etc/default/grub | grep GRUB_DEFAULT | grep lowlatency
 ```
-### To upgrade GRUB 
+### Upgrading GRUB 
 ```
 sudo update-grub
 ```
-### Reboot
+### Rebooting
 Check : 
 ```
 uname -r
 ```
 
 # STEP 1 : OPEN-SOURCE 5G NETWORK INSTALL
-## Install UHD
-### Install by source 
+## Installing UHD
+### Installing UHD by source 
 The installation is by source due to the GPSDO which need to be patched 
 ```
 cd nuradio
@@ -82,7 +81,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 chmod +x install_uhd_v4.1.0.5.sh && bash install_uhd_v4.1.0.5.sh
 ```
-### Verify UHD
+### Checking UHD
 ```
 uhd_config_info --version
 ```
@@ -102,8 +101,7 @@ which uhd_usrp_probe
 ```
 which uhd_images_downloader
 ```
-
-### Install FW images
+### Installing FW images
 ```
 sudo /usr/local/lib/uhd/utils/uhd_images_downloader.py
 ```
@@ -111,11 +109,11 @@ or directly :
 ```
 sudo uhd_images_downloader
 ```
-### Verify FW is download completly
+### Checking if FW is download completly
 ```
 ls /usr/local/share/uhd/images
 ```
-### Verify with pluging USRP
+### Checking with pluging USRP
 ```
 uhd_find_devices
 ```
@@ -126,15 +124,15 @@ uhd_usrp_probe
 sudo query_gpsdo_sensors 
 ```
 
-## Install srsRAN
-### Install srsRAN by source
+## Installing srsRAN
+### Installing srsRAN by source
 ```
 [ -f "srsran_50fe9623c_install.sh" ] && sudo rm -rf srsran_50fe9623c_install.sh; wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/srsran_50fe9623c_install.sh
 ```
 ```
 chmod +x srsran_50fe9623c_install.sh && bash srsran_50fe9623c_install.sh
 ```
-### Verify srsRAN
+### Checking srsRAN
 Verify 
 ```
 [ -d "srsRAN_Project/build" ] && sudo make -C srsRAN_Project/build test -j "$(nproc --ignore=1)"
@@ -142,8 +140,8 @@ Verify
 ```
 gnb --version
 ```
-## Install Open5gs
-### Install Mongodb
+## Installing Open5gs
+### Installing Mongodb
 ```
 [ ! -f install_mongodb_6.0.sh ] && wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/main/files/install_mongodb_6.0.sh
 ```
@@ -151,7 +149,7 @@ gnb --version
 chmod +x install_mongodb_6.0.sh && bash install_mongodb_6.0.sh
 ```
 
-### Verify MongoDB
+### Checking MongoDB
 ```
 mongod --version
 ```
@@ -162,7 +160,7 @@ sudo systemctl restart mongod
 sudo systemctl status mongod
 ```
 
-### Install Open5gs
+### Installing Open5gs
 ```
 [ ! -f install_open5gs_2.7.sh ] && \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_open5gs_2.7.sh
@@ -170,7 +168,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 chmod +x install_open5gs_2.7.sh && bash install_open5gs_2.7.sh
 ```
-### Checking of Open5gs
+### Checking Open5gs
 ```
 ls /usr/bin/open5gs*
 ```
@@ -196,7 +194,7 @@ which open5gs-amfd
 ldd $(which open5gs-amfd) | grep ogs
 ```
 
-### Install NodeJS (WEBUI)
+### Installing NodeJS (WEBUI)
 ```
 [ ! -f install_webui.sh ] && \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_webui.sh
@@ -240,7 +238,7 @@ sudo systemctl restart open5gs-webui
 sudo systemctl status open5gs-webui
 ```
 
-Tape on broswer :
+Taping on broswer :
 ```
 http://localhost:9999
 ```
@@ -254,12 +252,12 @@ Password is :
 ```
 
 # STEP 2 : OPEN-SOURCE 5G NETWORK ADMIN
-## Kill process on Open5Gs
+## Killing all processes on Open5Gs
 ### Alternative 1 (Bad Practice + Optionnal) : Killing one by one
 ```
 ps aux | grep open5gs
 ```
-Find all process and kill one by one like : 
+Find all processes and kill one by one like 'for EXAMPLE' : 
 ```
 sudo systemctl stop open5gs-pcrfd
 ```
@@ -279,7 +277,7 @@ sudo systemctl stop open5gs-sgwcd
 ps aux | grep open5gs
 ```
 ### Alternative 2 (automated) : Killing all directly
-* Show all process of open5Gs
+* Showing all processes of open5Gs
 ```
 ps aux | grep open5gs
 ```
@@ -295,7 +293,7 @@ sudo systemctl stop $(systemctl list-unit-files --type=service | grep open5gs | 
 ```
 sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
 ```
-* Show all process of open5Gs
+* Showing all process of open5Gs
 ```
 ps aux | grep open5gs
 ```
@@ -305,10 +303,17 @@ ps aux | grep '^open5gs' | wc -l
 ```
 
 ## Create and Start script on Open5Gs
+* Showing all process of open5Gs
 ```
 ps aux | grep open5gs
 ```
-### Creating script stop_5gc
+* Counting all processes
+```
+ps aux | grep '^open5gs' | wc -l
+```
+
+### Script stop_5gc
+* Creating script stop_5gc
 ```
 sudo tee stop_5gc > /dev/null <<'EOF'
 #!/usr/bin/zsh
@@ -348,14 +353,16 @@ sudo systemctl stop open5gs-udrd
 sudo systemctl stop open5gs-webui
 EOF
 ```
-
+* Authorizing script stop_5g as executable
 ```
 sudo chmod +x stop_5gc
 ```
+* Copying script stop_5g at binaries system
 ```
 sudo cp -rf stop_5gc /usr/bin/stop_5gc
 ```
-### Creating script start_5gc
+### Script start_5gc
+* Creating script start_5gc
 ```
 sudo tee start_5gc > /dev/null <<'EOF'
 #!/usr/bin/zsh
@@ -393,14 +400,16 @@ sudo systemctl restart open5gs-upfd
 sudo systemctl restart open5gs-webui
 EOF
 ```
-
+* Authorizing script start_5gc as executable
 ```
 sudo chmod +x start_5gc
 ```
+* Copying script start_5gc at binaries system
 ```
 sudo cp -rf start_5gc /usr/bin/start_5gc
 ```
-### Creating script 5gc as restart_5gc
+### Script 5gc
+* creation script 5gc
 ```
 sudo tee 5gc > /dev/null <<'EOF'
 #!/usr/bin/zsh
@@ -409,14 +418,16 @@ sudo stop_5gc
 sudo start_5gc
 EOF
 ```
-
+* Authorizing script 5gc as executable
 ```
 sudo chmod +x 5gc
 ```
+* Copying script 5g at binaries system
 ```
 sudo cp -rf 5gc /usr/bin/5gc
 ```
-
+### Script restart_5gc
+* Creating script restartç_5gc
 ```
 sudo tee restart_5gc > /dev/null <<'EOF'
 #!/usr/bin/zsh
@@ -425,16 +436,21 @@ stop_5gc
 start_5gc
 EOF
 ```
-
+* Authorizing script restart_5gc as executable
 ```
 sudo chmod +x restart_5gc
 ```
+* Copying script restart_5gc at binaries system
 ```
 sudo cp -rf restart_5gc /usr/bin/restart_5gc 
 ```
-
+* Showing all process of open5Gs
 ```
 ps aux | grep open5gs
+```
+* Counting all processes
+```
+ps aux | grep '^open5gs' | wc -l
 ```
 
 # STEP 3 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
