@@ -16,7 +16,7 @@ pwd | grep nuradio
 sudo apt update && sudo apt install -y wget curl neofetch
 ```
 
-## Verification of installation of utility
+## Checking of installation of utility
 ```
 wget --version
 ```
@@ -166,7 +166,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 chmod +x install_open5gs_2.7.sh && bash install_open5gs_2.7.sh
 ```
-### Verification of Open5gs
+### Checking of Open5gs
 ```
 ls /usr/bin/open5gs*
 ```
@@ -201,7 +201,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 chmod +x install_webui.sh && bash install_webui.sh
 ```
 
-### Verification NodeJS (WEBUI)
+### Checking NodeJS (WEBUI)
 ```
 node -v
 ```
@@ -210,7 +210,7 @@ node -v
 npm -v
 ```
 10.8.2
-### Verification file of WEBUI
+### Checking file of WEBUI
 ```
 ls open5gs/webui/.next/
 ```
@@ -491,19 +491,20 @@ The goal is to have schenario 3,
 
 * scenario 2 : OGSTUN Interface is not with no IP Address
 1. ifconfig  </br>
-
 <div align="center">
 
 <table border="1" align="center">
 <tr>
-<th align="center">Scenario 2</th>
+<th align="center">Scenario 3</th>
 </tr>
 <tr>
 <td>
 
 <pre>
-<font color="green"><b>ogstun</b></font>: flags=4241&lt;UP,POINTOPOINT,NOARP,MULTICAST&gt; mtu 1400
+<font color="green"><b>ogstun</b></font>: flags=430&lt;UP,POINTOPOINT,RUNNING,NOARP,MULTICAST&gt; mtu 1400
+        <font color="green"><b>inet</b></font> 10.45.0.1 <font color="green"><b>netmask</b></font> 255.255.0.0 <font color="green"><b>destination</b></font> 10.45.0.1
         inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20&lt;link&gt;
+        <font color="green"><b>inet</b></font> 2001:db8:ca0e::1 prefixlen 48 scopeid 0x0&lt;global&gt;
         unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
         RX packets 772 bytes 50678 (49.4 KiB)
         RX errors 0 dropped 0 overruns 0 frame 0
@@ -516,21 +517,12 @@ The goal is to have schenario 3,
 </table>
 
 </div>
+
 2. sudo ip addr add 10.45.0.1/16 dev ogstun
 
 scenario 3 :  OGSTUN Interface is configured with IP Address </br>
 * 1. ifconfig
-```
-ogstun: flags=430<UP,POINTOPOINT,RUNNING,NOARP,MULTICAST> mtu 1400
-        inet 10.45.0.1 netmask 255.255.0.0 destination 10.45.0.1
-        inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20<link>
-        inet 2001:db8:ca0e::1 prefixlen 48 scopeid 0x0<global>
-        unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
-        RX packets 772 bytes 50678 (49.4 KiB)
-        RX errors 0 dropped 0 overruns 0 frame 0
-        TX packets 213 bytes 10776 (10.5 KiB)
-        TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0
-```
+
 ### Choosing and processing all scenarios
 ```
 sudo tee configure_ogstun.sh > /dev/null <<'EOF'
@@ -593,7 +585,7 @@ else
     scenario="scenario1"
 fi
 
-echo "Scenario should be scenario3 after verification: $scenario"
+echo "Scenario should be scenario3 after Checking: $scenario"
 EOF
 ```
 ```
