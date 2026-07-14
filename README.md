@@ -482,14 +482,14 @@ sudo systemctl restart open5gs-webui
 ## Configuration OGSTUN
 ### Explainning the 3 scenarios : 
 The goal is to have schenario 3,
-* scenario 1 : OGSTUN Interface is not configured
+* Scenario 1 : OGSTUN Interface is not configured
 1. ifconfig </br>
 2. observe no interface named 'ogstun' </br>
 3. sudo ip tuntap add name ogstun mode tun </br>
 4. sudo ip addr add 10.45.0.1/16 dev ogstun </br>
 5. sudo ip link set ogstun up </br>
 
-* scenario 2 : OGSTUN Interface is not with no IP Address
+* Scenario 2 : OGSTUN Interface is not with no IP Address
 1. ifconfig  </br>
 <div align="center">
 
@@ -520,8 +520,8 @@ The goal is to have schenario 3,
 
 2. sudo ip addr add 10.45.0.1/16 dev ogstun
 
-scenario 3 :  OGSTUN Interface is configured with IP Address </br>
-* 1. ifconfig
+* Scenario 3 :  OGSTUN Interface is configured with IP Address </br>
+1. ifconfig
 
 ### Choosing and processing all scenarios
 ```
@@ -568,7 +568,12 @@ sudo chmod +x configure_ogstun.sh
 ```
 cp -rf configure_ogstun.sh /usr/local/bin/configure_ogstun.sh
 ```
-### checking ogstun
+```
+bash configure_ogstun.sh
+```
+Scenario 3 should appears
+
+### Checking ogstun
 
 ```
 sudo tee check_ogstun.sh > /dev/null <<'EOF'
@@ -594,6 +599,11 @@ sudo chmod +x check_ogstun.sh
 ```
 cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
 ```
+```
+bash check_ogstun.sh
+```
+Scenario 3 should appears
+## Configuration of routing Backhaul Internet
 
 ## Configuration PLMN amf.conf
 
