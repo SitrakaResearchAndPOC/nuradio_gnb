@@ -62,9 +62,13 @@ cat /etc/default/grub | grep GRUB_DEFAULT | grep lowlatency
 sudo update-grub
 ```
 ### Rebooting
-Check : 
 ```
-uname -r
+reboot
+```
+
+### Checking after reboot
+```
+uname -r | grep lowlatency
 ```
 
 # STEP 1 : OPEN-SOURCE 5G NETWORK INSTALL
