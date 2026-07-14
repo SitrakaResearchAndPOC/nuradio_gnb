@@ -29,16 +29,17 @@ NODE_MAJOR=20
 curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/nodesource.gpg
 echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 sudo apt update
-sudo sudo apt install nodejs -y
+sudo apt install nodejs -y
 
 cd webui
 # rm -rf node_modules package-lock.json .next
 # npm ci
 # NO NEED TO RUN IT , JUST TEST BEFORE LAUNCHING THE SYSTEMD OF OPEN5GS-WEBUI
 # npm run dev
+pwd
 
-npm install
-npm run build 
+sudo npm install
+sudo npm run build 
 
 # NEED FOR VERIFICATION
 # VERIFY IF ALL FILS EXISTS
@@ -52,20 +53,31 @@ npm run build
  
 WEBUI_PATH=$(pwd)
 
-# CREATE ALSO SYSTEMD FOR WEBUI TO FACILITE THE INTERFACE OF OPEN5GS
+# CREATE ALSO SYSTEMD FOR WEBUI TO FACILITATE THE OPEN5GS WEB INTERFACE
 sudo tee /etc/systemd/system/open5gs-webui.service > /dev/null <<EOF
 [Unit]
 Description=Open5GS WebUI
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
+User=$USER
+Group=$(id -gn)
+
 WorkingDirectory=${WEBUI_PATH}
+
+Environment=NODE_ENV=production
+Environment=HOME=$HOME
+Environment=USER=$USER
+Environment=LOGNAME=$USER
+Environment=PATH=$PATH
+
+ExecStartPre=-/usr/bin/pkill node
 ExecStart=$(which node) ${WEBUI_PATH}/server/index.js
+
 Restart=always
 RestartSec=3
-Environment=NODE_ENV=production
-User=root
 
 [Install]
 WantedBy=multi-user.target
