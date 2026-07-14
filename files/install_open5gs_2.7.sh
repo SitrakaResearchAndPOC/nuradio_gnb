@@ -49,9 +49,12 @@ sudo chown -R open5gs:open5gs /etc/open5gs/
 sudo mkdir -p  /var/log/open5gs
 sudo chown -R open5gs:open5gs /var/log/open5gs
 
-# CHANGE THE ADDRESS OF NRF TO PATCH THE CONFIGURATION
+# CHANGE THE ADDRESS OF NRF TO PATCH THE CONFIGURATION OF NRF
 sudo sed -i 's/address: 127.0.0.10/address: 127.0.0.200/' /etc/open5gs/nrf.yaml
 
+# CHANGE THE ADDRESS  PATCH THE CONFIGURATION OF SCP
+sudo sed -i 's/127\.0\.0\.200/127.0.1.10/' /etc/open5gs/scp.yaml
+sudo sed -i 's|http://127\.0\.0\.10:7777|http://127.0.0.200:7777|' /etc/open5gs/scp.yaml
 
 # COPY ALL SYSTEMD FILES
 sudo cp build/configs/systemd/*.service /etc/systemd/system/
