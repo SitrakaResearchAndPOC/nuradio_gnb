@@ -166,7 +166,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 chmod +x install_open5gs_2.7.sh && bash install_open5gs_2.7.sh
 ```
-### Verificaiton of Open5gs
+### Verification of Open5gs
 ```
 ls /usr/bin/open5gs*
 ```
@@ -285,6 +285,9 @@ ps aux | grep open5gs
 ```
 
 ## Create and Start script on Open5Gs
+```
+ps aux | grep open5gs
+```
 
 ```
 sudo tee /usr/bin/stop_5gc > /dev/null <<'EOF'
@@ -396,6 +399,9 @@ EOF
 ```
 sudo chmod +x /usr/bin/restart_5gc
 ```
+```
+ps aux | grep open5gs
+```
 
 #### A enlever  : 
 ```
@@ -474,9 +480,114 @@ sudo systemctl restart open5gs-webui
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
 ## Configuration OGSTUN
-### scenario 1
-### scenario 2
-### scenario 3
+### Explainning the 3 scenarios : 
+The goal is to have schenario 3,
+* scenario 1 : OGSTUN Interface is not configured
+1. ifconfig </br>
+2. observe no interface named 'ogstun' </br>
+3. sudo ip tuntap add name ogstun mode tun </br>
+4. sudo ip addr add 10.45.0.1/16 dev ogstun </br>
+5. sudo ip link set ogstun up </br>
+
+* scenario 2 : OGSTUN Interface is not with no IP Address
+1. ifconfig  </br>
+| Configuration de l'interface |
+|------------------------------|
+| <pre><span style="color:green"><b>ogstun</b></span>: flags=4241&lt;UP,POINTOPOINT,NOARP,MULTICAST&gt; mtu 1400
+inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20&lt;link&gt;
+unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
+RX packets 772 bytes 50678 (49.4 KiB)
+RX errors 0 dropped 0 overruns 0 frame 0
+TX packets 213 bytes 10776 (10.5 KiB)
+TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0</pre> |
+
+2. sudo ip addr add 10.45.0.1/16 dev ogstun
+
+scenario 3 :  OGSTUN Interface is configured with IP Address </br>
+* 1. ifconfig
+```
+ogstun: flags=430<UP,POINTOPOINT,RUNNING,NOARP,MULTICAST> mtu 1400
+        inet 10.45.0.1 netmask 255.255.0.0 destination 10.45.0.1
+        inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20<link>
+        inet 2001:db8:ca0e::1 prefixlen 48 scopeid 0x0<global>
+        unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
+        RX packets 772 bytes 50678 (49.4 KiB)
+        RX errors 0 dropped 0 overruns 0 frame 0
+        TX packets 213 bytes 10776 (10.5 KiB)
+        TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0
+```
+### Choosing and processing all scenarios
+```
+sudo tee configure_ogstun.sh > /dev/null <<'EOF'
+#!/bin/bash
+
+if ifconfig ogstun >/dev/null 2>&1; then
+    if ifconfig ogstun | grep -q "inet.*netmask.*destination"; then
+        scenario="scenario3"
+        echo "$scenario"
+        echo "The configuration is good, no modification."
+    else
+        scenario="scenario2"
+        echo "$scenario"
+
+        sudo ip tuntap add name ogstun mode tun
+        sudo ip addr add 10.45.0.1/16 dev ogstun
+        sudo ip link set ogstun up
+    fi
+else
+    scenario="scenario1"
+    echo "$scenario"
+
+    sudo ip addr add 10.45.0.1/16 dev ogstun
+fi
+
+# Vérification après les modifications
+if ifconfig ogstun >/dev/null 2>&1; then
+    if ifconfig ogstun | grep -q "inet.*netmask.*destination"; then
+        scenario="scenario3"
+    else
+        scenario="scenario2"
+    fi
+else
+    scenario="scenario1"
+fi
+
+echo "Scenario should be scenario3 after process: $scenario"
+EOF
+```
+```
+sudo chmod +x configure_ogstun.sh
+```
+```
+cp -rf configure_ogstun.sh /usr/local/bin/configure_ogstun.sh
+```
+### checking ogstun
+
+```
+sudo tee check_ogstun.sh > /dev/null <<'EOF'
+#!/bin/bash
+
+# Vérification après les modifications
+if ifconfig ogstun >/dev/null 2>&1; then
+    if ifconfig ogstun | grep -q "inet.*netmask.*destination"; then
+        scenario="scenario3"
+    else
+        scenario="scenario2"
+    fi
+else
+    scenario="scenario1"
+fi
+
+echo "Scenario should be scenario3 after verification: $scenario"
+EOF
+```
+```
+sudo chmod +x check_ogstun.sh
+```
+```
+cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
+```
+
 ## Configuration PLMN amf.conf
 
 # STEP 5 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
