@@ -569,7 +569,6 @@ Scenario 3 should appears
 ### Checking ogstun
 
 ```
-```
 sudo tee check_ogstun.sh > /dev/null <<'EOF'
 #!/bin/bash
 
@@ -600,6 +599,8 @@ ip addr show "$INTERFACE"
 
 EOF
 ```
+
+```
 sudo chmod +x check_ogstun.sh
 ```
 ```
@@ -608,7 +609,7 @@ cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
 ```
 bash check_ogstun.sh
 ```
-Scenario 3 should appears
+After lauching configure_ogstun.sh , scenario 3 should appears
 ## Configuration of routing Backhaul Internet
 
 ## Configuration PLMN amf.conf
