@@ -216,11 +216,11 @@ npm -v
 10.8.2
 ### Checking file of WEBUI
 ```
-ls open5gs/webui/.next/
+ls open5gs-webui/webui/.next/
 ```
 THIS DIRECTORY SHOULD EXIST : BUILD_ID
 ```
-ls open5gs/webui/
+ls open5gs-webui/webui/
 ```
 THIS DIRECTORY SHOULD EXIST : server/  </br>
 THIS DIRECTORY SHOULD EXIST  : static/  </br>
@@ -255,10 +255,11 @@ Password is :
 
 # STEP 2 : OPEN-SOURCE 5G NETWORK ADMIN
 ## Kill process on Open5Gs
-### Killing one by one
+### Alternative 1 (Bad Practice + Optionnal) : Killing one by one
 ```
 ps aux | grep open5gs
 ```
+Find all process and kill one by one like : 
 ```
 sudo systemctl stop open5gs-pcrfd
 ```
@@ -277,15 +278,30 @@ sudo systemctl stop open5gs-sgwcd
 ```
 ps aux | grep open5gs
 ```
-### Killing all directly
+### Alternative 2 (automated) : Killing all directly
+* Show all process of open5Gs
+```
+ps aux | grep open5gs
+```
+* Counting all processes
+```
+ps aux | grep '^open5gs' | wc -l
+```
+* Stopping all processes
 ```
 sudo systemctl stop $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
 ```
+* Status all processes
 ```
 sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
 ```
+* Show all process of open5Gs
 ```
 ps aux | grep open5gs
+```
+* Counting all processes
+```
+ps aux | grep '^open5gs' | wc -l
 ```
 
 ## Create and Start script on Open5Gs
