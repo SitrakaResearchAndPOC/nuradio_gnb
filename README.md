@@ -13,7 +13,7 @@ pwd | grep nuradio
 ```
 ## Installation utility
 ```
-sudo apt update && sudo apt install -y wget curl neofetch zsh
+sudo apt update && sudo apt install -y wget curl neofetch zsh net-tools
 ```
 
 ## Checking of installation of utility
@@ -23,6 +23,10 @@ wget --version
 ```
 neofetch
 ```
+```
+ifconfig
+```
+
 ## Installation CPU optimization
 ```
 sudo apt install -y linux-lowlatency linux-headers-lowlatency linux-tools-lowlatency linux-cloud-tools-lowlatency
