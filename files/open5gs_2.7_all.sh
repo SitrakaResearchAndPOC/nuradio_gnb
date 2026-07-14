@@ -116,7 +116,16 @@ User=root
 WantedBy=multi-user.target
 EOF
 
+# AUTHORIZED UPF TO CREATE OGSTUN
+sudo mkdir -p /etc/systemd/system/open5gs-upfd.service.d
 
+sudo tee /etc/systemd/system/open5gs-upfd.service.d/override.conf > /dev/null <<EOF
+[Service]
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
+EOF
+
+# RELOAD ALL AND RESTART
 
 sudo systemctl daemon-reload
 sudo systemctl enable open5gs-webui
