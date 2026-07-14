@@ -72,7 +72,7 @@ uname -r
 ### Installing UHD by source 
 The installation is by source due to the GPSDO which need to be patched 
 ```
-cd nuradio
+cd $HOME/nuradio
 ```
 ```
 [ -f "install_uhd_v4.1.0.5.sh" ] && sudo rm -rf install_uhd_v4.1.0.5.sh; \
