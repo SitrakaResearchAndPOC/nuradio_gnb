@@ -253,7 +253,7 @@ Password is :
 1423
 ```
 
-# STEP 3 : OPEN-SOURCE 5G NETWORK ADMIN
+# STEP 2 : OPEN-SOURCE 5G NETWORK ADMIN
 ## Kill process on Open5Gs
 ### Killing one by one
 ```
@@ -421,7 +421,7 @@ sudo cp -rf restart_5gc /usr/bin/restart_5gc
 ps aux | grep open5gs
 ```
 
-# STEP 4 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
+# STEP 3 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
 ## Configuration OGSTUN
 ### Explainning the 3 scenarios : 
 The goal is to have schenario 3,
@@ -614,9 +614,9 @@ After lauching configure_ogstun.sh , scenario 3 should appears
 
 ## Configuration PLMN amf.conf
 
-# STEP 5 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
+# STEP 4 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
 
-# STEP 6 : OPEN-SOURCE 5G NETWORK  CONFIGURATION SRSRAN_GNB
+# STEP 5 : OPEN-SOURCE 5G NETWORK  CONFIGURATION SRSRAN_GNB
 
 
 
