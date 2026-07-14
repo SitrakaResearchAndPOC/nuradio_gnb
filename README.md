@@ -492,7 +492,7 @@ The goal is to have schenario 3,
 
 </div>
 
-### Optionnal : If you want to del interface ogstun
+### Optionnal : If you want to del interface ogstun or restart computer
 ```
 ifconfig
 ```
@@ -510,8 +510,19 @@ ifconfig
 sudo tee configure_ogstun.sh > /dev/null <<'EOF'
 #!/bin/bash
 
-if ifconfig ogstun >/dev/null 2>&1; then
-    if ifconfig ogstun | grep -q "inet.*netmask.*destination"; then
+INTERFACE="ogstun"
+IP_ADDR="10.45.0.1/16"
+
+check_ogstun() {
+    ip link show "$INTERFACE" >/dev/null 2>&1
+}
+
+check_ip() {
+    ip addr show "$INTERFACE" | grep -q "$IP_ADDR"
+}
+
+if check_ogstun; then
+    if check_ip; then
         scenario="scenario3"
         echo "$scenario"
         echo "The configuration is good, no modification."
@@ -519,30 +530,30 @@ if ifconfig ogstun >/dev/null 2>&1; then
         scenario="scenario2"
         echo "$scenario"
 
-        sudo ip tuntap add name ogstun mode tun
-        sudo ip addr add 10.45.0.1/16 dev ogstun
-        sudo ip link set ogstun up
+        sudo ip addr add "$IP_ADDR" dev "$INTERFACE"
+        sudo ip link set "$INTERFACE" up
     fi
 else
     scenario="scenario1"
     echo "$scenario"
 
-    sudo ip addr add 10.45.0.1/16 dev ogstun
+    sudo ip tuntap add name "$INTERFACE" mode tun
+    sudo ip addr add "$IP_ADDR" dev "$INTERFACE"
+    sudo ip link set "$INTERFACE" up
 fi
 
-# Vérification après les modifications
-if ifconfig ogstun >/dev/null 2>&1; then
-    if ifconfig ogstun | grep -q "inet.*netmask.*destination"; then
-        scenario="scenario3"
-    else
-        scenario="scenario2"
-    fi
+# Vérification finale
+if check_ogstun && check_ip; then
+    scenario="scenario3"
 else
-    scenario="scenario1"
+    scenario="FAILED"
 fi
 
-echo "Scenario should be scenario3 after process: $scenario"
+echo "Scenario after process: $scenario"
+
+ip addr show "$INTERFACE"
 EOF
+
 ```
 ```
 sudo chmod +x configure_ogstun.sh
@@ -558,12 +569,24 @@ Scenario 3 should appears
 ### Checking ogstun
 
 ```
+```
 sudo tee check_ogstun.sh > /dev/null <<'EOF'
 #!/bin/bash
 
-# Vérification après les modifications
-if ifconfig ogstun >/dev/null 2>&1; then
-    if ifconfig ogstun | grep -q "inet.*netmask.*destination"; then
+INTERFACE="ogstun"
+IP_ADDR="10.45.0.1/16"
+
+check_ogstun() {
+    ip link show "$INTERFACE" >/dev/null 2>&1
+}
+
+check_ip() {
+    ip addr show "$INTERFACE" | grep -q "$IP_ADDR"
+}
+
+# Vérification de la configuration actuelle
+if check_ogstun; then
+    if check_ip; then
         scenario="scenario3"
     else
         scenario="scenario2"
@@ -572,9 +595,10 @@ else
     scenario="scenario1"
 fi
 
-echo "Scenario should be scenario3 after Checking: $scenario"
+echo "Scenario after Checking: $scenario"
+ip addr show "$INTERFACE"
+
 EOF
-```
 ```
 sudo chmod +x check_ogstun.sh
 ```
