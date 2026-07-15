@@ -459,8 +459,8 @@ ps aux | grep '^open5gs' | wc -l
 
 # STEP 3 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
 ## Configuration OGSTUN
-### Explainning the 3 scenarios : 
-The goal is to have schenario 3,
+### Script showing the 3 scenarios : 
+Let's see our scenario, and explain each other : 
 * Scenario 1 : OGSTUN Interface is not configured
 1. ifconfig </br>
 2. observe no interface named 'ogstun' </br>
@@ -495,7 +495,6 @@ The goal is to have schenario 3,
 
 </div>
 
-
 2. sudo ip addr add 10.45.0.1/16 dev ogstun
 
 * Scenario 3 :  OGSTUN Interface is configured with IP Address </br>
@@ -528,7 +527,65 @@ The goal is to have schenario 3,
 
 </div>
 
-### Optionnal : If you want to del interface ogstun or restart computer
+To see our scenario, let's create this script  : 
+```
+sudo tee check_ogstun.sh > /dev/null <<'EOF'
+#!/bin/bash
+
+INTERFACE="ogstun"
+IP_ADDR="10.45.0.1/16"
+
+check_ogstun() {
+    ip link show "$INTERFACE" >/dev/null 2>&1
+}
+
+check_ip() {
+    ip addr show "$INTERFACE" | grep -q "$IP_ADDR"
+}
+
+# Vérification de la configuration actuelle
+if check_ogstun; then
+    if check_ip; then
+        echo
+        echo "Scenario 3 : OGSTUN Interface is configured with IP Address"
+        ifconfig ogstun | grep --color=always -E \
+"^ogstun:|"\
+"inet |"\
+"netmask |"\
+"destination|"\
+"$"
+    else
+        echo
+        echo "Scenario 2 : OGSTUN Interface has no IP Address"
+        ifconfig ogstun | grep --color=always -E \
+"^ogstun:|"\
+"$"
+    fi
+else
+    echo
+    echo "Scenario 1 : OGSTUN Interface is not configured"
+    ifconfig
+fi
+
+echo
+echo
+ip addr show "$INTERFACE"
+
+EOF
+```
+```
+sudo chmod +x check_ogstun.sh
+```
+```
+cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
+```
+```
+bash check_ogstun.sh
+```
+The goal is to have schenario 3, 
+
+### Optionnal : If you want to del interface ogstun  : 
+Launch the command or directly restart computer
 ```
 ifconfig
 ```
@@ -603,45 +660,6 @@ bash configure_ogstun.sh
 Scenario 3 should appears
 
 ### Checking ogstun
-
-```
-sudo tee check_ogstun.sh > /dev/null <<'EOF'
-#!/bin/bash
-
-INTERFACE="ogstun"
-IP_ADDR="10.45.0.1/16"
-
-check_ogstun() {
-    ip link show "$INTERFACE" >/dev/null 2>&1
-}
-
-check_ip() {
-    ip addr show "$INTERFACE" | grep -q "$IP_ADDR"
-}
-
-# Vérification de la configuration actuelle
-if check_ogstun; then
-    if check_ip; then
-        scenario="scenario3"
-    else
-        scenario="scenario2"
-    fi
-else
-    scenario="scenario1"
-fi
-
-echo "Scenario after Checking: $scenario"
-ip addr show "$INTERFACE"
-
-EOF
-```
-
-```
-sudo chmod +x check_ogstun.sh
-```
-```
-cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
-```
 ```
 bash check_ogstun.sh
 ```
