@@ -289,6 +289,11 @@ ps aux | grep open5gs
 ```
 ps aux | grep '^open5gs' | wc -l
 ```
+OR
+```
+sudo systemctl stop $(systemctl list-unit-files --type=service | grep ^open5gs | wc -l')
+```
+
 * Stopping all processes
 ```
 sudo systemctl stop $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
@@ -304,6 +309,10 @@ ps aux | grep open5gs
 * Counting all processes
 ```
 ps aux | grep '^open5gs' | wc -l
+```
+OR 
+```
+sudo systemctl stop $(systemctl list-unit-files --type=service | grep ^open5gs | wc -l')
 ```
 
 ## Create and Start script on Open5Gs
