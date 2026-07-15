@@ -823,6 +823,9 @@ EOF
 sudo chmod +x configure_ipv4forward.sh
 ```
 ```
+sudo cp -rf configure_ipv4forward.sh /usr/local/bin/configure_ipv4forward.sh
+```
+```
 bash configure_ipv4forward.sh
 ```
 * Rechecking IPv4 Forwading
@@ -832,7 +835,75 @@ bash configure_ipv4forward.sh
   
 ## Configuration Blackhaul : IPTables NAT forwarding
 ### Explaining and showing IPTables NAT forwarding
+1. sudo iptables -L -n -v -t nat
+```html
+<div align="center">
 
+<table border="1" align="center">
+<tr>
+<th align="center">IPTables NAT forwarding</th>
+</tr>
+<tr>
+<td>
+
+<pre>
+$ sudo iptables -t nat -L -n -v
+
+Chain POSTROUTING (policy ACCEPT)
+ pkts bytes target     prot opt in  out     source      destination
+    0     0 MASQUERADE all  --  *   <font color="green"><b>ogstun</b></font>  0.0.0.0/0   0.0.0.0/0
+</pre>
+
+</td>
+</tr>
+</table>
+
+</div>
+```
+
+2. if ogstun 10.45.0.1/15 is not displayed
+3. sudo iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE
+```
+sudo tee check_iptableNATforward.sh > /dev/null <<'EOF'
+#!/bin/bash
+
+check_iptableNATforward() {
+    sudo iptables -t nat -L -n -v | grep -q "ogstun"
+}
+
+if check_iptableNATforward; then
+
+    echo
+    echo "IPTABLE NAT Forwarding enabled"
+    echo
+
+    sudo iptables -t nat -L -n -v | grep --color=always -E "ogstun|$"
+
+    echo
+    echo "No need to configure IPTABLE NAT Forwarding."
+
+else
+
+    echo
+    echo "IPTABLE NAT Forwarding disabled"
+    echo
+
+    sudo iptables -t nat -L -n -v
+
+fi
+
+EOF
+```
+```
+sudo chmod +x check_iptableNATforward.sh
+```
+
+```
+sudo cp -rf check_iptableNATforward.sh /usr/local/bin/check_iptableNATforward.sh
+```
+```
+bash check_iptableNATforward.sh
+```
 
 ## Configuration PLMN amf.conf
 
