@@ -579,11 +579,11 @@ if check_ogstun; then
 # ALL GREP SHOULD BE ALIGN IN THE FIRST
         ifconfig ogstun | \
         grep --color=always -E \
-"^ogstun:|"\
-"inet |"\
-"netmask |"
-"destination|"\
-"$"
+                -e "^ogstun:|" \
+                -e "inet |" \
+                -e "netmask |"  \
+                -e "destination|"\
+                -e "$"
     else
         echo
         echo "Scenario 2 : OGSTUN Interface has no IP Address"
@@ -592,8 +592,8 @@ if check_ogstun; then
 
         ifconfig ogstun | \
         grep --color=always -E \
-"^ogstun:|"\
-"$"
+                -e "^ogstun:|" \
+                -e "$"
     fi
 else
     echo
