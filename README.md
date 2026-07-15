@@ -742,7 +742,7 @@ net.ipv4.ip_forward_use_pmtu = 0
 
 Note : </br>
 Open5GS laptop requires internet connection to provide data service to UE </br>
-
+* Checking IPv4 Forwading
 ```
 sudo tee check_ipv4forward.sh > /dev/null <<'EOF'
 #!/bin/bash
@@ -776,14 +776,60 @@ EOF
 sudo chmod +x check_ipv4forward.sh
 ```
 ```
-cp -rf check_ipv4forward.sh /usr/local/bin/check_ipv4forward.sh
+sudo cp -rf check_ipv4forward.sh /usr/local/bin/check_ipv4forward.sh
 ```
 ```
 bash check_ipv4forward.sh
 ```
-The goal is to have 
+The goal is to have  net.ipv4.ip_forwad = 1
 
+* Configure IPv4 forward
+```
+sudo tee configure_ipv4forward.sh > /dev/null <<'EOF'
+#!/bin/bash
 
+check_ipv4forward() {
+    [ "$(sudo sysctl -n net.ipv4.ip_forward)" = "1" ]
+}
+
+if check_ipv4forward; then
+
+    echo
+    echo "IPv4 Forwarding enabled"
+
+    sudo sysctl -a | grep --color=always -E "^net\.ipv4\.ip_forward = 1$"
+
+    echo
+    echo "No need to configure IPv4 Forwarding."
+
+else
+
+    echo
+    echo "IPv4 Forwarding disabled"
+    echo "Configure net.ipv4.ip_forward"
+
+    sudo sysctl -w net.ipv4.ip_forward=1
+
+    echo
+    echo "IPv4 Forwarding enabled"
+
+    sudo sysctl -a | grep --color=always -E "^net\.ipv4\.ip_forward = 1$"
+
+fi
+
+EOF
+```
+```
+sudo chmod +x configure_ipv4forward.sh
+```
+```
+bash configure_ipv4forward.sh
+```
+* Rechecking IPv4 Forwading
+```
+bash configure_ipv4forward.sh
+```
+  
 ## Configuration Blackhaul : IPTables NAT forwarding
 ### Explaining and showing IPTables NAT forwarding
 
