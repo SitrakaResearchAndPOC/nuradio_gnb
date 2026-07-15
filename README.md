@@ -222,10 +222,20 @@ ls open5gs-webui/webui/.next/
 ```
 THIS DIRECTORY SHOULD EXIST : BUILD_ID
 ```
+ls open5gs-webui/webui/.next/ | grep "BUILD_ID"
+```
+```
 ls open5gs-webui/webui/
 ```
 THIS DIRECTORY SHOULD EXIST : server/  </br>
+```
+ls open5gs-webui/webui/ | grep "server"
+```
+
 THIS DIRECTORY SHOULD EXIST  : static/  </br>
+```
+ls open5gs-webui/webui/ | grep "static"
+```
 
 ### Lauching Mongodb & WEBUI
 
@@ -614,7 +624,10 @@ sudo cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
 ```
 bash check_ogstun.sh
 ```
-The goal is to have schenario 3, 
+The goal is to have Scenario 3, 
+```
+bash check_ogstun.sh | grep "Scenario 3"
+```
 
 ### Optionnal : If you want to del interface ogstun  : 
 Launch the command or directly restart computer
