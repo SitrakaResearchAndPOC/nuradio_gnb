@@ -603,7 +603,7 @@ EOF
 sudo chmod +x check_ogstun.sh
 ```
 ```
-cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
+sudo cp -rf check_ogstun.sh /usr/local/bin/check_ogstun.sh
 ```
 ```
 bash check_ogstun.sh
@@ -678,7 +678,7 @@ EOF
 sudo chmod +x configure_ogstun.sh
 ```
 ```
-cp -rf configure_ogstun.sh /usr/local/bin/configure_ogstun.sh
+sudo cp -rf configure_ogstun.sh /usr/local/bin/configure_ogstun.sh
 ```
 ```
 bash configure_ogstun.sh
