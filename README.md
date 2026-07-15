@@ -836,7 +836,6 @@ bash configure_ipv4forward.sh
 ## Configuration Blackhaul : IPTables NAT forwarding
 ### Explaining and showing IPTables NAT forwarding
 1. sudo iptables -L -n -v -t nat
-```html
 <div align="center">
 
 <table border="1" align="center">
@@ -859,7 +858,6 @@ Chain POSTROUTING (policy ACCEPT)
 </table>
 
 </div>
-```
 
 2. if ogstun 10.45.0.1/15 is not displayed
 3. sudo iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE
