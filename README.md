@@ -281,17 +281,29 @@ sudo systemctl stop open5gs-sgwcd
 ps aux | grep open5gs
 ```
 ### Alternative 2 (automated) : Killing all directly
+* Restarting all processes
+```
+sudo systemctl restart $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+
 * Showing all processes of open5Gs
 ```
 ps aux | grep open5gs
 ```
+```
+sudo systemctl list-unit-files --type=service | grep open5gs 
+```
+```
+sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
+```
+
 * Counting all processes
 ```
 ps aux | grep '^open5gs' | wc -l
 ```
 OR
 ```
-sudo systemctl stop $(systemctl list-unit-files --type=service | grep ^open5gs | wc -l')
+sudo systemctl list-unit-files --type=service | grep ^open5gs | wc -l
 ```
 
 * Stopping all processes
@@ -302,17 +314,17 @@ sudo systemctl stop $(systemctl list-unit-files --type=service | grep open5gs | 
 ```
 sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
 ```
-* Showing all process of open5Gs
+* Showing all process after stopping 
 ```
 ps aux | grep open5gs
 ```
-* Counting all processes
+* Counting all processes after stopping
 ```
 ps aux | grep '^open5gs' | wc -l
 ```
 OR 
 ```
-sudo systemctl stop $(systemctl list-unit-files --type=service | grep ^open5gs | wc -l')
+systemctl list-unit-files --type=service | grep ^open5gs | wc -l
 ```
 
 ## Create and Start script on Open5Gs
