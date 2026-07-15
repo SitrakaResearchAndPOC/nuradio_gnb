@@ -680,12 +680,85 @@ bash configure_ogstun.sh
 ```
 Scenario 3 should appears
 
-### Checking ogstun
+### Rechecking ogstun
 ```
 bash check_ogstun.sh
 ```
 After lauching configure_ogstun.sh , scenario 3 should appears
-## Configuration of routing Backhaul Internet
+## Configuration Blackhaul : IPv4 Forwarding
+### Explaining and showing IPv4 Forwarding
+Ensure IPv4 forwarding is enabled
+1. Check current status:
+<div align="center">
+
+<table border="1" align="center">
+<tr>
+<th align="center">IPv4 Forwarding</th>
+</tr>
+<tr>
+<td>
+
+<pre>
+$ sudo sysctl -a | grep ip_forward
+<font color="green"><b>net.ipv4.ip_forward = 1</b></font>
+net.ipv4.ip_forward_update_priority = 1
+net.ipv4.ip_forward_use_pmtu = 0
+</pre>
+
+</td>
+</tr>
+</table>
+
+</div>
+2. If net.ipv4.ip_forward = 0, enable it temporarily: </br>
+3. sudo sysctl -w net.ipv4.ip_forward=1 </br></br> 
+Note : </br>
+Open5GS laptop requires internet connection to provide data service to UE </br>
+
+```
+sudo tee check_ipv4forward.sh > /dev/null <<'EOF'
+#!/bin/bash
+
+check_ipv4forward() {
+    [ "$(sudo sysctl -n net.ipv4.ip_forward)" = "1" ]
+}
+
+if check_ipv4forward; then
+
+    echo
+    echo "IPv4 Forwarding enabled"
+
+    sudo sysctl -a | grep --color=always -E "^net\.ipv4\.ip_forward = 1$"
+
+    echo
+    echo "No need to configure IPv4 Forwarding."
+
+else
+
+    echo
+    echo "IPv4 Forwarding disabled"
+
+    sudo sysctl -a | grep --color=always -E "^net\.ipv4\.ip_forward = 0$"
+
+fi
+
+EOF
+```
+```
+sudo chmod +x check_ipv4forward.sh
+```
+```
+cp -rf check_ipv4forward.sh /usr/local/bin/check_ipv4forward.sh
+```
+```
+bash check_ipv4forward.sh
+```
+The goal is to have 
+
+
+## Configuration Blackhaul : IPTables NAT forwarding
+### Explaining and showing IPTables NAT forwarding
+
 
 ## Configuration PLMN amf.conf
 
