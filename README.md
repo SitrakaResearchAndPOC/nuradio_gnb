@@ -327,9 +327,10 @@ ps aux | grep open5gs
 ```
 ps aux | grep '^open5gs' | wc -l
 ```
-0 will be the value
+0 will be the value </br> </br>
+OR
 ```
-systemctl list-unit-files --type=service | grep ^open5gs | wc -l
+ps aux | grep 'open5gs' | wc -l | awk '{print $1-1}'
 ```
 0 will be the value 
 
