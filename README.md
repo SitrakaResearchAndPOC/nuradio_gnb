@@ -576,20 +576,24 @@ if check_ogstun; then
     if check_ip; then
         echo
         echo "Scenario 3 : OGSTUN Interface is configured with IP Address"
+# ALL GREP SHOULD BE ALIGN IN THE FIRST
         ifconfig ogstun | \
-            grep --color=always -E \
-                "^ogstun:|"
-                "inet |"
-                "netmask |"
-                "destination|"
-                "$"
+        grep --color=always -E \
+"^ogstun:|"\
+"inet |"\
+"netmask |"
+"destination|"\
+"$"
     else
         echo
         echo "Scenario 2 : OGSTUN Interface has no IP Address"
+
+# ALL GREP SHOULD BE ALIGN IN THE FIRST
+
         ifconfig ogstun | \
-                grep --color=always -E \
-                   "^ogstun:|"
-                   "$"
+        grep --color=always -E \
+"^ogstun:|"\
+"$"
     fi
 else
     echo
