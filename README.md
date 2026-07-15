@@ -498,15 +498,18 @@ ps aux | grep '^open5gs' | wc -l
 # STEP 3 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
 ## Configuration OGSTUN
 ### Script showing the 3 scenarios : 
+* Explaing scenario of interfaces ogstun
 Let's see our scenario, and explain each other : 
-* Scenario 1 : OGSTUN Interface is not configured
+
+'Scenario 1' : OGSTUN Interface is not configured
 1. ifconfig </br>
 2. observe no interface named 'ogstun' </br>
 3. sudo ip tuntap add name ogstun mode tun </br>
 4. sudo ip addr add 10.45.0.1/16 dev ogstun </br>
 5. sudo ip link set ogstun up </br>
 
-* Scenario 2 : OGSTUN Interface is not with no IP Address
+'Scenario 2' : OGSTUN Interface is not with no IP Address
+
 1. ifconfig  </br>
 <div align="center">
 
@@ -535,7 +538,7 @@ Let's see our scenario, and explain each other :
 
 2. sudo ip addr add 10.45.0.1/16 dev ogstun
 
-* Scenario 3 :  OGSTUN Interface is configured with IP Address </br>
+'Scenario 3' :  OGSTUN Interface is configured with IP Address </br>
 1. ifconfig
 
 <div align="center">
@@ -564,6 +567,7 @@ Let's see our scenario, and explain each other :
 </table>
 
 </div>
+* Checking ogstun
 
 To see our scenario, let's create this script  : 
 ```
@@ -642,7 +646,7 @@ Checking by using :
 ifconfig
 ```
 
-### Choosing and processing all scenarios
+### Configuring to the scenarios 3
 
 ```
 sudo tee configure_ogstun.sh > /dev/null <<'EOF'
@@ -711,8 +715,8 @@ bash check_ogstun.sh
 After lauching configure_ogstun.sh , scenario 3 should appears
 ## Configuration Blackhaul : IPv4 Forwarding
 ### Explaining and showing IPv4 Forwarding
+* Explaining IPv4 Forwading
 Ensure IPv4 forwarding is enabled
-
 1. Check current status:
 <div align="center">
 
@@ -783,7 +787,7 @@ bash check_ipv4forward.sh
 ```
 The goal is to have  net.ipv4.ip_forwad = 1
 
-* Configure IPv4 forward
+###  Configure IPv4 forward
 ```
 sudo tee configure_ipv4forward.sh > /dev/null <<'EOF'
 #!/bin/bash
@@ -828,13 +832,14 @@ sudo cp -rf configure_ipv4forward.sh /usr/local/bin/configure_ipv4forward.sh
 ```
 bash configure_ipv4forward.sh
 ```
-* Rechecking IPv4 Forwading
+###  Rechecking IPv4 Forwading
 ```
 bash configure_ipv4forward.sh
 ```
   
-## Configuration Blackhaul : IPTables NAT forwarding
-### Explaining and showing IPTables NAT forwarding
+## Configuration Blackhaul : IPTABLE NAT forwarding
+### Explaining and showing IPTABLE NAT forwarding
+* Explaining IPTABLE NAT forwarding
 1. sudo iptables -L -n -v -t nat
 <div align="center">
 
@@ -903,7 +908,7 @@ sudo cp -rf check_iptableNATforward.sh /usr/local/bin/check_iptableNATforward.sh
 ```
 bash check_iptableNATforward.sh
 ```
-* Configuring IPTABLE NAT Forwading
+###  Configuring IPTABLE NAT forwading
 ```
 sudo tee configure_iptableNATforward.sh > /dev/null <<'EOF'
 #!/bin/bash
@@ -951,7 +956,7 @@ sudo cp -rf configure_iptableNATforward.sh /usr/local/bin/configure_iptableNATfo
 ```
 bash configure_iptableNATforward.sh
 ```
-* Rechecking IPTABLE NAT Forwading
+###  Rechecking IPTABLE NAT Forwading
 ```
 bash check_iptableNATforward.sh
 ```
