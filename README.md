@@ -861,6 +861,7 @@ Chain POSTROUTING (policy ACCEPT)
 
 2. if ogstun 10.45.0.1/15 is not displayed
 3. sudo iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE
+* Checking IPTABLES  Forwading
 ```
 sudo tee check_iptableNATforward.sh > /dev/null <<'EOF'
 #!/bin/bash
@@ -902,7 +903,59 @@ sudo cp -rf check_iptableNATforward.sh /usr/local/bin/check_iptableNATforward.sh
 ```
 bash check_iptableNATforward.sh
 ```
+* Configuring IPTABLE NAT Forwading
+```
+sudo tee configure_iptableNATforward.sh > /dev/null <<'EOF'
+#!/bin/bash
 
+check_iptableNATforward() {
+    sudo iptables -t nat -L -n -v | grep -q "ogstun"
+}
+
+if check_iptableNATforward; then
+
+    echo
+    echo "IPTABLE NAT Forwarding enabled"
+    echo
+
+    sudo iptables -t nat -L -n -v | grep --color=always -E "ogstun|$"
+
+    echo
+    echo "No need to configure IPTABLE NAT Forwarding."
+
+else
+
+    echo
+    echo "IPTABLE NAT Forwarding disabled"
+    echo
+    echo "Configure IPTABLE NAT Forwarding"
+
+    sudo iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE
+
+    echo
+    echo "IPTABLE NAT Forwarding enabled"
+    echo
+
+    sudo iptables -t nat -L -n -v | grep --color=always -E "ogstun|$"
+
+fi
+
+EOF
+```
+```
+sudo chmod +x configure_iptableNATforward.sh
+```
+```
+sudo cp -rf configure_iptableNATforward.sh /usr/local/bin/configure_iptableNATforward.sh
+```
+```
+bash configure_iptableNATforward.sh
+```
+* Rechecking IPTABLE NAT Forwading
+```
+bash check_iptableNATforward.sh
+```
+ 
 ## Configuration PLMN amf.conf
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
