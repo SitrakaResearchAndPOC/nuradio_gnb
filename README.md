@@ -281,30 +281,34 @@ sudo systemctl stop open5gs-sgwcd
 ps aux | grep open5gs
 ```
 ### Alternative 2 (automated) : Killing all directly
+* Listing all services (even the process is stopped)
+```
+sudo systemctl list-unit-files --type=service | grep open5gs 
+```
+* Counting all services (even the process is stopped)
+```
+sudo systemctl list-unit-files --type=service | grep ^open5gs | wc -l
+```
+18 because webui is in the service system
+
 * Restarting all processes
 ```
 sudo systemctl restart $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
 ```
-
 * Showing all processes of open5Gs
 ```
 ps aux | grep open5gs
 ```
-```
-sudo systemctl list-unit-files --type=service | grep open5gs 
-```
+More informations,
 ```
 sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
 ```
 
 * Counting all processes
 ```
-ps aux | grep '^open5gs' | wc -l
+ps aux | grep 'open5gs' | wc -l | awk '{print $1-1}'
 ```
-OR
-```
-sudo systemctl list-unit-files --type=service | grep ^open5gs | wc -l
-```
+18 because the process webui doesn't begin by open5gs
 
 * Stopping all processes
 ```
@@ -318,14 +322,16 @@ sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs 
 ```
 ps aux | grep open5gs
 ```
+
 * Counting all processes after stopping
 ```
 ps aux | grep '^open5gs' | wc -l
 ```
-OR 
+0 will be the value
 ```
 systemctl list-unit-files --type=service | grep ^open5gs | wc -l
 ```
+0 will be the value 
 
 ## Create and Start script on Open5Gs
 * Showing all process of open5Gs
@@ -570,17 +576,15 @@ if check_ogstun; then
         echo
         echo "Scenario 3 : OGSTUN Interface is configured with IP Address"
         ifconfig ogstun | grep --color=always -E \
-"^ogstun:|"\
-"inet |"\
-"netmask |"\
-"destination|"\
-"$"
+                "^ogstun:|"\
+                "inet |"\
+                "netmask |"\
+                "destination|""$"
     else
         echo
         echo "Scenario 2 : OGSTUN Interface has no IP Address"
         ifconfig ogstun | grep --color=always -E \
-"^ogstun:|"\
-"$"
+                "^ogstun:|""$"
     fi
 else
     echo
