@@ -576,16 +576,20 @@ if check_ogstun; then
     if check_ip; then
         echo
         echo "Scenario 3 : OGSTUN Interface is configured with IP Address"
-        ifconfig ogstun | grep --color=always -E \
-                "^ogstun:|"\
-                "inet |"\
-                "netmask |"\
-                "destination|""$"
+        ifconfig ogstun | \
+            grep --color=always -E \
+                "^ogstun:|"
+                "inet |"
+                "netmask |"
+                "destination|"
+                "$"
     else
         echo
         echo "Scenario 2 : OGSTUN Interface has no IP Address"
-        ifconfig ogstun | grep --color=always -E \
-                "^ogstun:|""$"
+        ifconfig ogstun | \
+                grep --color=always -E \
+                   "^ogstun:|"
+                   "$"
     fi
 else
     echo
