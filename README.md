@@ -688,6 +688,7 @@ After lauching configure_ogstun.sh , scenario 3 should appears
 ## Configuration Blackhaul : IPv4 Forwarding
 ### Explaining and showing IPv4 Forwarding
 Ensure IPv4 forwarding is enabled
+
 1. Check current status:
 <div align="center">
 
@@ -710,8 +711,11 @@ net.ipv4.ip_forward_use_pmtu = 0
 </table>
 
 </div>
+
 2. If net.ipv4.ip_forward = 0, enable it temporarily: </br>
+
 3. sudo sysctl -w net.ipv4.ip_forward=1 </br></br> 
+
 Note : </br>
 Open5GS laptop requires internet connection to provide data service to UE </br>
 
