@@ -1481,6 +1481,136 @@ bash check_smf_5.sh
 mkdir 3-upf && cd 3-upf
 ```
 * Configure UPF
+```
+sudo tee configure_upf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/upf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_upf.sh
+```
+```
+sudo bash configure_upf.sh
+```
+* Configure UPF Logger
+```
+sudo tee configure_upf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/upf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_upf_logger.sh
+```
+```
+sudo bash configure_upf_logger.sh
+```
+
+* Check UPF all
+If you add smf in upf; the relation between them will be more active </br>
+the easy way, is that the smf find the upf not also upf find the smf </br>
+
+```
+sudo tee check_upf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/upf.yaml"
+
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+printf "\n\n"
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.7([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_upf.sh
+```
+```
+bash check_upf.sh
+```
+
+* Check UPF part1
+```
+sudo tee check_upf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/upf.yaml"
+
+printf "\n\n"
+
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_upf_1.sh
+```
+```
+bash check_upf_1.sh
+```
+
+* Check UPF part2
+```
+sudo tee check_upf_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/upf.yaml"
+
+printf "\n\n"
+
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.7([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_upf_2.sh
+```
+```
+bash check_upf_2.sh
+```
 
 ### 3.4.4. Configuration nrf.yaml
 * Create and change directory
