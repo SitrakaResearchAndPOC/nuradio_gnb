@@ -971,7 +971,7 @@ mkdir 1-amf && cd 1-amf
 * Configure AMF
 Directly all configuraiton in one manipulation
 ```
-sudo tee configure_amf_logger.sh > /dev/null << 'EOF'
+sudo tee configure_amf.sh > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1014,6 +1014,12 @@ sudo sed -Ei \
 # grep -nE 'mcc|mnc|tac' "$CONFIG"
 
 EOF
+```
+```
+sudo chmod +x configure_amf.sh
+```
+```
+bash configure_amf.sh
 ```
 
 
@@ -1084,7 +1090,7 @@ bash configure_amf_mcc_mnc.sh
 ```
 * check AMF all 
 ```
-sudo tee check_amf_1.sh > /dev/null << 'EOF'
+sudo tee check_amf.sh > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1130,6 +1136,12 @@ for i in $(seq 209 239); do
 done
 
 EOF
+```
+```
+chmod +x check_amf.sh
+```
+```
+bash check_amf.sh 
 ```
 
 *  Check AMF part1
@@ -1199,7 +1211,9 @@ chmod +x check_amf_3.sh
 bash check_amf_3.sh
 ```
 *  Check AMF part4
+  
 a little bit different, line by line
+
 ```
 sudo tee check_amf_4.sh > /dev/null << 'EOF'
 #!/bin/bash
@@ -1233,6 +1247,299 @@ sudo chmod +x check_amf_4.sh
 ```
 bash check_amf_4.sh
 ```
+
+### 3.4.2. Configuration SMF.yaml
+* Create and change directory
+```
+mkdir 2-smf && cd 2-smf
+```
+* Configure SMF all
+```
+sudo tee configure_smf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_smf.sh
+```
+```
+sudo bash configure_smf.sh
+```
+* Configure SMF logger
+```
+sudo tee configure_smf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_smf_logger.sh
+```
+```
+sudo bash configure_smf_logger.sh
+```
+* Check SMF all
+```
+sudo tee check_smf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+# part1
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+# part2
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
+    -e "$"
+
+# part3
+printf "\n\n"
+sed -n '11,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
+    -e "$"
+
+# part4
+printf "\n\n"
+sed -n '23,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.8\.8([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.4\.4([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8888([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8844([[:space:]]*#.*)?$" \
+    -e "$"
+
+# part 5
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+
+EOF
+```
+```
+chmod +x check_smf.sh
+```
+```
+bash check_smf.sh
+```
+* Check SMF part1
+```
+sudo tee check_smf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+
+printf "\n\n"
+
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_smf_1.sh
+```
+```
+bash check_smf_1.sh
+```
+
+* Check SMF part2
+```
+sudo tee check_smf_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+
+printf "\n\n"
+
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_smf_2.sh
+```
+```
+bash check_smf_2.sh
+```
+
+* Check SMF part3
+```
+sudo tee check_smf_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+
+printf "\n\n"
+
+sed -n '11,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_smf_3.sh
+```
+```
+bash check_smf_3.sh
+```
+
+* Check SMF part4
+```
+sudo tee check_smf_4.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+
+printf "\n\n"
+
+sed -n '23,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.8\.8([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.4\.4([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8888([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8844([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_smf_4.sh
+```
+```
+bash check_smf_4.sh
+```
+
+* Check SMF part5
+```
+sudo tee check_smf_5.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+
+printf "\n\n"
+
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_smf_5.sh
+```
+```
+bash check_smf_5.sh
+```
+
+### 3.4.3. Configuration upf.yaml
+* Create and change directory
+```
+mkdir 3-upf && cd 3-upf
+```
+* Configure UPF
+
+### 3.4.4. Configuration nrf.yaml
+* Create and change directory
+```
+mkdir 4-nrf && cd 4-nrf
+```
+* Configure NRF
+
+### 3.4.5. Configuration scp.yaml
+* Create and change directory
+```
+mkdir 5-scp && cd 5-scp
+```
+* Configure scp
+
+### 3.4.6. Configuration ausf.yaml
+* Create and change directory
+```
+mkdir 6-ausf && cd 6-ausf
+```
+* Configure AUSF
+
+### 3.4.7. Configuration udm.yaml
+* Create and change directory
+```
+mkdir 7-udm && cd 7-udm
+```
+* Configure UDM
+
+### 3.4.8. Configuration pcf.yaml
+* Create and change directory
+```
+mkdir 8-pcf && cd 8-pcf
+```
+* Configure PCF
+
+### 3.4.9. Configuration nssf.yaml
+* Create and change directory
+```
+mkdir 9-nssf && cd 9-nssf
+```
+* Configure NSSF
+
+### 3.4.10. Configuration bsf.yaml
+* Create and change directory
+```
+mkdir 10-bsf && cd 10-bsf
+```
+* Configure BSF
+
+### 3.4.11. Configuration udr.yaml
+* Create and change directory
+```
+mkdir 11-udr && cd 11-udr
+```
+* Configure UDR
+
+
+
 
 
 
