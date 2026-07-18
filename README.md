@@ -2012,14 +2012,329 @@ sudo bash check_scp_3.sh
 mkdir 6-ausf && cd 6-ausf
 ```
 * Configure AUSF
+```
+sudo tee configure_ausf.sh > /dev/null << 'EOF'
+#!/bin/bash
 
+CONFIG="/etc/open5gs/ausf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_ausf.sh
+```
+```
+sudo bash configure_ausf.sh
+```
+
+* Configure AUSF Logger
+```
+sudo tee configure_ausf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/ausf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_ausf_logger.sh
+```
+```
+sudo bash configure_ausf_logger.sh
+```
+* Check AUSF
+```
+sudo tee check_ausf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/ausf.yaml"
+# part1
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+# Part2
+printf "\n\n"
+sed -n '11,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.11([[:space:]]*#.*)?$" \
+    -e "$"
+
+# Part3
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_ausf.sh
+```
+```
+sudo bash check_ausf.sh
+```
+
+* Check AUSF part1
+```
+sudo tee check_ausf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/ausf.yaml"
+
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_ausf_1.sh
+```
+```
+sudo bash check_ausf_1.sh
+```
+
+* Check AUSF part2
+```
+sudo tee check_ausf_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/ausf.yaml"
+
+printf "\n\n"
+sed -n '11,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.11([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_ausf_2.sh
+```
+```
+bash check_ausf_2.sh
+```
+
+* Check AUSF part3
+```
+sudo tee check_ausf_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/ausf.yaml"
+
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_ausf_3.sh
+```
+```
+bash check_ausf_3.sh
+```
+use directly scp not nrf
 ### 3.4.7. Configuration udm.yaml
 * Create and change directory
 ```
 mkdir 7-udm && cd 7-udm
 ```
 * Configure UDM
+```
+sudo tee configure_udm.sh > /dev/null << 'EOF'
+#!/bin/bash
 
+CONFIG="/etc/open5gs/udm.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_udm.sh
+```
+```
+sudo bash configure_udm.sh
+```
+
+* Configure UDM Logger
+```
+sudo tee configure_udm_logger.sh > /dev/null << 'EOF'
+
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udm.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_udm_logger.sh
+```
+```
+sudo bash configure_udm_logger.sh
+```
+
+* Check UDM
+```
+sudo tee check_udm.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udm.yaml"
+
+# part1
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+# part2
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.12([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+
+# part3
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_udm.sh
+```
+```
+bash check_udm.sh
+```
+
+* Check UDM part1
+```
+sudo tee check_udm_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udm.yaml"
+
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_udm_1.sh
+```
+```
+bash check_udm_1.sh
+```
+
+* Check UDM part2
+```
+sudo tee check_udm_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udm.yaml"
+
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.12([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_udm_2.sh
+```
+```
+bash check_udm_2.sh
+```
+
+* Check UDM part3
+```
+sudo tee check_udm_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udm.yaml"
+
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_udm_3.sh
+```
+```
+bash check_udm_3.sh
+```
+Use directly scp not nrf
 ### 3.4.8. Configuration pcf.yaml
 * Create and change directory
 ```
