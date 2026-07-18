@@ -1019,7 +1019,7 @@ EOF
 sudo chmod +x configure_amf.sh
 ```
 ```
-bash configure_amf.sh
+sudo bash configure_amf.sh
 ```
 
 
@@ -1050,7 +1050,7 @@ EOF
 sudo chmod +x configure_amf_logger.sh
 ```
 ```
-bash configure_amf_logger.sh 
+sudo bash configure_amf_logger.sh 
 ```
 * Configure AMF MCC & MNC
 ```
@@ -1086,7 +1086,7 @@ EOF
 sudo chmod +x configure_amf_mcc_mnc.sh
 ```
 ```
-bash configure_amf_mcc_mnc.sh
+sudo bash configure_amf_mcc_mnc.sh
 ```
 * check AMF all 
 ```
@@ -1138,10 +1138,10 @@ done
 EOF
 ```
 ```
-chmod +x check_amf.sh
+sudo chmod +x check_amf.sh
 ```
 ```
-bash check_amf.sh 
+sudo bash check_amf.sh 
 ```
 
 *  Check AMF part1
@@ -1159,10 +1159,10 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x check_amf_1.sh
+sudo chmod +x check_amf_1.sh
 ```
 ```
-bash check_amf_1.sh 
+sudo bash check_amf_1.sh 
 ```
 *  Check AMF part2
 ```
@@ -1182,10 +1182,10 @@ sed -n '20,49p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x check_amf_2.sh
+sudo chmod +x check_amf_2.sh
 ```
 ```
-bash check_amf_2.sh 
+sudo bash check_amf_2.sh 
 ```
 *  Check AMF part3
 ```
@@ -1205,10 +1205,10 @@ sed -n '40,69p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x check_amf_3.sh
+sudo chmod +x check_amf_3.sh
 ```
 ```
-bash check_amf_3.sh
+sudo bash check_amf_3.sh
 ```
 *  Check AMF part4
   
@@ -1245,7 +1245,7 @@ EOF
 sudo chmod +x check_amf_4.sh
 ```
 ```
-bash check_amf_4.sh
+sudo bash check_amf_4.sh
 ```
 
 ### 3.4.2. Configuration SMF.yaml
@@ -1355,10 +1355,10 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x check_smf.sh
+sudo chmod +x check_smf.sh
 ```
 ```
-bash check_smf.sh
+sudo bash check_smf.sh
 ```
 * Check SMF part1
 ```
@@ -1376,10 +1376,10 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x check_smf_1.sh
+sudo chmod +x check_smf_1.sh
 ```
 ```
-bash check_smf_1.sh
+sudo bash check_smf_1.sh
 ```
 
 * Check SMF part2
@@ -1401,7 +1401,7 @@ EOF
 sudo chmod +x check_smf_2.sh
 ```
 ```
-bash check_smf_2.sh
+sudo bash check_smf_2.sh
 ```
 
 * Check SMF part3
@@ -1423,7 +1423,7 @@ EOF
 sudo chmod +x check_smf_3.sh
 ```
 ```
-bash check_smf_3.sh
+sudo bash check_smf_3.sh
 ```
 
 * Check SMF part4
@@ -1449,7 +1449,7 @@ EOF
 sudo chmod +x check_smf_4.sh
 ```
 ```
-bash check_smf_4.sh
+sudo bash check_smf_4.sh
 ```
 
 * Check SMF part5
@@ -1472,7 +1472,7 @@ EOF
 sudo chmod +x check_smf_5.sh
 ```
 ```
-bash check_smf_5.sh
+sudo bash check_smf_5.sh
 ```
 
 ### 3.4.3. Configuration upf.yaml
@@ -1562,10 +1562,10 @@ sed -n '5,33p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x check_upf.sh
+sudo chmod +x check_upf.sh
 ```
 ```
-bash check_upf.sh
+sudo bash check_upf.sh
 ```
 
 * Check UPF part1
@@ -1584,10 +1584,10 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x check_upf_1.sh
+sudo chmod +x check_upf_1.sh
 ```
 ```
-bash check_upf_1.sh
+sudo bash check_upf_1.sh
 ```
 
 * Check UPF part2
@@ -1609,7 +1609,7 @@ EOF
 sudo chmod +x check_upf_2.sh
 ```
 ```
-bash check_upf_2.sh
+sudo bash check_upf_2.sh
 ```
 
 ### 3.4.4. Configuration nrf.yaml
@@ -1618,13 +1618,390 @@ bash check_upf_2.sh
 mkdir 4-nrf && cd 4-nrf
 ```
 * Configure NRF
+```
+sudo tee configure_nrf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
 
+CONFIG="/etc/open5gs/nrf.yaml"
+
+# PART1 : LOG
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+
+# PART 2 : MCC & MNC
+# echo "===== Avant ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+
+# Remplace mcc: 999 par mcc: 001
+sudo sed -Ei \
+'s/^([[:space:]]*mcc[[:space:]]*:[[:space:]]*)999([[:space:]]*(#.*)?)$/\1001\2/' \
+"$CONFIG"
+
+# Remplace mnc: 70 par mnc: 01
+sudo sed -Ei \
+'s/^([[:space:]]*mnc[[:space:]]*:[[:space:]]*)70([[:space:]]*(#.*)?)$/\101\2/' \
+"$CONFIG"
+
+# Remplace tac: 1 par tac: 77
+sudo sed -Ei \
+'s/^([[:space:]]*tac[[:space:]]*:[[:space:]]*)1([[:space:]]*(#.*)?)$/\177\2/' \
+"$CONFIG"
+
+# echo
+# echo "===== Après ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+
+EOF
+```
+```
+sudo chmod +x configure_nrf.sh
+```
+```
+sudo bash configure_nrf.sh
+```
+
+* Configure NRF LOGGER
+```
+sudo tee configure_nrf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nrf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+
+```
+sudo chmod +x configure_nrf_logger.sh
+```
+```
+sudo bash configure_nrf_logger.sh
+```
+* Configure NRF MCC & MNC & TAC
+```
+sudo tee configure_nrf_mcc_mnc.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nrf.yaml"
+
+# echo "===== Avant ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+
+# Remplace mcc: 999 par mcc: 001
+sudo sed -Ei \
+'s/^([[:space:]]*mcc[[:space:]]*:[[:space:]]*)999([[:space:]]*(#.*)?)$/\1001\2/' \
+"$CONFIG"
+
+# Remplace mnc: 70 par mnc: 01
+sudo sed -Ei \
+'s/^([[:space:]]*mnc[[:space:]]*:[[:space:]]*)70([[:space:]]*(#.*)?)$/\101\2/' \
+"$CONFIG"
+
+# Remplace tac: 1 par tac: 77
+sudo sed -Ei \
+'s/^([[:space:]]*tac[[:space:]]*:[[:space:]]*)1([[:space:]]*(#.*)?)$/\177\2/' \
+"$CONFIG"
+
+# echo
+# echo "===== Après ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_nrf_mcc_mnc.sh
+```
+```
+sudo bash configure_nrf_mcc_mnc.sh
+```
+
+* Check NRF 
+```
+sudo tee check_nrf.sh > /dev/null << 'EOF'
+#!/bin/bash
+CONFIG="/etc/open5gs/nrf.yaml"
+
+# PART 1
+printf "\n\n"
+sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+# PART 2
+printf "\n\n"
+sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
+    -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
+    -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
+    -e "$"
+
+# PART 3
+printf "\n\n"
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.10([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+sudo chmod +x check_nrf.sh
+```
+```
+sudo bash check_nrf.sh
+```
+In configuration, if nrf is not commented, it's not directly used , go tho SCP after to NRF
+
+* Check NRF part1
+```
+sudo tee check_nrf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nrf.yaml"
+
+printf "\n\n"
+sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+EOF
+```
+```
+sudo chmod +x check_nrf_1.sh
+```
+```
+sudo bash check_nrf_1.sh
+```
+
+* Check NRF part2
+```
+sudo tee check_nrf_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nrf.yaml"
+
+printf "\n\n"
+sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
+    -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
+    -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_nrf_2.sh
+```
+```
+sudo bash check_nrf_2.sh
+```
+
+* Check NRF part3
+```
+sudo tee check_nrf_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nrf.yaml"
+
+printf "\n\n"
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.10([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_nrf_3.sh
+```
+```
+sudo bash check_nrf_3.sh
+```
+
+  
 ### 3.4.5. Configuration scp.yaml
 * Create and change directory
 ```
 mkdir 5-scp && cd 5-scp
 ```
 * Configure scp
+```
+sudo tee configure_scp.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/scp.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_scp.sh
+```
+```
+sudo bash configure_scp.sh
+```
+
+* Configure scp logger
+```
+sudo tee configure_scp_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/scp.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_scp_logger.sh
+```
+```
+sudo bash configure_scp_logger.sh
+```
+* Check scp
+```
+sudo tee check_scp.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/scp.yaml"
+
+# part1
+printf "\n\n"
+sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+# part2
+printf "\n\n"
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.200([[:space:]]*#.*)?$" \
+    -e "$"
+
+# part3
+printf "\n\n"
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*nrf:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.10:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_scp.sh
+```
+```
+sudo bash check_scp.sh
+```
+
+* Check scp part1
+```
+sudo tee check_scp_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/scp.yaml"
+
+printf "\n\n"
+sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_scp_1.sh
+```
+```
+sudo bash check_scp_1.sh
+```
+
+* Check scp part2
+```
+sudo tee check_scp_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/scp.yaml"
+
+printf "\n\n"
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.200([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_scp_2.sh
+```
+```
+sudo bash check_scp_2.sh
+```
+
+* Check scp part3
+```
+Not directly connected to nrf , go tho SCP after to nrf
+sudo tee check_scp_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/scp.yaml"
+
+printf "\n\n"
+sed -n '5,33p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*nrf:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.10:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_scp_3.sh
+```
+```
+sudo bash check_scp_3.sh
+```
 
 ### 3.4.6. Configuration ausf.yaml
 * Create and change directory
