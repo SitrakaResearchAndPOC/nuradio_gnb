@@ -1767,6 +1767,7 @@ sed -n '5,33p' "$CONFIG" | grep --color=always -E \
 
 EOF
 ```
+```
 sudo chmod +x check_nrf.sh
 ```
 ```
