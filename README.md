@@ -1,22 +1,22 @@
 # STEP 0 : PREPARING SYSTEM
-## Installation Ubuntu 22.04
+## 0.1. Installation Ubuntu 22.04
 * Download and install ubuntu 22.04
 * Use RAM >= 4Gio
 
-## Creation repository
+## 0.2. Creation repository
 ```
 [ -d "nuradio" ] && sudo rm -rf nuradio; mkdir nuradio && cd nuradio
 ```
-## Checking the nuradio directory  
+## 0.3. Checking the nuradio directory  
 ```
 pwd | grep nuradio
 ```
-## Installation utility
+## 0.4. Installation utility
 ```
 sudo apt update && sudo apt install -y wget curl neofetch zsh net-tools
 ```
 
-## Checking installation of utility
+## 0.5. Checking installation of utility
 ```
 wget --version
 ```
@@ -26,54 +26,55 @@ neofetch
 ```
 ifconfig
 ```
-
-## Installation CPU optimization
+## 0.6. Installation CPU optimization
+### 0.6.1. Installation
 ```
 sudo apt install -y linux-lowlatency linux-headers-lowlatency linux-tools-lowlatency linux-cloud-tools-lowlatency
 ```
 ```
 sudo apt install  -y cpuset stress-ng
 ```
-### Configuring grub adding menu mode
+### 0.6.2. Configuring grub adding menu mode
 ```
 sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
 ```
-### Checking grub for mode menu
+### 0.6.3. Checking grub for mode menu
 ```
 cat /etc/default/grub | grep GRUB_TIMEOUT_STYLE | grep menu
 ```
-### Configuring grub timeout in second
+### 0.6.4. Configuring grub timeout in second
 ```
 sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/' /etc/default/grub
 ```
-## Checking grub timeout in second
+## 0.6.5. Checking grub timeout in second
 ```
 cat /etc/default/grub | grep GRUB_TIMEOUT | grep 5
 ```
-## Changing low latency as default Grub
+## 0.7. Changing low latency as default Grub
+### 0.7.1. Installation
 ```
 sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux '"$(ls /boot/vmlinuz* | grep lowlatency | sed 's|^/boot/vmlinuz-||')"'"/' /etc/default/grub
 ```
 ```
 cat /etc/default/grub | grep GRUB_DEFAULT | grep lowlatency
 ```
-### Upgrading GRUB 
+### 0.7.2. Upgrading GRUB 
 ```
 sudo update-grub
 ```
-### Rebooting
+### 0.7.3. Rebooting
 ```
 reboot
 ```
 
-### Checking after reboot
+### 0.7.4. Checking after reboot
 ```
 uname -r | grep lowlatency
 ```
 
 # STEP 1 : OPEN-SOURCE 5G NETWORK INSTALL
-## Installing UHD
-### Installing UHD by source 
+## 1.1. Installing UHD
+### 1.1.1. Installing UHD by source 
 The installation is by source due to the GPSDO which need to be patched 
 ```
 cd $HOME/nuradio
@@ -85,7 +86,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 chmod +x install_uhd_v4.1.0.5.sh && bash install_uhd_v4.1.0.5.sh
 ```
-### Checking UHD
+### 1.1.2. Checking UHD
 ```
 uhd_config_info --version
 ```
@@ -105,7 +106,7 @@ which uhd_usrp_probe
 ```
 which uhd_images_downloader
 ```
-### Installing FW images
+### 1.1.3. Installing FW images
 ```
 sudo /usr/local/lib/uhd/utils/uhd_images_downloader.py
 ```
@@ -113,11 +114,11 @@ or directly :
 ```
 sudo uhd_images_downloader
 ```
-### Checking if FW is download completly
+### 1.1.4. Checking if FW is download completly
 ```
 ls /usr/local/share/uhd/images
 ```
-### Checking with pluging USRP
+### 1.1.5. Checking with pluging USRP
 ```
 uhd_find_devices
 ```
@@ -128,15 +129,15 @@ uhd_usrp_probe
 sudo query_gpsdo_sensors 
 ```
 
-## Installing srsRAN
-### Installing srsRAN by source
+## 1.2. Installing srsRAN
+### 1.2.1. Installing srsRAN by source
 ```
 [ -f "srsran_50fe9623c_install.sh" ] && sudo rm -rf srsran_50fe9623c_install.sh; wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/srsran_50fe9623c_install.sh
 ```
 ```
 chmod +x srsran_50fe9623c_install.sh && bash srsran_50fe9623c_install.sh
 ```
-### Checking srsRAN
+### 1.2.2. Checking srsRAN
 Verify 
 ```
 [ -d "srsRAN_Project/build" ] && sudo make -C srsRAN_Project/build test -j "$(nproc --ignore=1)"
@@ -144,8 +145,8 @@ Verify
 ```
 gnb --version
 ```
-## Installing Open5gs
-### Installing Mongodb
+## 1.3. Installing Open5gs
+### 1.3.1. Installing Mongodb
 ```
 [ ! -f install_mongodb_6.0.sh ] && wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/main/files/install_mongodb_6.0.sh
 ```
@@ -153,7 +154,7 @@ gnb --version
 chmod +x install_mongodb_6.0.sh && bash install_mongodb_6.0.sh
 ```
 
-### Checking MongoDB
+### 1.3.2. Checking MongoDB
 ```
 mongod --version
 ```
@@ -164,7 +165,7 @@ sudo systemctl restart mongod
 sudo systemctl status mongod
 ```
 
-### Installing Open5gs
+### 1.3.3. Installing Open5gs
 ```
 [ ! -f install_open5gs_2.7.sh ] && \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_open5gs_2.7.sh
@@ -172,7 +173,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 chmod +x install_open5gs_2.7.sh && bash install_open5gs_2.7.sh
 ```
-### Checking Open5gs
+### 1.3.4. Checking Open5gs
 ```
 ls /usr/bin/open5gs*
 ```
@@ -198,7 +199,7 @@ which open5gs-amfd
 ldd $(which open5gs-amfd) | grep ogs
 ```
 
-### Installing NodeJS (WEBUI)
+### 1.3.5. Installing NodeJS (WEBUI)
 ```
 [ ! -f install_webui.sh ] && \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_webui.sh
@@ -207,7 +208,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 chmod +x install_webui.sh && bash install_webui.sh
 ```
 
-### Checking NodeJS (WEBUI)
+### 1.3.6. Checking NodeJS (WEBUI)
 ```
 node -v
 ```
@@ -216,7 +217,7 @@ node -v
 npm -v
 ```
 10.8.2
-### Checking file of WEBUI
+### 1.3.7. Checking file of WEBUI
 ```
 ls open5gs-webui/webui/.next/
 ```
@@ -237,7 +238,7 @@ THIS DIRECTORY SHOULD EXIST  : static/  </br>
 ls open5gs-webui/webui/ | grep "static"
 ```
 
-### Lauching Mongodb & WEBUI
+### 1.3.8. Lauching Mongodb & WEBUI
 
 ```
 sudo systemctl restart mongod
@@ -266,8 +267,9 @@ Password is :
 ```
 
 # STEP 2 : OPEN-SOURCE 5G NETWORK ADMIN
-## Killing all processes on Open5Gs
-### Alternative 1 (Bad Practice + Optionnal) : Killing one by one
+## 2.1. Killing all processes on Open5Gs
+### 2.1.1. Optionnal Alternative 1 
+It's a bad Practice by Killing one by one
 ```
 ps aux | grep open5gs
 ```
@@ -290,7 +292,7 @@ sudo systemctl stop open5gs-sgwcd
 ```
 ps aux | grep open5gs
 ```
-### Alternative 2 (automated) : Killing all directly
+### 2.1.2. Alternative 2 (automated) : Killing all directly
 * Listing all services (even the process is stopped)
 ```
 sudo systemctl list-unit-files --type=service | grep open5gs 
@@ -313,7 +315,6 @@ More informations,
 ```
 sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs | awk '{print $1}')
 ```
-
 * Counting all processes
 ```
 ps aux | grep 'open5gs' | wc -l | awk '{print $1-1}'
@@ -344,7 +345,8 @@ ps aux | grep 'open5gs' | wc -l | awk '{print $1-1}'
 ```
 0 will be the value 
 
-## Create and Start script on Open5Gs
+## 2.2. Create and Start script on Open5Gs
+### 2.2.1. Managing script
 * Showing all process of open5Gs
 ```
 ps aux | grep open5gs
@@ -354,7 +356,7 @@ ps aux | grep open5gs
 ps aux | grep '^open5gs' | wc -l
 ```
 
-### Script stop_5gc
+### 2.2.2. Script stop_5gc
 * Creating script stop_5gc
 ```
 sudo tee stop_5gc > /dev/null <<'EOF'
@@ -403,7 +405,7 @@ sudo chmod +x stop_5gc
 ```
 sudo cp -rf stop_5gc /usr/bin/stop_5gc
 ```
-### Script start_5gc
+### 2.2.3. Script start_5gc
 * Creating script start_5gc
 ```
 sudo tee start_5gc > /dev/null <<'EOF'
@@ -450,7 +452,7 @@ sudo chmod +x start_5gc
 ```
 sudo cp -rf start_5gc /usr/bin/start_5gc
 ```
-### Script 5gc
+### 2.2.4. Script 5gc
 * creation script 5gc
 ```
 sudo tee 5gc > /dev/null <<'EOF'
@@ -468,7 +470,7 @@ sudo chmod +x 5gc
 ```
 sudo cp -rf 5gc /usr/bin/5gc
 ```
-### Script restart_5gc
+### 2.2.5. Script restart_5gc
 * Creating script restartç_5gc
 ```
 sudo tee restart_5gc > /dev/null <<'EOF'
@@ -496,8 +498,8 @@ ps aux | grep '^open5gs' | wc -l
 ```
 
 # STEP 3 : OPEN-SOURCE 5G NETWORK CONFIGURATION OPEN5GS
-## Configuration OGSTUN
-### Script showing the 3 scenarios : 
+## 3.1. Configuration OGSTUN
+### 3.1.1. Script showing the 3 scenarios : 
 * Explaing scenario of interfaces ogstun
 Let's see our scenario, and explain each other : 
 
@@ -633,7 +635,7 @@ The goal is to have Scenario 3,
 bash check_ogstun.sh | grep "Scenario 3"
 ```
 
-### Optionnal : If you want to del interface ogstun  : 
+### 3.1.2. Optionnal : If you want to del interface ogstun  : 
 Launch the command or directly restart computer
 ```
 ifconfig
@@ -646,8 +648,7 @@ Checking by using :
 ifconfig
 ```
 
-### Configuring to the scenarios 3
-
+### 3.1.3. Configuring to the scenarios 3
 ```
 sudo tee configure_ogstun.sh > /dev/null <<'EOF'
 #!/bin/bash
@@ -708,13 +709,13 @@ bash configure_ogstun.sh
 ```
 Scenario 3 should appears
 
-### Rechecking ogstun
+### 3.1.4. Rechecking ogstun
 ```
 bash check_ogstun.sh
 ```
 After lauching configure_ogstun.sh , scenario 3 should appears
-## Configuration Blackhaul : IPv4 Forwarding
-### Explaining and showing IPv4 Forwarding
+## 3.2. Configuration Blackhaul : IPv4 Forwarding
+### 3.2.1. Explaining and showing IPv4 Forwarding
 * Explaining IPv4 Forwading
 Ensure IPv4 forwarding is enabled
 1. Check current status:
@@ -787,7 +788,7 @@ bash check_ipv4forward.sh
 ```
 The goal is to have  net.ipv4.ip_forwad = 1
 
-###  Configure IPv4 forward
+### 3.2.2. Configure IPv4 forward
 ```
 sudo tee configure_ipv4forward.sh > /dev/null <<'EOF'
 #!/bin/bash
@@ -832,13 +833,13 @@ sudo cp -rf configure_ipv4forward.sh /usr/local/bin/configure_ipv4forward.sh
 ```
 bash configure_ipv4forward.sh
 ```
-###  Rechecking IPv4 Forwading
+### 3.2.3. Rechecking IPv4 Forwading
 ```
 bash configure_ipv4forward.sh
 ```
   
-## Configuration Blackhaul : IPTABLE NAT forwarding
-### Explaining and showing IPTABLE NAT forwarding
+## 3.3. Configuration Blackhaul : IPTABLE NAT forwarding
+### 3.3.1. Explaining and showing IPTABLE NAT forwarding
 * Explaining IPTABLE NAT forwarding
 1. sudo iptables -L -n -v -t nat
 <div align="center">
@@ -908,7 +909,7 @@ sudo cp -rf check_iptableNATforward.sh /usr/local/bin/check_iptableNATforward.sh
 ```
 bash check_iptableNATforward.sh
 ```
-###  Configuring IPTABLE NAT forwading
+### 3.3.2. Configuring IPTABLE NAT forwading
 ```
 sudo tee configure_iptableNATforward.sh > /dev/null <<'EOF'
 #!/bin/bash
@@ -956,12 +957,286 @@ sudo cp -rf configure_iptableNATforward.sh /usr/local/bin/configure_iptableNATfo
 ```
 bash configure_iptableNATforward.sh
 ```
-###  Rechecking IPTABLE NAT Forwading
+### 3.3.3. Rechecking IPTABLE NAT Forwading
 ```
 bash check_iptableNATforward.sh
 ```
  
-## Configuration PLMN amf.conf
+## 3.4. Configuration PLMN & DEBUG MODE
+### 3.4.1. Configuration amf.yaml
+* Create and change directory
+```
+mkdir 1-amf && cd 1-amf
+```
+* Configure AMF
+Directly all configuraiton in one manipulation
+```
+sudo tee configure_amf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+
+# echo "===== Avant ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+
+# Remplace mcc: 999 par mcc: 001
+sudo sed -Ei \
+'s/^([[:space:]]*mcc[[:space:]]*:[[:space:]]*)999([[:space:]]*(#.*)?)$/\1001\2/' \
+"$CONFIG"
+
+# Remplace mnc: 70 par mnc: 01
+sudo sed -Ei \
+'s/^([[:space:]]*mnc[[:space:]]*:[[:space:]]*)70([[:space:]]*(#.*)?)$/\101\2/' \
+"$CONFIG"
+
+# Remplace tac: 1 par tac: 77
+sudo sed -Ei \
+'s/^([[:space:]]*tac[[:space:]]*:[[:space:]]*)1([[:space:]]*(#.*)?)$/\177\2/' \
+"$CONFIG"
+
+# echo
+# echo "===== Après ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+
+EOF
+```
+
+
+* Configure AMF log
+```
+sudo tee configure_amf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_amf_logger.sh
+```
+```
+bash configure_amf_logger.sh 
+```
+* Configure AMF MCC & MNC
+```
+sudo tee configure_amf_mcc_mnc.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+
+# echo "===== Avant ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+
+# Remplace mcc: 999 par mcc: 001
+sudo sed -Ei \
+'s/^([[:space:]]*mcc[[:space:]]*:[[:space:]]*)999([[:space:]]*(#.*)?)$/\1001\2/' \
+"$CONFIG"
+
+# Remplace mnc: 70 par mnc: 01
+sudo sed -Ei \
+'s/^([[:space:]]*mnc[[:space:]]*:[[:space:]]*)70([[:space:]]*(#.*)?)$/\101\2/' \
+"$CONFIG"
+
+# Remplace tac: 1 par tac: 77
+sudo sed -Ei \
+'s/^([[:space:]]*tac[[:space:]]*:[[:space:]]*)1([[:space:]]*(#.*)?)$/\177\2/' \
+"$CONFIG"
+
+# echo
+# echo "===== Après ====="
+# grep -nE 'mcc|mnc|tac' "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_amf_mcc_mnc.sh
+```
+bash configure_amf_mcc_mnc.sh
+```
+* check AMF all 
+```
+sudo tee check_amf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+# part 1
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+    
+# part 2
+printf "\n\n"
+sed -n '20,49p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
+    -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
+    -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
+    -e "$"
+# part 3
+printf "\n\n"
+sed -n '40,69p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*time[[:space:]]*:" \
+    -e "^[[:space:]]*t3512[[:space:]]*:" \
+    -e "^[[:space:]]*value[[:space:]]*:[[:space:]]*540.*$" \
+    -e "$"
+
+# part 4
+printf "\n\n"
+for i in $(seq 209 239); do
+    line=$(sed -n "${i}p" "$CONFIG")
+    
+    if [ "$i" -eq 226 ]; then
+        echo "$line" | grep --color=always -E \
+            -e "^[[:space:]]*#[[:space:]]*-[[:space:]]*plmn_id[[:space:]]*:" \
+            -e "$"
+    else
+        echo "$line" | grep --color=always -E \
+            -e "^[[:space:]]*#[[:space:]]*access_control[[:space:]]*:" \
+            -e "^[[:space:]]*#[[:space:]]*-[[:space:]]*default_reject_cause[[:space:]]*:[[:space:]]*13.*$" \
+            -e "^[[:space:]]*#[[:space:]]*reject_cause[[:space:]]*:[[:space:]]*15.*$" \
+            -e "^[[:space:]]*#[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
+            -e "^[[:space:]]*#[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
+            -e "$"
+    fi
+done
+
+EOF
+```
+
+*  Check AMF part1
+```
+sudo tee check_amf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+
+printf "\n\n"
+
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+EOF
+```
+```
+chmod +x check_amf_1.sh
+```
+```
+bash check_amf_1.sh 
+```
+*  Check AMF part2
+```
+sudo tee check_amf_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+
+printf "\n\n"
+
+sed -n '20,49p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
+    -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
+    -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_amf_2.sh
+```
+```
+bash check_amf_2.sh 
+```
+*  Check AMF part3
+```
+sudo tee check_amf_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+
+printf "\n\n"
+
+sed -n '40,69p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*time[[:space:]]*:" \
+    -e "^[[:space:]]*t3512[[:space:]]*:" \
+    -e "^[[:space:]]*value[[:space:]]*:[[:space:]]*540.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_amf_3.sh
+```
+```
+bash check_amf_3.sh
+```
+*  Check AMF part4
+a little bit different, line by line
+```
+sudo tee check_amf_4.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/amf.yaml"
+
+printf "\n\n"
+for i in $(seq 209 239); do
+    line=$(sed -n "${i}p" "$CONFIG")
+    
+    if [ "$i" -eq 226 ]; then
+        echo "$line" | grep --color=always -E \
+            -e "^[[:space:]]*#[[:space:]]*-[[:space:]]*plmn_id[[:space:]]*:" \
+            -e "$"
+    else
+        echo "$line" | grep --color=always -E \
+            -e "^[[:space:]]*#[[:space:]]*access_control[[:space:]]*:" \
+            -e "^[[:space:]]*#[[:space:]]*-[[:space:]]*default_reject_cause[[:space:]]*:[[:space:]]*13.*$" \
+            -e "^[[:space:]]*#[[:space:]]*reject_cause[[:space:]]*:[[:space:]]*15.*$" \
+            -e "^[[:space:]]*#[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
+            -e "^[[:space:]]*#[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
+            -e "$"
+    fi
+done
+
+EOF
+```
+```
+sudo chmod +x check_amf_4.sh
+```
+```
+bash check_amf_4.sh
+```
+
+
+
+
+
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
 
