@@ -1079,6 +1079,7 @@ EOF
 ```
 sudo chmod +x configure_amf_mcc_mnc.sh
 ```
+```
 bash configure_amf_mcc_mnc.sh
 ```
 * check AMF all 
