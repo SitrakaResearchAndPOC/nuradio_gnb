@@ -1540,6 +1540,7 @@ sudo bash configure_upf_logger.sh
 ```
 
 * Check UPF all
+
 If you add smf in upf; the relation between them will be more active </br>
 the easy way, is that the smf find the upf not also upf find the smf </br>
 
@@ -1549,11 +1550,12 @@ sudo tee check_upf.sh > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/upf.yaml"
 
+# Part1
 printf "\n\n"
 sed -n '1,30p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
     -e "$"
-
+# Part2
 printf "\n\n"
 sed -n '5,33p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.7([[:space:]]*#.*)?$" \
@@ -1619,7 +1621,7 @@ mkdir 4-nrf && cd 4-nrf
 ```
 * Configure NRF
 ```
-sudo tee configure_nrf_logger.sh > /dev/null << 'EOF'
+sudo tee configure_nrf.sh > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nrf.yaml"
@@ -1674,7 +1676,7 @@ sudo bash configure_nrf.sh
 
 * Configure NRF LOGGER
 ```
-sudo tee configure_nrf.sh > /dev/null << 'EOF'
+sudo tee configure_nrf_logger.sh > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nrf.yaml"
@@ -1982,8 +1984,8 @@ sudo bash check_scp_2.sh
 ```
 
 * Check scp part3
-```
 Not directly connected to nrf , go tho SCP after to nrf
+```
 sudo tee check_scp_3.sh > /dev/null << 'EOF'
 #!/bin/bash
 
