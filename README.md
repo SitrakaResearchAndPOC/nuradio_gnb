@@ -2348,6 +2348,164 @@ mkdir 8-pcf && cd 8-pcf
 mkdir 9-nssf && cd 9-nssf
 ```
 * Configure NSSF
+```
+sudo tee configure_nssf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nssf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_nssf.sh
+```
+```
+sudo bash configure_nssf.sh
+```
+
+* Configure nssf logger
+```
+sudo tee configure_nssf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nssf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x configure_nssf_logger.sh
+```
+```
+sudo bash configure_nssf_logger.sh
+```
+
+
+* Check nssf 
+```
+sudo tee check_nssf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nssf.yaml"
+
+# PART 1
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+# PART2
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.14([[:space:]]*#.*)?$" \
+    -e "$"
+
+# PART3
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_nssf.sh
+```
+```
+sudo bash check_nssf.sh
+```
+* Check nssf part1
+```
+sudo tee check_nssf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nssf.yaml"
+
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_nssf_1.sh
+```
+```
+sudo bash check_nssf_1.sh
+```
+
+
+* Configure nssf part2
+```
+sudo tee check_nssf_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nssf.yaml"
+
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.14([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_nssf_2.sh
+```
+```
+sudo bash check_nssf_2.sh
+```
+
+* Configure nssf part3
+```
+sudo tee check_nssf_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/nssf.yaml"
+
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_nssf_3.sh
+```
+```
+sudo bash check_nssf_3.sh
+```
 
 ### 3.4.10. Configuration bsf.yaml
 * Create and change directory
@@ -2355,6 +2513,151 @@ mkdir 9-nssf && cd 9-nssf
 mkdir 10-bsf && cd 10-bsf
 ```
 * Configure BSF
+```
+sudo tee configure_bsf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/bsf.yaml"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+EOF
+```
+```
+sudo chmod +x configure_bsf.sh
+```
+```
+sudo bash configure_bsf.sh
+```
+
+* Configure BSF logger
+```
+sudo tee configure_bsf_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/bsf.yaml"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+EOF
+```
+```
+sudo chmod +x configure_bsf_logger.sh
+```
+```
+sudo bash configure_bsf_logger.sh
+```
+
+* Check BSF
+```
+sudo tee check_bsf.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/bsf.yaml"
+
+# PART 1
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+# PART 2
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.15([[:space:]]*#.*)?$" \
+    -e "$"
+
+# PART 3
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_bsf.sh
+```
+```
+sudo bash check_bsf.sh
+```
+
+* Check BSF part1
+```
+sudo tee check_bsf_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/bsf.yaml"
+
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_bsf_1.sh
+```
+```
+sudo bash check_bsf_1.sh
+```
+
+* Check BSF part2
+```
+sudo tee check_bsf_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/bsf.yaml"
+
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.15([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_bsf_2.sh
+```
+```
+sudo bash check_bsf_2.sh
+```
+
+* Check BSF part3
+```
+sudo tee check_bsf_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/bsf.yaml"
+
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_bsf_3.sh
+```
+```
+sudo bash check_bsf_3.sh
+```
 
 ### 3.4.11. Configuration udr.yaml
 * Create and change directory
@@ -2362,7 +2665,151 @@ mkdir 10-bsf && cd 10-bsf
 mkdir 11-udr && cd 11-udr
 ```
 * Configure UDR
+```
+sudo tee configure_udr.sh > /dev/null << 'EOF'
+#!/bin/bash
 
+CONFIG="/etc/open5gs/udr.yaml"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+EOF
+```
+```
+sudo chmod +x configure_udr.sh
+```
+```
+sudo bash configure_udr.sh
+```
+
+* Configure UDR logger
+```
+sudo tee configure_udr_logger.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udr.yaml"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+EOF
+```
+```
+sudo chmod +x configure_udr_logger.sh
+```
+```
+sudo bash configure_udr_logger.sh
+```
+
+* Check UDR
+```
+sudo tee check_udr.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udr.yaml"
+
+# PART 1
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+# PART 2
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.20([[:space:]]*#.*)?$" \
+    -e "$"
+
+# PART 3
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_udr.sh
+```
+```
+sudo bash check_udr.sh
+```
+
+* Check UDR part1
+```
+sudo tee check_udr_1.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udr.yaml"
+
+printf "\n\n"
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "$"
+
+EOF
+```
+```
+chmod +x check_udr_1.sh
+```
+```
+sudo bash check_udr_1.sh
+```
+
+* Check UDR part2
+```
+sudo tee check_udr_2.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udr.yaml"
+
+printf "\n\n"
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.20([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_udr_2.sh
+```
+```
+sudo bash check_udr_2.sh
+```
+
+* Check UDR part3
+```
+sudo tee check_udr_3.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/udr.yaml"
+
+printf "\n\n"
+sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_udr_3.sh
+```
+```
+sudo bash check_udr_3.sh
+```
 
 
 
