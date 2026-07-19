@@ -226,7 +226,7 @@ ldd $(which open5gs-amfd) | grep ogs
 ```
 ```
 cd "$HOME/nuradio/script_install" && \
-[ ! -f install_webui.sh ] && \
+[ ! -f "install_webui.sh" ] && \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_webui.sh
 ```
 ```
