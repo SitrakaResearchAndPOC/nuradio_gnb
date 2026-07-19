@@ -1312,7 +1312,7 @@ sudo tee "$HOME/nuradio/2-smf/check_smf.sh" > /dev/null << 'EOF'
 CONFIG="/etc/open5gs/smf.yaml"
 # part1 to part4
 printf "\n\n"
-cat "$CONFIG" | grep --color=always -E \
+sed -n '1,51p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
@@ -1334,7 +1334,6 @@ sudo cp -rf "$HOME/nuradio/2-smf/check_smf.sh" /usr/bin/check_smf.sh
 ```
 sudo bash "$HOME/nuradio/2-smf/check_smf.sh"
 ```
-
 OR just
 ```
 sudo bash check_smf.sh
@@ -1491,7 +1490,7 @@ EOF
 sudo chmod +x "$HOME/nuradio/3-upf/configure_upf.sh"
 ```
 ```
-cp -rf "$HOME/nuradio/3-upf/configure_upf.sh" /usr/bin/configure_upf.sh
+sudo cp -rf "$HOME/nuradio/3-upf/configure_upf.sh" /usr/bin/configure_upf.sh
 ```
 
 ```
@@ -1515,7 +1514,7 @@ CONFIG="/etc/open5gs/upf.yaml"
 
 # Part1 and part2
 printf "\n\n"
-sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+sed -n '1,27p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.7([[:space:]]*#.*)?$" \
     -e "$"
@@ -1526,7 +1525,7 @@ EOF
 sudo chmod +x "$HOME/nuradio/3-upf/check_upf.sh"
 ```
 ```
-cp -rf "$HOME/nuradio/3-upf/check_upf.sh" /usr/bin/check_upf.sh
+sudo cp -rf "$HOME/nuradio/3-upf/check_upf.sh" /usr/bin/check_upf.sh
 ```
 ```
 sudo bash "$HOME/nuradio/3-upf/check_upf.sh"
