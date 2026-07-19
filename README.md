@@ -1272,7 +1272,7 @@ sudo bash "$HOME/nuradio/script1-amf/check_amf_1.sh"
 ```
 * Optionnal : Check part2 AMF : IP ADDRESS & MCC & MNC & TAC
 ```
-sudo "$HOME/nuradio/script1-amf/check_amf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script1-amf/check_amf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
