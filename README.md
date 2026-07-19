@@ -1437,7 +1437,7 @@ sudo chmod +x "$HOME/nuradio/2-smf/check_smf_3.sh"
 sudo bash "$HOME/nuradio/2-smf/check_smf_3.sh"
 ```
 
-* Optionnal : Check part4 SMF OTHER ADDRESS 
+* Optionnal : Check part4 SMF OTHER ADDRESS (CLIENT SCP) 
 ```
 sudo tee "$HOME/nuradio/2-smf/check_smf_4.sh" > /dev/null << 'EOF'
 #!/bin/bash
@@ -1459,15 +1459,14 @@ sudo chmod +x "$HOME/nuradio/2-smf/check_smf_4.sh"
 sudo bash "$HOME/nuradio/2-smf/check_smf_4.sh"
 ```
 
-
 ### 3.4.3. Configuration upf.yaml
 * Create and change directory
 ```
-mkdir 3-upf && cd 3-upf
+mkdir "$HOME/nuradio/3-upf" && cd "$HOME/nuradio/3-upf"
 ```
-* Configure UPF
+* Configure UPF all
 ```
-sudo tee configure_upf.sh > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/3-upf/configure_upf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1489,39 +1488,18 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x configure_upf.sh
+sudo chmod +x "$HOME/nuradio/3-upf/configure_upf.sh"
 ```
+```
+cp -rf "$HOME/nuradio/3-upf/configure_upf.sh" /usr/bin/configure_upf.sh
+```
+
+```
+sudo bash "$HOME/nuradio/3-upf/configure_upf.sh"
+```
+OR just
 ```
 sudo bash configure_upf.sh
-```
-* Configure UPF Logger
-```
-sudo tee configure_upf_logger.sh > /dev/null << 'EOF'
-#!/bin/bash
-
-CONFIG="/etc/open5gs/upf.yaml"
-
-# echo "Avant :"
-# grep -n "level" "$CONFIG"
-
-sudo sed -Ei \
-'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
-"$CONFIG"
-
-sudo sed -Ei \
-'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
-"$CONFIG"
-
-# echo
-# echo "Après :"
-# grep -n "level" "$CONFIG"
-EOF
-```
-```
-sudo chmod +x configure_upf_logger.sh
-```
-```
-sudo bash configure_upf_logger.sh
 ```
 
 * Check UPF all
@@ -1530,34 +1508,66 @@ If you add smf in upf; the relation between them will be more active </br>
 the easy way, is that the smf find the upf not also upf find the smf </br>
 
 ```
-sudo tee check_upf.sh > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/3-upf/check_upf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
 
-# Part1
+# Part1 and part2
 printf "\n\n"
 sed -n '1,30p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
-    -e "$"
-# Part2
-printf "\n\n"
-sed -n '5,33p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.7([[:space:]]*#.*)?$" \
     -e "$"
 
 EOF
 ```
 ```
-sudo chmod +x check_upf.sh
+sudo chmod +x "$HOME/nuradio/3-upf/check_upf.sh"
 ```
+```
+cp -rf "$HOME/nuradio/3-upf/check_upf.sh" /usr/bin/check_upf.sh
+```
+```
+sudo bash "$HOME/nuradio/3-upf/check_upf.sh"
+```
+OR just
 ```
 sudo bash check_upf.sh
 ```
 
-* Check UPF part1
+* Configure UPF Logger
 ```
-sudo tee check_upf_1.sh > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/3-upf/configure_upf_logger.sh" > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/upf.yaml"
+
+# echo "Avant :"
+# grep -n "level" "$CONFIG"
+
+sudo sed -Ei \
+'s/^([[:space:]]*)#?[[:space:]]*(level[[:space:]]*:[[:space:]]*)[^#[:space:]]+/\1\2debug/' \
+"$CONFIG"
+
+sudo sed -Ei \
+'/^[[:space:]]*level[[:space:]]*:/s/^[[:space:]]*/  /' \
+"$CONFIG"
+
+# echo
+# echo "Après :"
+# grep -n "level" "$CONFIG"
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/3-upf/configure_upf_logger.sh"
+```
+```
+sudo bash "$HOME/nuradio/3-upf/configure_upf_logger.sh"
+```
+* Optionnal : Check part1 UPF LOG 
+```
+sudo tee "$HOME/nuradio/3-upf/check_upf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1571,15 +1581,15 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x check_upf_1.sh
+sudo chmod +x "$HOME/nuradio/3-upf/check_upf_1.sh"
 ```
 ```
-sudo bash check_upf_1.sh
+sudo bash "$HOME/nuradio/3-upf/check_upf_1.sh"
 ```
 
-* Check UPF part2
+* Optionnal : Check part2 UPF IP ADDRESS
 ```
-sudo tee check_upf_2.sh > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/3-upf/check_upf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1593,10 +1603,10 @@ sed -n '5,33p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x check_upf_2.sh
+sudo chmod +x "$HOME/nuradio/3-upf/check_upf_2.sh"
 ```
 ```
-sudo bash check_upf_2.sh
+sudo bash "$HOME/nuradio/3-upf/check_upf_2.sh"
 ```
 
 ### 3.4.4. Configuration nrf.yaml
