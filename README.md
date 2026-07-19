@@ -1019,13 +1019,19 @@ EOF
 sudo chmod +x "$HOME/nuradio/1-amf/configure_amf.sh"
 ```
 ```
+sudo cp -rf "$HOME/nuradio/1-amf/configure_amf.sh" /usr/bin/configure_amf.sh
+```
+```
 sudo bash "$HOME/nuradio/1-amf/configure_amf.sh"
 ```
-
+OR just
+```
+bash configure_amf.sh
+```
 
 * Configure AMF log
 ```
-sudo tee "$HOME/nuradio/configure_amf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/1-amf/configure_amf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1090,7 +1096,7 @@ sudo bash "$HOME/nuradio/1-amf/configure_amf_mcc_mnc.sh"
 ```
 * check AMF all 
 ```
-sudo tee "$HOME/nuradio/1-amf/check_amf.sh > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/1-amf/check_amf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1141,7 +1147,14 @@ EOF
 sudo chmod +x "$HOME/nuradio/1-amf/check_amf.sh"
 ```
 ```
+sudo cp -rf "$HOME/nuradio/1-amf/check_amf.sh" /usr/bin/check_amf.sh
+```
+```
 sudo bash "$HOME/nuradio/1-amf/check_amf.sh" 
+```
+OR just
+```
+bash check_amf.sh
 ```
 
 *  Check AMF part1
