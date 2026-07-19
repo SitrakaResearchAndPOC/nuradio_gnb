@@ -343,7 +343,7 @@ sudo systemctl status $(systemctl list-unit-files --type=service | grep open5gs 
 ```
 ps aux | grep 'open5gs' | wc -l | awk '{print $1-1}'
 ```
-18 because the process webui doesn't begin by open5gs
+17 because the process webui doesn't begin by open5gs
 
 * Stopping all processes
 ```
