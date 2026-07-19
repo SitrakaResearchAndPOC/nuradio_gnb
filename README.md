@@ -2015,7 +2015,7 @@ sudo bash "$HOME/nuradio/script5-scp/configure_scp_logger.sh"
 
 * Optionnal : Check part1 scp log
 ```
-sudo "$HOME/nuradio/script5-scp/tee check_scp_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script5-scp/check_scp_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
