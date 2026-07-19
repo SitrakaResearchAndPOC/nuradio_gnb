@@ -1044,6 +1044,7 @@ sed -n '1,19p' "$CONFIG" | grep --color=always -E \
 # part 2
 # printf "\n\n"
 sed -n '20,49p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.5([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
     -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
     -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
@@ -1176,9 +1177,9 @@ sudo chmod +x "$HOME/nuradio/1-amf/check_amf_1.sh"
 ```
 sudo bash "$HOME/nuradio/1-amf/check_amf_1.sh" 
 ```
-* Optionnal : Check part2 AMF MCC & MNC & TAC
+* Optionnal : Check part2 AMF : IP ADDRESS & MCC & MNC & TAC
 ```
-sudo "$HOME/nuradio/1-amf/tee check_amf_2.sh" > /dev/null << 'EOF'
+sudo "$HOME/nuradio/1-amf/check_amf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1186,6 +1187,7 @@ CONFIG="/etc/open5gs/amf.yaml"
 printf "\n\n"
 
 sed -n '20,49p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.5([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
     -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
     -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
@@ -1292,9 +1294,54 @@ EOF
 sudo chmod +x "$HOME/nuradio/2-smf/configure_smf.sh"
 ```
 ```
+sudo cp -rf "$HOME/nuradio/2-smf/configure_smf.sh" /usr/bin/configure_smf.sh
+```
+```
 sudo bash "$HOME/nuradio/2-smf/configure_smf.sh"
 ```
-* Configure SMF logger
+OR just
+```
+sudo bash configure_smf.sh
+```
+
+* Check SMF all
+```
+sudo tee "$HOME/nuradio/2-smf/check_smf.sh" > /dev/null << 'EOF'
+#!/bin/bash
+
+CONFIG="/etc/open5gs/smf.yaml"
+# part1 to part4
+printf "\n\n"
+cat "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.8\.8([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.4\.4([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8888([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8844([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "$"
+
+
+```
+```
+sudo chmod +x "$HOME/nuradio/2-smf/check_smf.sh"
+```
+```
+sudo cp -rf "$HOME/nuradio/2-smf/check_smf.sh" /usr/bin/check_smf.sh
+```
+```
+sudo bash "$HOME/nuradio/2-smf/check_smf.sh"
+```
+
+OR just
+```
+sudo bash check_smf.sh
+```
+
+* Optionnal : Configure SMF part1 logger
 ```
 sudo tee "$HOME/nuradio/2-smf/configure_smf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
@@ -1323,36 +1370,7 @@ sudo chmod +x "$HOME/nuradio/2-smf/configure_smf_logger.sh"
 ```
 sudo bash "$HOME/nuradio/2-smf/configure_smf_logger.sh"
 ```
-* Check SMF all
-```
-sudo tee "$HOME/nuradio/2-smf/check_smf.sh" > /dev/null << 'EOF'
-#!/bin/bash
-
-CONFIG="/etc/open5gs/smf.yaml"
-# part1 to part5
-printf "\n\n"
-cat "$CONFIG" | grep --color=always -E \
-    -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
-    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
-    -e "^[[:space:]]*-[[:space:]]*8\.8\.8\.8([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*-[[:space:]]*8\.8\.4\.4([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8888([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8844([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*scp:[[:space:]]*$" \
-    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
-    -e "$"
-
-
-```
-```
-sudo chmod +x "$HOME/nuradio/2-smf/check_smf.sh"
-```
-```
-sudo bash "$HOME/nuradio/2-smf/check_smf.sh"
-```
-* Check SMF part1
+* Optionnal : Check part1 SMF LOG 
 ```
 sudo tee "$HOME/nuradio/2-smf/check_smf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
@@ -1374,7 +1392,7 @@ sudo chmod +x "$HOME/nuradio/2-smf/check_smf_1.sh"
 sudo bash "$HOME/nuradio/2-smf/check_smf_1.sh"
 ```
 
-* Check SMF part2
+* Optionnal : Check part2 SMF IP address 
 ```
 sudo tee "$HOME/nuradio/2-smf/check_smf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
@@ -1382,8 +1400,7 @@ sudo tee "$HOME/nuradio/2-smf/check_smf_2.sh" > /dev/null << 'EOF'
 CONFIG="/etc/open5gs/smf.yaml"
 
 printf "\n\n"
-
-sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+sed -n '1,39p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
     -e "$"
 
@@ -1404,9 +1421,12 @@ sudo tee "$HOME/nuradio/2-smf/check_smf_3.sh" > /dev/null << 'EOF'
 CONFIG="/etc/open5gs/smf.yaml"
 
 printf "\n\n"
-
-sed -n '11,39p' "$CONFIG" | grep --color=always -E \
-    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
+sed -n '23,50p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.8\.8([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*8\.8\.4\.4([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8888([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8844([[:space:]]*#.*)?$" \
     -e "$"
 
 EOF
@@ -1426,13 +1446,9 @@ sudo tee "$HOME/nuradio/2-smf/check_smf_4.sh" > /dev/null << 'EOF'
 CONFIG="/etc/open5gs/smf.yaml"
 
 printf "\n\n"
-
-sed -n '23,50p' "$CONFIG" | grep --color=always -E \
-    -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
-    -e "^[[:space:]]*-[[:space:]]*8\.8\.8\.8([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*-[[:space:]]*8\.8\.4\.4([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8888([[:space:]]*#.*)?$" \
-    -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8844([[:space:]]*#.*)?$" \
+sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
     -e "$"
 
 EOF
@@ -1444,28 +1460,6 @@ sudo chmod +x "$HOME/nuradio/2-smf/check_smf_4.sh"
 sudo bash "$HOME/nuradio/2-smf/check_smf_4.sh"
 ```
 
-* Check SMF part5
-```
-sudo tee "$HOME/nuradio/2-smf/check_smf_5.sh" > /dev/null << 'EOF'
-#!/bin/bash
-
-CONFIG="/etc/open5gs/smf.yaml"
-
-printf "\n\n"
-
-sed -n '1,30p' "$CONFIG" | grep --color=always -E \
-    -e "^[[:space:]]*scp:[[:space:]]*$" \
-    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
-    -e "$"
-
-EOF
-```
-```
-sudo chmod +x "$HOME/nuradio/2-smf/check_smf_5.sh"
-```
-```
-sudo bash "$HOME/nuradio/2-smf/check_smf_5.sh"
-```
 
 ### 3.4.3. Configuration upf.yaml
 * Create and change directory
