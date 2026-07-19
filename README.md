@@ -149,7 +149,7 @@ bash "$HOME/nuradio/script_install/install_srsran_50fe9623c.sh"
 Verify 
 ```
 [ -d "$HOME/nuradio/script_install/srsRAN_Project/build" ] && \
-sudo make -C "$HOME/nuradio/script_install/srsRAN_Project/build test" -j "$(nproc --ignore=1)"
+sudo make -C "$HOME/nuradio/script_install/srsRAN_Project/build" test -j "$(nproc --ignore=1)"
 ```
 ```
 gnb --version
