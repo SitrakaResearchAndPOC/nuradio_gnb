@@ -517,7 +517,7 @@ sudo chmod +x "$HOME/nuradio/script_open5gs/5gc"
 sudo cp -rf "$HOME/nuradio/script_open5gs/5gc" /usr/bin/5gc
 ```
 ### 2.2.5. Script restart_5gc
-* Creating script restartç_5gc
+* Creating script restart_5gc
 ```
 [ ! -d "$HOME/nuradio/script_open5gs" ] && mkdir -p "$HOME/nuradio/script_open5gs"
 ```
