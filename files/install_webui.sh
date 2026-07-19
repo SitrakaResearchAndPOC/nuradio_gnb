@@ -69,6 +69,8 @@ export PATH=/usr/bin:/bin
 
 exec sudo $(which node) ${WEBUI_PATH}/server/index.js
 EOF
+sudo chmod +x /usr/bin/open5gs-webui-start.sh
+# sudo chown root:root /usr/bin/open5gs-webui-start.sh
 
 sudo tee /etc/systemd/system/open5gs-webui.service > /dev/null <<EOF
 [Unit]
