@@ -227,7 +227,8 @@ ldd $(which open5gs-amfd) | grep ogs
 ```
 cd "$HOME/nuradio/script_install" && \
 [ ! -f "install_webui.sh" ] && \
-wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_webui.sh
+wget
+https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_webui.sh
 ```
 ```
 chmod +x "$HOME/nuradio/script_install/install_webui.sh" && \
@@ -249,19 +250,17 @@ ls open5gs-webui/webui/.next/
 ```
 THIS DIRECTORY SHOULD EXIST : BUILD_ID
 ```
-ls open5gs-webui/webui/.next/ | grep "BUILD_ID"
+ls open5gs-webui/webui/.next/ | grep --color=always -E 'BUILD_ID|$'
 ```
 ```
 ls open5gs-webui/webui/
 ```
 THIS DIRECTORY SHOULD EXIST : server/  </br>
-```
-ls open5gs-webui/webui/ | grep "server"
-```
-
 THIS DIRECTORY SHOULD EXIST  : static/  </br>
 ```
-ls open5gs-webui/webui/ | grep "static"
+ls open5gs-webui/webui/ | grep --color=always -E \
+-e 'server|$' \
+-e 'static|$'
 ```
 
 ### 1.3.8. Lauching Mongodb & WEBUI
