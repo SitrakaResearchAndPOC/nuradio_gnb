@@ -1993,6 +1993,7 @@ sed -n '1,37p' "$CONFIG" | grep --color=always -E \
 
 EOF
 ```
+```
 sudo chmod +x "$HOME/nuradio/script5-scp/check_scp.sh"
 ```
 ```
