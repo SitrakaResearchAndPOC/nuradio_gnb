@@ -1760,7 +1760,7 @@ sudo chmod +x "$HOME/nuradio/script4-nrf/configure_nrf.sh"
 sudo cp -rf "$HOME/nuradio/script4-nrf/configure_nrf.sh" /usr/bin/configure_nrf.sh
 ```
 ```
-sudo bash configure_nrf.sh"
+sudo bash configure_nrf.sh
 ```
 OR, 
 ```
@@ -1928,7 +1928,7 @@ EOF
 sudo chmod +x "$HOME/nuradio/script4-nrf/check_nrf_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script4-nrf/check_nrf_3.sh
+sudo bash "$HOME/nuradio/script4-nrf/check_nrf_3.sh"
 ```
 
   
