@@ -1773,14 +1773,13 @@ sudo tee "$HOME/nuradio/script4-nrf/check_nrf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 CONFIG="/etc/open5gs/nrf.yaml"
 
-# PART 1 to part3
+# PART 1 to part2
 printf "\n\n"
 sed -n '1,37p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
     -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
     -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
     -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
-    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.10([[:space:]]*#.*)?$" \
     -e "$"
 
 EOF
@@ -1908,27 +1907,6 @@ sudo chmod +x "$HOME/nuradio/script4-nrf/check_nrf_2.sh"
 ```
 ```
 sudo bash "$HOME/nuradio/script4-nrf/check_nrf_2.sh"
-```
-
-* Optionnal : Check part3 NRF IP ADDRESS
-```
-sudo tee "$HOME/nuradio/script4-nrf/check_nrf_3.sh" > /dev/null << 'EOF'
-#!/bin/bash
-
-CONFIG="/etc/open5gs/nrf.yaml"
-
-printf "\n\n"
-sed -n '5,33p' "$CONFIG" | grep --color=always -E \
-    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.10([[:space:]]*#.*)?$" \
-    -e "$"
-
-EOF
-```
-```
-sudo chmod +x "$HOME/nuradio/script4-nrf/check_nrf_3.sh"
-```
-```
-sudo bash "$HOME/nuradio/script4-nrf/check_nrf_3.sh"
 ```
 
   
