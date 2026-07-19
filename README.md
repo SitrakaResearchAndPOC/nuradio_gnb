@@ -110,11 +110,11 @@ which uhd_images_downloader
 ```
 ### 1.1.3. Installing FW images
 ```
-sudo /usr/local/lib/uhd/utils/uhd_images_downloader.py
-```
-or directly : 
-```
 sudo uhd_images_downloader
+```
+OR,
+```
+sudo /usr/local/lib/uhd/utils/uhd_images_downloader.py
 ```
 ### 1.1.4. Checking if FW is download completly
 ```
