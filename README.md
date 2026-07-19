@@ -1977,7 +1977,7 @@ sudo chmod +x "$HOME/nuradio/script5-scp/check_scp.sh"
 sudo cp -rf "$HOME/nuradio/script5-scp/check_scp.sh" /usr/bin/check_scp.sh
 ```
 ```
-sudo bash check_scp.sh"
+sudo bash check_scp.sh
 ```
 OR,
 ```
