@@ -1323,8 +1323,7 @@ cat "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
     -e "$"
-
-
+EOF
 ```
 ```
 sudo chmod +x "$HOME/nuradio/2-smf/check_smf.sh"
@@ -1413,7 +1412,7 @@ sudo chmod +x "$HOME/nuradio/2-smf/check_smf_2.sh"
 sudo bash "$HOME/nuradio/2-smf/check_smf_2.sh"
 ```
 
-* Check SMF part3
+* Optionnal : Check part3 SMF DNS 
 ```
 sudo tee "$HOME/nuradio/2-smf/check_smf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
@@ -1438,7 +1437,7 @@ sudo chmod +x "$HOME/nuradio/2-smf/check_smf_3.sh"
 sudo bash "$HOME/nuradio/2-smf/check_smf_3.sh"
 ```
 
-* Check SMF part4
+* Optionnal : Check part4 SMF OTHER ADDRESS 
 ```
 sudo tee "$HOME/nuradio/2-smf/check_smf_4.sh" > /dev/null << 'EOF'
 #!/bin/bash
