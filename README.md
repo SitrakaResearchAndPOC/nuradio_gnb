@@ -2036,7 +2036,7 @@ sudo bash "$HOME/nuradio/script5-scp/check_scp_1.sh"
 
 * Optionnal : Check part2 scp IP address
 ```
-sudo "$HOME/nuradio/script5-scp/tee check_scp_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script5-scp/check_scp_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
@@ -2058,7 +2058,7 @@ sudo bash "$HOME/nuradio/script5-scp/check_scp_2.sh"
 * Optionnal : Check part3 scp other ip address for scp
 Not directly connected to nrf , go tho SCP after to nrf
 ```
-sudo "$HOME/nuradio/script5-scp/tee check_scp_3.sh" > /dev/null << 'EOF'
+sudo tee  "$HOME/nuradio/script5-scp/check_scp_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
