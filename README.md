@@ -138,8 +138,8 @@ sudo query_gpsdo_sensors
 ```
 ```
 cd "$HOME/nuradio/script_install" && \
-[ -f "install_srsran_50fe9623c.sh" ] && sudo rm -rf install_srsran_50fe9623c.sh; wget
-https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_srsran_50fe9623c.sh
+[ -f "install_srsran_50fe9623c.sh" ] && sudo rm -rf install_srsran_50fe9623c.sh; \
+wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_srsran_50fe9623c.sh
 ```
 ```
 chmod +x "$HOME/nuradio/script_install/install_srsran_50fe9623c.sh" && \
