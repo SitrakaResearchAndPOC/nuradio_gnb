@@ -231,7 +231,7 @@ wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/he
 ```
 ```
 chmod +x "$HOME/nuradio/script_install/install_webui.sh" && \
-bash "$HOME/nuradio/script_install /install_webui.sh"
+bash "$HOME/nuradio/script_install/install_webui.sh"
 ```
 
 ### 1.3.6. Checking NodeJS (WEBUI)
