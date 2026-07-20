@@ -2880,7 +2880,7 @@ sudo bash "$HOME/nuradio/script_bsf_index10/check_bsf_1.sh"
 
 * Optionnal : Check part2 BSF ip address
 ```
-sudo "$HOME/nuradio/script_bsf_index10/tee check_bsf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_bsf_index10/check_bsf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/bsf.yaml"
