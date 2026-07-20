@@ -2475,10 +2475,12 @@ sudo tee "$HOME/nuradio/script_pcf_index8/check_pcf.sh" > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/pcf.yaml"
 
-# part1 to part3
+# part1 to part3 & add pcf and sbi
 printf "\n\n"
-sed -n '1,40p' "$CONFIG" | grep --color=always -E \
+sed -n '1,25p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*pcf:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.13([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
