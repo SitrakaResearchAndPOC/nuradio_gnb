@@ -2406,7 +2406,7 @@ sudo bash "$HOME/nuradio/script_udm_index7/check_udm_2.sh"
 
 * Optionnal : Check part3 UDM other ip address (scp)
 ```
-sudo "$HOME/nuradio/script_udm_index7/tee check_udm_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udm_index7/check_udm_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udm.yaml"
