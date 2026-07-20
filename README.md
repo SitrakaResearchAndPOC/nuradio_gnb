@@ -2546,10 +2546,10 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_1.sh"
 ```
 ```
-bash "$HOME/nuradio/script_pcf_index8/check_pcf_1.sh"
+sudo bash "$HOME/nuradio/script_pcf_index8/check_pcf_1.sh"
 ```
 
 
@@ -2571,7 +2571,7 @@ EOF
 sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_2.sh"
 ```
 ```
-bash "$HOME/nuradio/script_pcf_index8/check_pcf_2.sh"
+sudo bash "$HOME/nuradio/script_pcf_index8/check_pcf_2.sh"
 ```
 * Optionnal : Check part3 PCF other address (scp) 
 ```
@@ -2592,7 +2592,7 @@ EOF
 sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 ```
 ```
-bash "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
+sudo bash "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 ```
 
 ### 3.4.9. Configuration nssf.yaml
