@@ -2193,7 +2193,7 @@ sudo bash "$HOME/nuradio/script_ausf_index6/configure_ausf_logger.sh"
 
 * Optionnal : Check part1 AUSF log
 ```
-sudo "$HOME/nuradio/script_ausf_index6/tee check_ausf_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_ausf_index6/check_ausf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
@@ -2235,7 +2235,7 @@ bash "$HOME/nuradio/script_ausf_index6/check_ausf_2.sh"
 
 * Optionnal : Check part3 AUSF other ip address (scp)
 ```
-sudo "$HOME/nuradio/script_ausf_index6/tee check_ausf_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_ausf_index6/check_ausf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
