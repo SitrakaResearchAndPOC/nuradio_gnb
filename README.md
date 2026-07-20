@@ -2433,8 +2433,8 @@ Use directly scp not nrf
 mkdir "$HOME/nuradio/script_pcf_index8" && cd "$HOME/nuradio/script_pcf_index8"
 ```
 * Configure PCF all
-sudo tee "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" > /dev/null << 'EOF'
 ```
+sudo tee "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/pcf.yaml"
