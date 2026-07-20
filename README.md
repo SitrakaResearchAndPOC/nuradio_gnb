@@ -2752,7 +2752,7 @@ sudo tee "$HOME/nuradio/script_nssf_index9/check_nssf_3.sh" > /dev/null << 'EOF'
 CONFIG="/etc/open5gs/nssf.yaml"
 
 printf "\n\n"
-sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
     -e "$"
