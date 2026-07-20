@@ -1778,7 +1778,7 @@ CONFIG="/etc/open5gs/nrf.yaml"
 
 # PART 1 to part2 && nrf, sbi, addres
 printf "\n\n"
-sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+sed -n '1,19p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
     -e "^[[:space:]]*nrf:[[:space:]]*$" \
     -e "^[[:space:]]*sbi:[[:space:]]*$" \
@@ -1967,8 +1967,10 @@ CONFIG="/etc/open5gs/scp.yaml"
 
 # part1 to part3
 printf "\n\n"
-sed -n '1,37p' "$CONFIG" | grep --color=always -E \
+sed -n '1,18p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.200([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*nrf:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.10:7777([[:space:]]*#.*)?$" \
