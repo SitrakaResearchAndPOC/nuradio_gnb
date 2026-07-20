@@ -1606,10 +1606,12 @@ sudo tee "$HOME/nuradio/script_upf_index3/check_upf.sh" > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/upf.yaml"
 
-# Part1 and part2
+# Part1 and part2 & upf, server, addres upf 
 printf "\n\n"
 sed -n '1,27p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*upf:[[:space:]]*$" \
+    -e "^[[:space:]]*server:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.7([[:space:]]*#.*)?$" \
     -e "$"
 
