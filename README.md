@@ -1121,7 +1121,7 @@ sudo tee "$HOME/nuradio/script_amf_index1/check_amf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
-# part 1
+# part 1 && add all other address sbi and scp
 printf "\n\n"
 sed -n '1,19p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
