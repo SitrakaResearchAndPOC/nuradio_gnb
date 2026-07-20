@@ -3063,7 +3063,7 @@ sudo tee "$HOME/nuradio/script_udr_index11/check_udr_3.sh" > /dev/null << 'EOF'
 CONFIG="/etc/open5gs/udr.yaml"
 
 printf "\n\n"
-sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
     -e "$"
