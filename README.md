@@ -1606,12 +1606,11 @@ sudo tee "$HOME/nuradio/script_upf_index3/check_upf.sh" > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/upf.yaml"
 
-# Part1 and part2 & upf, server, addres upf 
+# Part1 and part2 & upf, addres upf 
 printf "\n\n"
 sed -n '1,27p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
     -e "^[[:space:]]*upf:[[:space:]]*$" \
-    -e "^[[:space:]]*server:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.7([[:space:]]*#.*)?$" \
     -e "$"
 
@@ -1777,10 +1776,13 @@ sudo tee "$HOME/nuradio/script_nrf_index4/check_nrf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 CONFIG="/etc/open5gs/nrf.yaml"
 
-# PART 1 to part2
+# PART 1 to part2 && nrf, sbi, addres
 printf "\n\n"
 sed -n '1,37p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*nrf:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.10([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*mcc[[:space:]]*:[[:space:]]*001.*$" \
     -e "^[[:space:]]*mnc[[:space:]]*:[[:space:]]*01.*$" \
     -e "^[[:space:]]*tac[[:space:]]*:[[:space:]]*77.*$" \
