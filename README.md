@@ -2643,10 +2643,12 @@ sudo tee "$HOME/nuradio/script_nssf_index9/check_nssf.sh" > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/nssf.yaml"
 
-# PART 1 to part3
+# PART 1 to part3 && add nssf and sbi
 printf "\n\n"
-sed -n '1,50p' "$CONFIG" | grep --color=always -E \
+sed -n '1,23p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*nssf:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.14([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
