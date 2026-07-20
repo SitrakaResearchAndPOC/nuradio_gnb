@@ -2907,7 +2907,7 @@ sudo tee "$HOME/nuradio/script_bsf_index10/check_bsf_3.sh" > /dev/null << 'EOF'
 CONFIG="/etc/open5gs/bsf.yaml"
 
 printf "\n\n"
-sed -n '20,50p' "$CONFIG" | grep --color=always -E \
+sed -n '9,39p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
     -e "$"
@@ -2963,10 +2963,12 @@ sudo tee "$HOME/nuradio/script_udr_index11/check_udr.sh" > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/udr.yaml"
 
-# PART 1
+# PART1 to PART3 && udr && sbi
 printf "\n\n"
-sed -n '1,50p' "$CONFIG" | grep --color=always -E \
+sed -n '1,21p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*udr:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.20([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
