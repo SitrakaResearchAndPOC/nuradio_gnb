@@ -2808,10 +2808,12 @@ sudo tee check_bsf.sh > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/bsf.yaml"
 
-# PART 1 to Part 3
+# PART 1 to Part 3 & add bsf and sbi
 printf "\n\n"
-sed -n '1,50p' "$CONFIG" | grep --color=always -E \
+sed -n '1,20p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*bsf:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.15([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
@@ -2870,7 +2872,7 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf_1.sh"
 ```
 ```
 sudo bash "$HOME/nuradio/script_bsf_index10/check_bsf_1.sh"
