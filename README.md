@@ -1121,7 +1121,7 @@ sudo tee "$HOME/nuradio/script_amf_index1/check_amf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
-# part 1 && add all other address sbi and scp
+# part 1 && add all other : amf , address sbi and scp
 printf "\n\n"
 sed -n '1,19p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
@@ -1401,10 +1401,12 @@ sudo tee "$HOME/nuradio/script_smf_index2/check_smf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
-# part1 to part4
+# part1 to part4 ; and add smf, sbi, upf and upd address
 printf "\n\n"
 sed -n '1,51p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*smf:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.4([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*dns[[:space:]]*:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*8\.8\.8\.8([[:space:]]*#.*)?$" \
@@ -1413,6 +1415,8 @@ sed -n '1,51p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*-[[:space:]]*2001:4860:4860::8844([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*upf:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.7:7777([[:space:]]*#.*)?$" \
     -e "$"
 EOF
 ```
