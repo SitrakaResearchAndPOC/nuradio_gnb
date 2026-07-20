@@ -2134,10 +2134,12 @@ sudo tee "$HOME/nuradio/script_ausf_index6/check_ausf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
-# part1 to part3
+# part1 to part3 & and add ausf and sbi
 printf "\n\n"
-sed -n '1,30p' "$CONFIG" | grep --color=always -E \
+sed -n '1,20p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*ausf:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.11([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
@@ -2188,6 +2190,7 @@ sudo chmod +x "$HOME/nuradio/script_ausf_index6/configure_ausf_logger.sh"
 ```
 sudo bash "$HOME/nuradio/script_ausf_index6/configure_ausf_logger.sh"
 ```
+
 * Optionnal : Check part1 AUSF log
 ```
 sudo "$HOME/nuradio/script_ausf_index6/tee check_ausf_1.sh" > /dev/null << 'EOF'
