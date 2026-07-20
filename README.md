@@ -2304,10 +2304,12 @@ sudo tee "$HOME/nuradio/script_udm_index7/check_udm.sh" > /dev/null << 'EOF'
 
 CONFIG="/etc/open5gs/udm.yaml"
 
-# part1 to part3
+# part1 to part3 & add udm and sbi
 printf "\n\n"
-sed -n '1,50p' "$CONFIG" | grep --color=always -E \
+sed -n '1,39p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*udm:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.12([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
     -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
