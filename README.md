@@ -2310,7 +2310,7 @@ sed -n '1,50p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
     -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.12([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*scp:[[:space:]]*$" \
-    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \   
+    -e "^[[:space:]]*-[[:space:]]*uri:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
     -e "$"
 EOF
 ```
@@ -2318,7 +2318,7 @@ EOF
 sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script_udm_index7/check_udm.sh /usr/bin/check_udm.sh"
+sudo cp -rf "$HOME/nuradio/script_udm_index7/check_udm.sh" /usr/bin/check_udm.sh
 ```
 ```
 sudo bash check_udm.sh
