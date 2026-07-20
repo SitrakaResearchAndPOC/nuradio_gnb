@@ -2716,7 +2716,7 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf_1.sh"
 ```
 ```
 sudo bash "$HOME/nuradio/script_nssf_index9/check_nssf_1.sh"
