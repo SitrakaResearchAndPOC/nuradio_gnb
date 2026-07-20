@@ -1125,6 +1125,11 @@ CONFIG="/etc/open5gs/amf.yaml"
 printf "\n\n"
 sed -n '1,19p' "$CONFIG" | grep --color=always -E \
     -e "^[[:space:]]*level[[:space:]]*:[[:space:]]*debug.*$" \
+    -e "^[[:space:]]*amf:[[:space:]]*$" \
+    -e "^[[:space:]]*sbi:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*address[[:space:]]*:[[:space:]]*127\.0\.0\.5([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*scp:[[:space:]]*$" \
+    -e "^[[:space:]]*-[[:space:]]*uri[[:space:]]*:[[:space:]]*http://127\.0\.0\.200:7777([[:space:]]*#.*)?$" \
     -e "$"
     
 # part 2
