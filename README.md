@@ -245,19 +245,12 @@ npm -v
 10.8.2
 ### 1.3.7. Checking file of WEBUI
 ```
-ls open5gs-webui/webui/.next/
-```
-THIS DIRECTORY SHOULD EXIST : BUILD_ID
-```
-ls open5gs-webui/webui/.next/ | grep --color=always -E 'BUILD_ID|$'
-```
-```
-ls open5gs-webui/webui/
+sudo ls "$HOME/nuradio/script_install/open5gs-webui/webui/.next/"
 ```
 THIS DIRECTORY SHOULD EXIST : server/  </br>
 THIS DIRECTORY SHOULD EXIST  : static/  </br>
 ```
-ls open5gs-webui/webui/ | grep --color=always -E \
+sudo ls "$HOME/nuradio/script_install/open5gs-webui/webui/" | grep --color=always -E \
 -e 'server|$' \
 -e 'static|$'
 ```
@@ -1059,12 +1052,12 @@ bash check_iptableNATforward.sh
 ### 3.4.1. Configuration amf.yaml
 * Create and change directory
 ```
-mkdir -p "$HOME/nuradio/script1-amf" && cd "$HOME/nuradio/script1-amf"
+mkdir -p "$HOME/nuradio/script_amf_index1" && cd "$HOME/nuradio/script_amf_index1"
 ```
 * Configure AMF
 Directly all configuraiton in one manipulation
 ```
-sudo tee "$HOME/nuradio/script1-amf/configure_amf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/configure_amf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1109,22 +1102,22 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/configure_amf.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/configure_amf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script1-amf/configure_amf.sh" /usr/bin/configure_amf.sh
+sudo cp -rf "$HOME/nuradio/script_amf_index1/configure_amf.sh" /usr/bin/configure_amf.sh
 ```
 ```
 bash configure_amf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script1-amf/configure_amf.sh"
+sudo bash "$HOME/nuradio/script_amf_index1/configure_amf.sh"
 ```
 
 * check AMF all 
 ```
-sudo tee "$HOME/nuradio/script1-amf/check_amf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/check_amf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1173,22 +1166,22 @@ done
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/check_amf.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script1-amf/check_amf.sh" /usr/bin/check_amf.sh
+sudo cp -rf "$HOME/nuradio/script_amf_index1/check_amf.sh" /usr/bin/check_amf.sh
 ```
 ```
 bash check_amf.sh
 ```
 OR 
 ```
-sudo bash "$HOME/nuradio/script1-amf/check_amf.sh" 
+sudo bash "$HOME/nuradio/script_amf_index1/check_amf.sh" 
 ```
 
 * Optionnal : Configure part1 AMF log
 ```
-sudo tee "$HOME/nuradio/script1-amf/configure_amf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/configure_amf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1210,14 +1203,14 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/configure_amf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/configure_amf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script1-amf/configure_amf_logger.sh" 
+sudo bash "$HOME/nuradio/script_amf_index1/configure_amf_logger.sh" 
 ```
 * Optionnal : Configure part2 AMF MCC & MNC
 ```
-sudo tee "$HOME/nuradio/script1-amf/configure_amf_mcc_mnc.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/configure_amf_mcc_mnc.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1246,14 +1239,14 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/configure_amf_mcc_mnc.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/configure_amf_mcc_mnc.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script1-amf/configure_amf_mcc_mnc.sh"
+sudo bash "$HOME/nuradio/script_amf_index1/configure_amf_mcc_mnc.sh"
 ```
 *  Optionnal : Check part1 AMF log 
 ```
-sudo tee "$HOME/nuradio/script1-amf/check_amf_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/check_amf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1265,14 +1258,14 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/check_amf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script1-amf/check_amf_1.sh" 
+sudo bash "$HOME/nuradio/script_amf_index1/check_amf_1.sh" 
 ```
 * Optionnal : Check part2 AMF : IP ADDRESS & MCC & MNC & TAC
 ```
-sudo tee "$HOME/nuradio/script1-amf/check_amf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/check_amf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1289,14 +1282,14 @@ sed -n '20,49p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/check_amf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script1-amf/check_amf_2.sh" 
+sudo bash "$HOME/nuradio/script_amf_index1/check_amf_2.sh" 
 ```
 *  Optionnal : Check part3 AMF GNB Timer
 ```
-sudo tee "$HOME/nuradio/script1-amf/check_amf_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/check_amf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1311,10 +1304,10 @@ sed -n '40,69p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/check_amf_3.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script1-amf/check_amf_3.sh"
+sudo bash "$HOME/nuradio/script_amf_index1/check_amf_3.sh"
 ```
 
 *  Optionnal : Check part4 AMF Reject cause 
@@ -1322,7 +1315,7 @@ sudo bash "$HOME/nuradio/script1-amf/check_amf_3.sh"
 a little bit different, line by line
 
 ```
-sudo tee "$HOME/nuradio/script1-amf/check_amf_4.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_amf_index1/check_amf_4.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/amf.yaml"
@@ -1349,20 +1342,20 @@ done
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script1-amf/check_amf_4.sh"
+sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf_4.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script1-amf/check_amf_4.sh"
+sudo bash "$HOME/nuradio/script_amf_index1/check_amf_4.sh"
 ```
 
 ### 3.4.2. Configuration SMF.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script2-smf" && cd "$HOME/nuradio/script2-smf"
+mkdir "$HOME/nuradio/script_smf_index2" && cd "$HOME/nuradio/script_smf_index2"
 ```
 * Configure SMF all
 ```
-sudo tee "$HOME/nuradio/script2-smf/configure_smf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_smf_index2/configure_smf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
@@ -1384,22 +1377,22 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script2-smf/configure_smf.sh"
+sudo chmod +x "$HOME/nuradio/script_smf_index2/configure_smf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script2-smf/configure_smf.sh" /usr/bin/configure_smf.sh
+sudo cp -rf "$HOME/nuradio/script_smf_index2/configure_smf.sh" /usr/bin/configure_smf.sh
 ```
 ```
 sudo bash configure_smf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script2-smf/configure_smf.sh"
+sudo bash "$HOME/nuradio/script_smf_index2/configure_smf.sh"
 ```
 
 * Check SMF all
 ```
-sudo tee "$HOME/nuradio/script2-smf/check_smf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_smf_index2/check_smf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
@@ -1419,22 +1412,22 @@ sed -n '1,51p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script2-smf/check_smf.sh"
+sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script2-smf/check_smf.sh" /usr/bin/check_smf.sh
+sudo cp -rf "$HOME/nuradio/script_smf_index2/check_smf.sh" /usr/bin/check_smf.sh
 ```
 ```
 sudo bash check_smf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script2-smf/check_smf.sh"
+sudo bash "$HOME/nuradio/script_smf_index2/check_smf.sh"
 ```
 
 * Optionnal : Configure SMF part1 logger
 ```
-sudo tee "$HOME/nuradio/script2-smf/configure_smf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_smf_index2/configure_smf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
@@ -1456,14 +1449,14 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script2-smf/configure_smf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_smf_index2/configure_smf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script2-smf/configure_smf_logger.sh"
+sudo bash "$HOME/nuradio/script_smf_index2/configure_smf_logger.sh"
 ```
 * Optionnal : Check part1 SMF LOG 
 ```
-sudo tee "$HOME/nuradio/script2-smf/check_smf_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_smf_index2/check_smf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
@@ -1477,15 +1470,15 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script2-smf/check_smf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script2-smf/check_smf_1.sh"
+sudo bash "$HOME/nuradio/script_smf_index2/check_smf_1.sh"
 ```
 
 * Optionnal : Check part2 SMF IP address 
 ```
-sudo tee "$HOME/nuradio/script2-smf/check_smf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_smf_index2/check_smf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
@@ -1498,15 +1491,15 @@ sed -n '1,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script2-smf/check_smf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script2-smf/check_smf_2.sh"
+sudo bash "$HOME/nuradio/script_smf_index2/check_smf_2.sh"
 ```
 
 * Optionnal : Check part3 SMF DNS 
 ```
-sudo tee "$HOME/nuradio/script2-smf/check_smf_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_smf_index2/check_smf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
@@ -1523,15 +1516,15 @@ sed -n '23,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script2-smf/check_smf_3.sh"
+sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script2-smf/check_smf_3.sh"
+sudo bash "$HOME/nuradio/script_smf_index2/check_smf_3.sh"
 ```
 
 * Optionnal : Check part4 SMF OTHER ADDRESS (CLIENT SCP) 
 ```
-sudo tee "$HOME/nuradio/script2-smf/check_smf_4.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_smf_index2/check_smf_4.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/smf.yaml"
@@ -1545,20 +1538,20 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script2-smf/check_smf_4.sh"
+sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf_4.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script2-smf/check_smf_4.sh"
+sudo bash "$HOME/nuradio/script_smf_index2/check_smf_4.sh"
 ```
 
 ### 3.4.3. Configuration upf.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script3-upf" && cd "$HOME/nuradio/script3-upf"
+mkdir "$HOME/nuradio/script_upf_index3" && cd "$HOME/nuradio/script_upf_index3"
 ```
 * Configure UPF all
 ```
-sudo tee "$HOME/nuradio/script3-upf/configure_upf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_upf_index3/configure_upf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1580,17 +1573,17 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script3-upf/configure_upf.sh"
+sudo chmod +x "$HOME/nuradio/script_upf_index3/configure_upf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script3-upf/configure_upf.sh" /usr/bin/configure_upf.sh
+sudo cp -rf "$HOME/nuradio/script_upf_index3/configure_upf.sh" /usr/bin/configure_upf.sh
 ```
 ```
 sudo bash configure_upf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script3-upf/configure_upf.sh"
+sudo bash "$HOME/nuradio/script_upf_index3/configure_upf.sh"
 ```
 
 * Check UPF all
@@ -1599,7 +1592,7 @@ If you add smf in upf; the relation between them will be more active </br>
 the easy way, is that the smf find the upf not also upf find the smf </br>
 
 ```
-sudo tee "$HOME/nuradio/script3-upf/check_upf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_upf_index3/check_upf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1614,22 +1607,22 @@ sed -n '1,27p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script3-upf/check_upf.sh"
+sudo chmod +x "$HOME/nuradio/script_upf_index3/check_upf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script3-upf/check_upf.sh" /usr/bin/check_upf.sh
+sudo cp -rf "$HOME/nuradio/script_upf_index3/check_upf.sh" /usr/bin/check_upf.sh
 ```
 ```
 sudo bash check_upf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script3-upf/check_upf.sh"
+sudo bash "$HOME/nuradio/script_upf_index3/check_upf.sh"
 ```
 
 * Configure UPF Logger
 ```
-sudo tee "$HOME/nuradio/script3-upf/configure_upf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_upf_index3/configure_upf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1651,14 +1644,14 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script3-upf/configure_upf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_upf_index3/configure_upf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script3-upf/configure_upf_logger.sh"
+sudo bash "$HOME/nuradio/script_upf_index3/configure_upf_logger.sh"
 ```
 * Optionnal : Check part1 UPF LOG 
 ```
-sudo tee "$HOME/nuradio/script3-upf/check_upf_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_upf_index3/check_upf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1672,15 +1665,15 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script3-upf/check_upf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_upf_index3/check_upf_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script3-upf/check_upf_1.sh"
+sudo bash "$HOME/nuradio/script_upf_index3/check_upf_1.sh"
 ```
 
 * Optionnal : Check part2 UPF IP ADDRESS
 ```
-sudo tee "$HOME/nuradio/script3-upf/check_upf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_upf_index3/check_upf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/upf.yaml"
@@ -1694,20 +1687,20 @@ sed -n '5,33p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script3-upf/check_upf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_upf_index3/check_upf_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script3-upf/check_upf_2.sh"
+sudo bash "$HOME/nuradio/script_upf_index3/check_upf_2.sh"
 ```
 
 ### 3.4.4. Configuration nrf.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script4-nrf" && cd "$HOME/nuradio/script4-nrf"
+mkdir "$HOME/nuradio/script_nrf_index4" && cd "$HOME/nuradio/script_nrf_index4"
 ```
 * Configure NRF
 ```
-sudo tee "$HOME/nuradio/script4-nrf/configure_nrf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nrf_index4/configure_nrf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nrf.yaml"
@@ -1754,22 +1747,22 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script4-nrf/configure_nrf.sh"
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/configure_nrf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script4-nrf/configure_nrf.sh" /usr/bin/configure_nrf.sh
+sudo cp -rf "$HOME/nuradio/script_nrf_index4/configure_nrf.sh" /usr/bin/configure_nrf.sh
 ```
 ```
 sudo bash configure_nrf.sh
 ```
 OR, 
 ```
-sudo bash "$HOME/nuradio/script4-nrf/configure_nrf.sh"
+sudo bash "$HOME/nuradio/script_nrf_index4/configure_nrf.sh"
 ```
 
 * Check NRF 
 ```
-sudo tee "$HOME/nuradio/script4-nrf/check_nrf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nrf_index4/check_nrf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 CONFIG="/etc/open5gs/nrf.yaml"
 
@@ -1785,23 +1778,23 @@ sed -n '1,37p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script4-nrf/check_nrf.sh"
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/check_nrf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script4-nrf/check_nrf.sh" /usr/bin/check_nrf.sh
+sudo cp -rf "$HOME/nuradio/script_nrf_index4/check_nrf.sh" /usr/bin/check_nrf.sh
 ```
 ```
 sudo bash check_nrf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script4-nrf/check_nrf.sh"
+sudo bash "$HOME/nuradio/script_nrf_index4/check_nrf.sh"
 ```
 In configuration, if nrf is not commented, it's not directly used , go tho SCP after to NRF
 
 * Optionnal : Configure part1 NRF LOGGER
 ```
-sudo tee "$HOME/nuradio/script4-nrf/configure_nrf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nrf_index4/configure_nrf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nrf.yaml"
@@ -1824,14 +1817,14 @@ EOF
 ```
 
 ```
-sudo chmod +x "$HOME/nuradio/script4-nrf/configure_nrf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/configure_nrf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script4-nrf/configure_nrf_logger.sh"
+sudo bash "$HOME/nuradio/script_nrf_index4/configure_nrf_logger.sh"
 ```
 * Optionnal : Configure part2 NRF MCC & MNC & TAC
 ```
-sudo tee "$HOME/nuradio/script4-nrf/configure_nrf_mcc_mnc.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nrf_index4/configure_nrf_mcc_mnc.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nrf.yaml"
@@ -1860,15 +1853,15 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script4-nrf/configure_nrf_mcc_mnc.sh"
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/configure_nrf_mcc_mnc.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script4-nrf/configure_nrf_mcc_mnc.sh"
+sudo bash "$HOME/nuradio/script_nrf_index4/configure_nrf_mcc_mnc.sh"
 ```
 
 * Optionnal : Check part1 NRF LOG
 ```
-sudo tee "$HOME/nuradio/script4-nrf/check_nrf_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nrf_index4/check_nrf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nrf.yaml"
@@ -1880,15 +1873,15 @@ sed -n '1,37p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script4-nrf/check_nrf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/check_nrf_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script4-nrf/check_nrf_1.sh"
+sudo bash "$HOME/nuradio/script_nrf_index4/check_nrf_1.sh"
 ```
 
 * Optionnal : Check part2 NRF MCC MNC TAC
 ```
-sudo tee "$HOME/nuradio/script4-nrf/check_nrf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nrf_index4/check_nrf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nrf.yaml"
@@ -1903,21 +1896,21 @@ sed -n '1,37p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script4-nrf/check_nrf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/check_nrf_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script4-nrf/check_nrf_2.sh"
+sudo bash "$HOME/nuradio/script_nrf_index4/check_nrf_2.sh"
 ```
 
   
 ### 3.4.5. Configuration scp.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script5-scp" && cd "$HOME/nuradio/script5-scp"
+mkdir "$HOME/nuradio/script_scp_index5" && cd "$HOME/nuradio/script_scp_index5"
 ```
 * Configure scp all
 ```
-sudo tee "$HOME/nuradio/script5-scp/configure_scp.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_scp_index5/configure_scp.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
@@ -1939,22 +1932,22 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script5-scp/configure_scp.sh"
+sudo chmod +x "$HOME/nuradio/script_scp_index5/configure_scp.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script5-scp/configure_scp.sh" /usr/bin/configure_scp.sh
+sudo cp -rf "$HOME/nuradio/script_scp_index5/configure_scp.sh" /usr/bin/configure_scp.sh
 ```
 ```
 sudo bash configure_scp.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script5-scp/configure_scp.sh"
+sudo bash "$HOME/nuradio/script_scp_index5/configure_scp.sh"
 ```
 
 * Check scp
 ```
-sudo tee "$HOME/nuradio/script5-scp/check_scp.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_scp_index5/check_scp.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
@@ -1971,21 +1964,21 @@ sed -n '1,37p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script5-scp/check_scp.sh"
+sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script5-scp/check_scp.sh" /usr/bin/check_scp.sh
+sudo cp -rf "$HOME/nuradio/script_scp_index5/check_scp.sh" /usr/bin/check_scp.sh
 ```
 ```
 sudo bash check_scp.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script5-scp/check_scp.sh"
+sudo bash "$HOME/nuradio/script_scp_index5/check_scp.sh"
 ```
 * Optionnal : Configure part1 scp log
 ```
-sudo tee "$HOME/nuradio/script5-scp/configure_scp_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_scp_index5/configure_scp_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
@@ -2007,15 +2000,15 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script5-scp/configure_scp_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_scp_index5/configure_scp_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script5-scp/configure_scp_logger.sh"
+sudo bash "$HOME/nuradio/script_scp_index5/configure_scp_logger.sh"
 ```
 
 * Optionnal : Check part1 scp log
 ```
-sudo tee "$HOME/nuradio/script5-scp/check_scp_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_scp_index5/check_scp_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
@@ -2028,15 +2021,15 @@ sed -n '1,37p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script5-scp/check_scp_1.sh"
+sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script5-scp/check_scp_1.sh"
+sudo bash "$HOME/nuradio/script_scp_index5/check_scp_1.sh"
 ```
 
 * Optionnal : Check part2 scp IP address
 ```
-sudo tee "$HOME/nuradio/script5-scp/check_scp_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_scp_index5/check_scp_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
@@ -2049,16 +2042,16 @@ sed -n '5,33p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script5-scp/check_scp_2.sh"
+sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script5-scp/check_scp_2.sh"
+sudo bash "$HOME/nuradio/script_scp_index5/check_scp_2.sh"
 ```
 
 * Optionnal : Check part3 scp other ip address for scp
 Not directly connected to nrf , go tho SCP after to nrf
 ```
-sudo tee  "$HOME/nuradio/script5-scp/check_scp_3.sh" > /dev/null << 'EOF'
+sudo tee  "$HOME/nuradio/script_scp_index5/check_scp_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/scp.yaml"
@@ -2072,20 +2065,20 @@ sed -n '5,33p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script5-scp/check_scp_3.sh"
+sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script5-scp/check_scp_3.sh"
+sudo bash "$HOME/nuradio/script_scp_index5/check_scp_3.sh"
 ```
 
 ### 3.4.6. Configuration ausf.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script6-ausf" && cd "$HOME/nuradio/script6-ausf"
+mkdir "$HOME/nuradio/script_ausf_index6" && cd "$HOME/nuradio/script_ausf_index6"
 ```
 * Configure AUSF all
 ```
-sudo tee "$HOME/nuradio/script6-ausf/configure_ausf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_ausf_index6/configure_ausf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
@@ -2107,22 +2100,22 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script6-ausf/configure_ausf.sh"
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/configure_ausf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script6-ausf/configure_ausf.sh" /usr/bin/configure_ausf.sh
+sudo cp -rf "$HOME/nuradio/script_ausf_index6/configure_ausf.sh" /usr/bin/configure_ausf.sh
 ```
 ```
 sudo bash configure_ausf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script6-ausf/configure_ausf.sh"
+sudo bash "$HOME/nuradio/script_ausf_index6/configure_ausf.sh"
 ```
 
 * Check AUSF all
 ```
-sudo tee "$HOME/nuradio/script6-ausf/check_ausf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_ausf_index6/check_ausf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
@@ -2138,22 +2131,22 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script6-ausf/check_ausf.sh"
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script6-ausf/check_ausf.sh" /usr/bin/check_ausf.sh
+sudo cp -rf "$HOME/nuradio/script_ausf_index6/check_ausf.sh" /usr/bin/check_ausf.sh
 ```
 ```
 sudo bash check_ausf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script6-ausf/check_ausf.sh"
+sudo bash "$HOME/nuradio/script_ausf_index6/check_ausf.sh"
 ```
 
 * Optionnal : Configure part1 AUSF Log
 ```
-sudo tee "$HOME/nuradio/script6-ausf/configure_ausf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_ausf_index6/configure_ausf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
@@ -2175,14 +2168,14 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script6-ausf/configure_ausf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/configure_ausf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script6-ausf/configure_ausf_logger.sh"
+sudo bash "$HOME/nuradio/script_ausf_index6/configure_ausf_logger.sh"
 ```
 * Optionnal : Check part1 AUSF log
 ```
-sudo "$HOME/nuradio/script6-ausf/tee check_ausf_1.sh" > /dev/null << 'EOF'
+sudo "$HOME/nuradio/script_ausf_index6/tee check_ausf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
@@ -2195,15 +2188,15 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script6-ausf/check_ausf_1.sh"
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script6-ausf/check_ausf_1.sh"
+sudo bash "$HOME/nuradio/script_ausf_index6/check_ausf_1.sh"
 ```
 
 * Optionnal : Check part2 AUSF ip address
 ```
-sudo tee "$HOME/nuradio/script6-ausf/check_ausf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_ausf_index6/check_ausf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
@@ -2216,15 +2209,15 @@ sed -n '11,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script6-ausf/check_ausf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf_2.sh"
 ```
 ```
-bash "$HOME/nuradio/script6-ausf/check_ausf_2.sh"
+bash "$HOME/nuradio/script_ausf_index6/check_ausf_2.sh"
 ```
 
 * Optionnal : Check part3 AUSF other ip address (scp)
 ```
-sudo "$HOME/nuradio/script6-ausf/tee check_ausf_3.sh" > /dev/null << 'EOF'
+sudo "$HOME/nuradio/script_ausf_index6/tee check_ausf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/ausf.yaml"
@@ -2238,20 +2231,20 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script6-ausf/check_ausf_3.sh"
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf_3.sh"
 ```
 ```
-bash "$HOME/nuradio/script6-ausf/check_ausf_3.sh"
+bash "$HOME/nuradio/script_ausf_index6/check_ausf_3.sh"
 ```
 use directly scp not nrf
 ### 3.4.7. Configuration udm.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script7-udm" && cd "$HOME/nuradio/script7-udm"
+mkdir "$HOME/nuradio/script_udm_index7" && cd "$HOME/nuradio/script_udm_index7"
 ```
 * Configure UDM
 ```
-sudo tee "$HOME/nuradio/script7-udm/configure_udm.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udm_index7/configure_udm.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udm.yaml"
@@ -2273,22 +2266,22 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script7-udm/configure_udm.sh"
+sudo chmod +x "$HOME/nuradio/script_udm_index7/configure_udm.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script7-udm/configure_udm.sh" /usr/bin/configure_udm.sh
+sudo cp -rf "$HOME/nuradio/script_udm_index7/configure_udm.sh" /usr/bin/configure_udm.sh
 ```
 ```
 sudo bash configure_udm.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script7-udm/configure_udm.sh"
+sudo bash "$HOME/nuradio/script_udm_index7/configure_udm.sh"
 ```
 
 * Check UDM all
 ```
-sudo tee "$HOME/nuradio/script7-udm/check_udm.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udm_index7/check_udm.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udm.yaml"
@@ -2304,22 +2297,22 @@ sed -n '1,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script7-udm/check_udm.sh"
+sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script7-udm/check_udm.sh /usr/bin/check_udm.sh"
+sudo cp -rf "$HOME/nuradio/script_udm_index7/check_udm.sh /usr/bin/check_udm.sh"
 ```
 ```
 sudo bash check_udm.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script7-udm/check_udm.sh"
+sudo bash "$HOME/nuradio/script_udm_index7/check_udm.sh"
 ```
 
 * Optionnal : Configure part1 UDM log
 ```
-sudo tee "$HOME/nuradio/script7-udm/configure_udm_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udm_index7/configure_udm_logger.sh" > /dev/null << 'EOF'
 
 #!/bin/bash
 
@@ -2342,16 +2335,16 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script7-udm/configure_udm_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_udm_index7/configure_udm_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script7-udm/configure_udm_logger.sh"
+sudo bash "$HOME/nuradio/script_udm_index7/configure_udm_logger.sh"
 ```
 
 
 * Optionnal  : Check part1 UDM log
 ```
-sudo tee "$HOME/nuradio/script7-udm/check_udm_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udm_index7/check_udm_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udm.yaml"
@@ -2364,15 +2357,15 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script7-udm/check_udm_1.sh"
+sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script7-udm/check_udm_1.sh"
+sudo bash "$HOME/nuradio/script_udm_index7/check_udm_1.sh"
 ```
 
 * Optionnal : Check part2 UDM ip address
 ```
-sudo tee "$HOME/nuradio/script7-udm/check_udm_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udm_index7/check_udm_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udm.yaml"
@@ -2385,15 +2378,15 @@ sed -n '9,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script7-udm/check_udm_2.sh"
+sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script7-udm/check_udm_2.sh"
+sudo bash "$HOME/nuradio/script_udm_index7/check_udm_2.sh"
 ```
 
 * Optionnal : Check part3 UDM other ip address (scp)
 ```
-sudo "$HOME/nuradio/script7-udm/tee check_udm_3.sh" > /dev/null << 'EOF'
+sudo "$HOME/nuradio/script_udm_index7/tee check_udm_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udm.yaml"
@@ -2407,20 +2400,20 @@ sed -n '20,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script7-udm/check_udm_3.sh"
+sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script7-udm/check_udm_3.sh"
+sudo bash "$HOME/nuradio/script_udm_index7/check_udm_3.sh"
 ```
 Use directly scp not nrf
 
 ### 3.4.8. Configuration pcf.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script8-pcf" && cd "$HOME/nuradio/script8-pcf"
+mkdir "$HOME/nuradio/script_pcf_index8" && cd "$HOME/nuradio/script_pcf_index8"
 ```
 * Configure PCF all
-sudo tee "$HOME/nuradio/script8-pcf/configure_pcf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" > /dev/null << 'EOF'
 ```
 #!/bin/bash
 
@@ -2443,21 +2436,21 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x  "$HOME/nuradio/script8-pcf/configure_pcf.sh"
+sudo chmod +x  "$HOME/nuradio/script_pcf_index8/configure_pcf.sh"
 ```
 ```
-sudo cp -rf  "$HOME/nuradio/script8-pcf/configure_pcf.sh" /usr/bin/configure_pcf.sh
+sudo cp -rf  "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" /usr/bin/configure_pcf.sh
 ```
 ```
 sudo bash configure_pcf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script8-pcf/configure_pcf.sh"
+sudo bash "$HOME/nuradio/script_pcf_index8/configure_pcf.sh"
 ```
 * Check PCF all
 ```
-sudo tee "$HOME/nuradio/script8-pcf/check_pcf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_pcf_index8/check_pcf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/pcf.yaml"
@@ -2474,21 +2467,21 @@ sed -n '1,40p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script8-pcf/check_pcf.sh"
+sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script8-pcf/check_pcf.sh" /usr/bin/check_pcf.sh
+sudo cp -rf "$HOME/nuradio/script_pcf_index8/check_pcf.sh" /usr/bin/check_pcf.sh
 ```
 ```
 bash check_pcf.sh
 ```
 OR,
 ```
-bash "$HOME/nuradio/script8-pcf/check_pcf.sh"
+bash "$HOME/nuradio/script_pcf_index8/check_pcf.sh"
 ```
 * Optionnal : Configure part1 PCF log
 ```
-sudo tee "$HOME/nuradio/script8-pcf/configure_pcf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_pcf_index8/configure_pcf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/pcf.yaml"
@@ -2510,15 +2503,15 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script8-pcf/configure_pcf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_pcf_index8/configure_pcf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script8-pcf/configure_pcf_logger.sh"
+sudo bash "$HOME/nuradio/script_pcf_index8/configure_pcf_logger.sh"
 ```
 
 * Optionnal : Check part1 PCF log
 ```
-sudo tee "$HOME/nuradio/script8-pcf/check_pcf_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_pcf_index8/check_pcf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/pcf.yaml"
@@ -2531,16 +2524,16 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x "$HOME/nuradio/script8-pcf/check_pcf_1.sh"
+chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_1.sh"
 ```
 ```
-bash "$HOME/nuradio/script8-pcf/check_pcf_1.sh"
+bash "$HOME/nuradio/script_pcf_index8/check_pcf_1.sh"
 ```
 
 
 * Optionnal : Check part2 PCF ip address
 ```
-sudo tee "$HOME/nuradio/script8-pcf/check_pcf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_pcf_index8/check_pcf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/pcf.yaml"
@@ -2553,14 +2546,14 @@ sed -n '9,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script8-pcf/check_pcf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_2.sh"
 ```
 ```
-bash "$HOME/nuradio/script8-pcf/check_pcf_2.sh"
+bash "$HOME/nuradio/script_pcf_index8/check_pcf_2.sh"
 ```
 * Optionnal : Check part3 PCF other address (scp) 
 ```
-sudo tee "$HOME/nuradio/script8-pcf/check_pcf_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/pcf.yaml"
@@ -2574,20 +2567,20 @@ sed -n '5,35p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script8-pcf/check_pcf_3.sh"
+sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 ```
 ```
-bash "$HOME/nuradio/script8-pcf/check_pcf_3.sh"
+bash "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 ```
 
 ### 3.4.9. Configuration nssf.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script9-nssf" && cd "$HOME/nuradio/script9-nssf"
+mkdir "$HOME/nuradio/script_nssf_index9" && cd "$HOME/nuradio/script_nssf_index9"
 ```
 * Configure NSSF all
 ```
-sudo tee "$HOME/nuradio/script9-nssf/configure_nssf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nssf_index9/configure_nssf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nssf.yaml"
@@ -2609,21 +2602,21 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script9-nssf/configure_nssf.sh"
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/configure_nssf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script9-nssf/configure_nssf.sh" /usr/bin/configure_nssf.sh
+sudo cp -rf "$HOME/nuradio/script_nssf_index9/configure_nssf.sh" /usr/bin/configure_nssf.sh
 ```
 ```
 sudo bash configure_nssf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script9-nssf/configure_nssf.sh"
+sudo bash "$HOME/nuradio/script_nssf_index9/configure_nssf.sh"
 ```
 * Check nssf 
 ```
-sudo tee "$HOME/nuradio/script9-nssf/check_nssf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nssf_index9/check_nssf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nssf.yaml"
@@ -2640,23 +2633,23 @@ sed -n '1,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script9-nssf/check_nssf.sh"
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script9-nssf/check_nssf.sh" /usr/bin/check_nssf.sh
+sudo cp -rf "$HOME/nuradio/script_nssf_index9/check_nssf.sh" /usr/bin/check_nssf.sh
 ```
 ```
 sudo bash check_nssf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script9-nssf/check_nssf.sh"
+sudo bash "$HOME/nuradio/script_nssf_index9/check_nssf.sh"
 ```
 
 
 * Optionnal : Configure part1 nssf log
 ```
-sudo tee "$HOME/nuradio/script9-nssf/configure_nssf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nssf_index9/configure_nssf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nssf.yaml"
@@ -2678,15 +2671,15 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script9-nssf/configure_nssf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/configure_nssf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script9-nssf/configure_nssf_logger.sh"
+sudo bash "$HOME/nuradio/script_nssf_index9/configure_nssf_logger.sh"
 ```
 
 * Optionnal : Check nssf part1 log
 ```
-sudo tee "$HOME/nuradio/script9-nssf/check_nssf_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nssf_index9/check_nssf_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nssf.yaml"
@@ -2699,16 +2692,16 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x "$HOME/nuradio/script9-nssf/check_nssf_1.sh"
+chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script9-nssf/check_nssf_1.sh"
+sudo bash "$HOME/nuradio/script_nssf_index9/check_nssf_1.sh"
 ```
 
 
 * Optionnal : Configure nssf part2 ip address
 ```
-sudo tee "$HOME/nuradio/script9-nssf/check_nssf_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nssf_index9/check_nssf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nssf.yaml"
@@ -2721,15 +2714,15 @@ sed -n '9,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script9-nssf/check_nssf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script9-nssf/check_nssf_2.sh"
+sudo bash "$HOME/nuradio/script_nssf_index9/check_nssf_2.sh"
 ```
 
 * Optionnal : Configure part3 nssf other ip address (scp)
 ```
-sudo tee "$HOME/nuradio/script9-nssf/check_nssf_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_nssf_index9/check_nssf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/nssf.yaml"
@@ -2743,20 +2736,20 @@ sed -n '20,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script9-nssf/check_nssf_3.sh"
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script9-nssf/check_nssf_3.sh"
+sudo bash "$HOME/nuradio/script_nssf_index9/check_nssf_3.sh"
 ```
 
 ### 3.4.10. Configuration bsf.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script10-bsf" && cd "$HOME/nuradio/script10-bsf"
+mkdir "$HOME/nuradio/script_bsf_index10" && cd "$HOME/nuradio/script_bsf_index10"
 ```
 * Configure BSF all
 ```
-sudo tee "$HOME/nuradio/script10-bsf/configure_bsf.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_bsf_index10/configure_bsf.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/bsf.yaml"
@@ -2772,17 +2765,17 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script10-bsf/configure_bsf.sh"
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/configure_bsf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script10-bsf/configure_bsf.sh" /usr/bin/configure_bsf.sh
+sudo cp -rf "$HOME/nuradio/script_bsf_index10/configure_bsf.sh" /usr/bin/configure_bsf.sh
 ```
 ```
 sudo bash configure_bsf.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script10-bsf/configure_bsf.sh"
+sudo bash "$HOME/nuradio/script_bsf_index10/configure_bsf.sh"
 ```
 * Check BSF
 ```
@@ -2802,22 +2795,22 @@ sed -n '1,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script10-bsf/check_bsf.sh"
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script10-bsf/check_bsf.sh" /usr/bin/check_bsf.sh
+sudo cp -rf "$HOME/nuradio/script_bsf_index10/check_bsf.sh" /usr/bin/check_bsf.sh
 ```
 ```
 sudo bash check_bsf.sh
 ```
 OR,
 ```
-sudo bash  "$HOME/nuradio/script10-bsf/check_bsf.sh"
+sudo bash  "$HOME/nuradio/script_bsf_index10/check_bsf.sh"
 ```
 
 * Optionnal : Configure part1 BSF log
 ```
-sudo tee "$HOME/nuradio/script10-bsf/configure_bsf_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_bsf_index10/configure_bsf_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/bsf.yaml"
@@ -2833,10 +2826,10 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script10-bsf/configure_bsf_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/configure_bsf_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script10-bsf/configure_bsf_logger.sh"
+sudo bash "$HOME/nuradio/script_bsf_index10/configure_bsf_logger.sh"
 ```
 * Optionnal : Check part1 BSF log
 ```
@@ -2853,15 +2846,15 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x "$HOME/nuradio/script10-bsf/check_bsf_1.sh"
+chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script10-bsf/check_bsf_1.sh"
+sudo bash "$HOME/nuradio/script_bsf_index10/check_bsf_1.sh"
 ```
 
 * Optionnal : Check part2 BSF ip address
 ```
-sudo "$HOME/nuradio/script10-bsf/tee check_bsf_2.sh" > /dev/null << 'EOF'
+sudo "$HOME/nuradio/script_bsf_index10/tee check_bsf_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/bsf.yaml"
@@ -2874,15 +2867,15 @@ sed -n '9,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script10-bsf/check_bsf_2.sh"
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script10-bsf/check_bsf_2.sh"
+sudo bash "$HOME/nuradio/script_bsf_index10/check_bsf_2.sh"
 ```
 
 * Optionnal : Check part3 BSF other ip address (scp) 
 ```
-sudo tee "$HOME/nuradio/script10-bsf/check_bsf_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_bsf_index10/check_bsf_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/bsf.yaml"
@@ -2896,20 +2889,20 @@ sed -n '20,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script10-bsf/check_bsf_3.sh"
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script10-bsf/check_bsf_3.sh"
+sudo bash "$HOME/nuradio/script_bsf_index10/check_bsf_3.sh"
 ```
 
 ### 3.4.11. Configuration udr.yaml
 * Create and change directory
 ```
-mkdir "$HOME/nuradio/script11-udr" && cd "$HOME/nuradio/script11-udr"
+mkdir "$HOME/nuradio/script_udr_index11" && cd "$HOME/nuradio/script_udr_index11"
 ```
 * Configure UDR all
 ```
-sudo tee "$HOME/nuradio/script11-udr/configure_udr.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udr_index11/configure_udr.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udr.yaml"
@@ -2925,21 +2918,21 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script11-udr/configure_udr.sh"
+sudo chmod +x "$HOME/nuradio/script_udr_index11/configure_udr.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script11-udr/configure_udr.sh" /usr/bin/configure_udr.sh
+sudo cp -rf "$HOME/nuradio/script_udr_index11/configure_udr.sh" /usr/bin/configure_udr.sh
 ```
 ```
 sudo bash configure_udr.sh
 ```
 OR,
 ```
-sudo bash "$HOME/nuradio/script11-udr/configure_udr.sh"
+sudo bash "$HOME/nuradio/script_udr_index11/configure_udr.sh"
 ```
 * Check UDR all
 ```
-sudo tee "$HOME/nuradio/script11-udr/check_udr.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udr_index11/check_udr.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udr.yaml"
@@ -2956,22 +2949,22 @@ sed -n '1,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script11-udr/check_udr.sh"
+sudo chmod +x "$HOME/nuradio/script_udr_index11/check_udr.sh"
 ```
 ```
-sudo cp -rf "$HOME/nuradio/script11-udr/check_udr.sh" /usr/bin/check_udr.sh
+sudo cp -rf "$HOME/nuradio/script_udr_index11/check_udr.sh" /usr/bin/check_udr.sh
 ```
 ```
 sudo bash check_udr.sh
 ```
 OR 
 ```
-sudo bash "$HOME/nuradio/script11-udr/check_udr.sh"
+sudo bash "$HOME/nuradio/script_udr_index11/check_udr.sh"
 ```
 
 * Optionnal : Configure part1 UDR log
 ```
-sudo tee "$HOME/nuradio/script11-udr/configure_udr_logger.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udr_index11/configure_udr_logger.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udr.yaml"
@@ -2987,14 +2980,14 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script11-udr/configure_udr_logger.sh"
+sudo chmod +x "$HOME/nuradio/script_udr_index11/configure_udr_logger.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script11-udr/configure_udr_logger.sh"
+sudo bash "$HOME/nuradio/script_udr_index11/configure_udr_logger.sh"
 ```
 * Optionnal : Check part1 UDR log
 ```
-sudo tee "$HOME/nuradio/script11-udr/check_udr_1.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udr_index11/check_udr_1.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udr.yaml"
@@ -3007,15 +3000,15 @@ sed -n '1,30p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-chmod +x "$HOME/nuradio/script11-udr/check_udr_1.sh"
+chmod +x "$HOME/nuradio/script_udr_index11/check_udr_1.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script11-udr/check_udr_1.sh"
+sudo bash "$HOME/nuradio/script_udr_index11/check_udr_1.sh"
 ```
 
 * Optionnal : Check part2 UDR ip address
 ```
-sudo tee "$HOME/nuradio/script11-udr/check_udr_2.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udr_index11/check_udr_2.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udr.yaml"
@@ -3028,15 +3021,15 @@ sed -n '9,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script11-udr/check_udr_2.sh"
+sudo chmod +x "$HOME/nuradio/script_udr_index11/check_udr_2.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script11-udr/check_udr_2.sh"
+sudo bash "$HOME/nuradio/script_udr_index11/check_udr_2.sh"
 ```
 
 * Optionnal : Check part3 UDR other ip address (scp)
 ```
-sudo tee "$HOME/nuradio/script11-udr/check_udr_3.sh" > /dev/null << 'EOF'
+sudo tee "$HOME/nuradio/script_udr_index11/check_udr_3.sh" > /dev/null << 'EOF'
 #!/bin/bash
 
 CONFIG="/etc/open5gs/udr.yaml"
@@ -3050,10 +3043,10 @@ sed -n '20,50p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script11-udr/check_udr_3.sh"
+sudo chmod +x "$HOME/nuradio/script_udr_index11/check_udr_3.sh"
 ```
 ```
-sudo bash "$HOME/nuradio/script11-udr/check_udr_3.sh"
+sudo bash "$HOME/nuradio/script_udr_index11/check_udr_3.sh"
 ```
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
