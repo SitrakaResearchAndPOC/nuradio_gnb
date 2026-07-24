@@ -3132,8 +3132,8 @@ cat gnb*.yml | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x check_gnb_amf.sh \
-sudo cp -rf check_gnb_amf.sh /usr/bin/check_gnb_amf.sh
+sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_amf.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_amf.sh" /usr/bin/check_gnb_amf.sh
 ```
 ```
 sudo bash check_gnb_amf.sh
