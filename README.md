@@ -3090,13 +3090,322 @@ Configure OPC
 ```
 9ED73ED8F0FD186430CA9D7ED728EA0F
 ```
-
-
 # STEP 5 : OPEN-SOURCE 5G NETWORK  CONFIGURATION SRSRAN_GNB
+## 5.1. Creating directory of gnb script
+```
+mkdir "$HOME/nuradio/script_gnb" && cd "$HOME/nuradio/script_gnb"
+```
+## 5.2. Downloading the gnb configuration
 ```
 cd && \
-wget 
-https://raw.githubusercontent.com/SitrakaResearchAndPOC/fork_nuradio_5G_Network/ref
-s/heads/main/srsRAN_Project/gnb_n3.yml
+[ -f gnb_n3.yml ] && rm -f gnb_n3.yml; wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/fork_nuradio_5G_Network/refs/heads/main/srsRAN_Project/gnb_n3.yml
+```
+## 5.3. Configuring and checking the gnb 
+### 5.3.1. Configuring and checking gnb about AMF
+```
+sudo tee cd "$HOME/nuradio/script_gnb/configure_gnb_amf.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+sudo sed -i \
+  -e 's/^\([[:space:]]*addr:\).*/\1 127.0.0.5/' \
+  -e 's/^\([[:space:]]*bind_addr:\).*/\1 127.0.0.66/' \
+  gnb*.yml
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/configure_gnb_amf.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/configure_gnb_amf.sh" /usr/bin/configure_gnb_amf.sh
+```
+```
+sudo configure_gnb_amf.sh
+```
+```
+sudo tee "$HOME/nuradio/script_gnb/check_gnb_amf.sh" > /dev/null << 'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*addr:[[:space:]]*127\.0\.0\.5([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*bind_addr:[[:space:]]*127\.0\.0\.66([[:space:]]*#.*)?$" \
+    -e "$"
+
+EOF
+```
+```
+sudo chmod +x check_gnb_amf.sh \
+sudo cp -rf check_gnb_amf.sh /usr/bin/check_gnb_amf.sh
+```
+```
+sudo bash check_gnb_amf.sh
+```
+### 5.3.2  Configuring and checking gnb about SDR & CLOCK
+```
+sudo tee "$HOME/nuradio/script_gnb/configure_gnb_sdr_clock.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+sudo sed -i \
+  -e 's/^[[:space:]]*device_args:.*/  device_args: type=b200                                          # Optionally pass arguments to the selected RF driver./' \
+  -e 's/^[[:space:]]*clock:.*/  clock: gpsdo/' \
+  -e 's/^[[:space:]]*sync:.*/  sync: gpsdo/' \
+  gnb*.yml
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/configure_gnb_sdr_clock.sh" && \
+sudo cp -f "$HOME/nuradio/script_gnb/configure_gnb_sdr_clock.sh" /usr/bin/configure_gnb_sdr_clock.sh
+```
+```
+sudo configure_gnb_sdr_clock.sh
+```
+```
+sudo tee "$HOME/nuradio/script_gnb/check_gnb_sdr_clock.sh" > /dev/null << 'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*device_args:[[:space:]]*type=b200([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*clock:[[:space:]]*gpsdo([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*sync:[[:space:]]*gpsdo([[:space:]]*#.*)?$" \
+    -e "^"
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_sdr_clock.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_sdr_clock.sh" /usr/bin/check_gnb_sdr_clock.sh
+```
+```
+sudo check_gnb_sdr_clock.sh
+```
+
+### Configuring and checking gnb about GAIN TRX
+```
+sudo tee "$HOME/nuradio/script_gnb/configure_gnb_gain_trx.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+sudo sed -i \
+  -e 's/^[[:space:]]*tx_gain:.*/  tx_gain: 70                                                     # Transmit gain of the RF might need to adjusted to the given situation./' \
+  -e 's/^[[:space:]]*rx_gain:.*/  rx_gain: 60                                                     # Receive gain of the RF might need to adjusted to the given situation./' \
+  gnb*.yml
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/configure_gnb_gain_trx.sh" && \
+sudo cp -f "$HOME/nuradio/script_gnb/configure_gnb_gain_trx.sh" /usr/bin/configure_gnb_gain_trx.sh
+```
+```
+sudo configure_gnb_gain_trx.sh
+```
+```
+tee "$HOME/nuradio/script_gnb/check_gnb_gain_trx.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*tx_gain:[[:space:]]*70([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*rx_gain:[[:space:]]*60([[:space:]]*#.*)?$" \
+    -e "^"
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_gain_trx.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_gain_trx.sh" /usr/bin/check_gnb_gain_trx.sh
+```
+```
+sudo check_gnb_gain_trx.sh
+```
+### 5.3.4. Configuring and checking gnb about BAND
+```
+tee "$HOME/nuradio/script_gnb/configure_gnb_band.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+sudo sed -i \
+  -e 's/^[[:space:]]*dl_arfcn:.*/  dl_arfcn: 368500                                                # ARFCN of the downlink carrier (center frequency)/' \
+  -e 's/^[[:space:]]*band:.*/  band: 3                                                         # The NR band./' \
+  -e 's/^[[:space:]]*channel_bandwidth_MHz:.*/  channel_bandwidth_MHz: 10                                       # Bandwith in MHz. Number of PRBs will be automatically derived./' \
+  -e 's/^[[:space:]]*common_scs:.*/  common_scs: 15                                                  # Subcarrier spacing in kHz used for data./' \
+  gnb*.yml
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/configure_gnb_band.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/configure_gnb_band.sh" /usr/bin/configure_gnb_band.sh
+```
+```
+sudo configure_gnb_band.sh
+```
+```
+tee "$HOME/nuradio/script_gnb/check_gnb_band.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*dl_arfcn:[[:space:]]*368500([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*band:[[:space:]]*3([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*channel_bandwidth_MHz:[[:space:]]*10([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*common_scs:[[:space:]]*15([[:space:]]*#.*)?$" \
+    -e "^"
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_band.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_band.sh" /usr/bin/check_gnb_band.sh
+```
+```
+sudo  check_gnb_band.sh
+```
+### 5.3.5. Configuring and checking gnb about PLMN
+```
+sudo tee "$HOME/nuradio/script_gnb/configure_gnb_plmn.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+sudo sed -i \
+  -e 's/^[[:space:]]*plmn:.*/  plmn: "00101"                                                   # PLMN broadcasted by the gNB./' \
+  -e 's/^[[:space:]]*tac:.*/  tac: 77                                                         # Tracking area code (needs to match the core configuration)./' \
+  -e 's/^[[:space:]]*pci:.*/  pci: 1/' \
+  gnb*.yml
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/configure_gnb_plmn.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/configure_gnb_plmn.sh" /usr/bin/configure_gnb_plmn.sh
+```
+```
+sudo configure_gnb_plmn.sh
+```
+```
+sudo tee "$HOME/nuradio/script_gnb/check_gnb_plmn.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*plmn:[[:space:]]*\"00101\"([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*tac:[[:space:]]*77([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*pci:[[:space:]]*1([[:space:]]*#.*)?$" \
+    -e "^"
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_plmn.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_plmn.sh /usr/bin/check_gnb_plmn.sh"
+```
+```
+sudo check_gnb_plmn.sh
+```
+
+
+### 5.3.6. Checking gnb ONLY FOR UE
+```
+sudo tee "$HOME/nuradio/script_gnb/check_gnb_for_ue.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*pdcch:[[:space:]]*$" \
+    -e "^[[:space:]]*dedicated:[[:space:]]*$" \
+    -e "^[[:space:]]*ss2_type:[[:space:]]*common([[:space:]]*)?$" \
+    -e "^[[:space:]]*dci_format_0_1_and_1_1:[[:space:]]*false([[:space:]]*)?$" \
+    -e "^[[:space:]]*prach:[[:space:]]*$" \
+    -e "^[[:space:]]*prach_config_index:[[:space:]]*1([[:space:]]*)?$" \
+    -e "^"
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_for_ue.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_for_ue.sh" /usr/bin/check_gnb_for_ue.sh
+```
+```
+sudo check_gnb_for_ue.sh
+```
+### 5.3.7. Configuring and checking gnb about LOG
+```
+sudo tee "$HOME/nuradio/script_gnb/configure_gnb_log.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+sudo sed -i \
+  -e 's/^[[:space:]]*filename:.*/  filename: \/tmp\/gnb.log                                          # Path of the log file./' \
+  -e 's/^[[:space:]]*all_level:.*/  all_level: debug                                                # Logging level applied to all layers./' \
+  gnb*.yml
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/configure_gnb_log.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/configure_gnb_log.sh" /usr/bin/configure_gnb_log.sh
+```
+```
+sudo configure_gnb_log.sh
+```
+```
+sudo tee "$HOME/nuradio/script_gnb/check_gnb_log.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*filename:[[:space:]]*/tmp/gnb\.log([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*all_level:[[:space:]]*debug([[:space:]]*#.*)?$" \
+    -e "^"
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_log.sh" && \
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_log.sh" /usr/bin/check_gnb_log.sh
+```
+```
+sudo check_gnb_log.sh
+```
+
+
+### 5.3.8. Configuring and checking gnb about PCAP
+```
+sudo tee  "$HOME/nuradio/script_gnb/configure_gnb_pcap.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+sudo sed -i \
+  -e 's/^[[:space:]]*mac_enable:.*/  mac_enable: true                                               # Set to true to enable MAC-layer PCAPs./' \
+  -e 's/^[[:space:]]*mac_filename:.*/  mac_filename: \/tmp\/gnb_mac.pcap                                 # Path where the MAC PCAP is stored./' \
+  -e 's/^[[:space:]]*ngap_enable:.*/  ngap_enable: true                                              # Set to true to enable NGAP PCAPs./' \
+  -e 's/^[[:space:]]*ngap_filename:.*/  ngap_filename: \/tmp\/gnb_ngap.pcap                               # Path where the NGAP PCAP is stored./' \
+  gnb*.yml
+
+EOF
+```
+```
+sudo chmod +x  "$HOME/nuradio/script_gnb/configure_gnb_pcap.sh" && \
+sudo cp -rf  "$HOME/nuradio/script_gnb/configure_gnb_pcap.sh" /usr/bin/configure_gnb_pcap.sh
+```
+```
+sudo configure_gnb_pcap.sh
+```
+```
+sudo tee  "$HOME/nuradio/script_gnb/check_gnb_pcap.sh" > /dev/null <<'EOF'
+#!/bin/bash
+
+printf "\n\n"
+cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*pcap:[[:space:]]*$" \
+    -e "^[[:space:]]*mac_enable:[[:space:]]*true([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*mac_filename:[[:space:]]*/tmp/gnb_mac\.pcap([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*ngap_enable:[[:space:]]*true([[:space:]]*#.*)?$" \
+    -e "^[[:space:]]*ngap_filename:[[:space:]]*/tmp/gnb_ngap\.pcap([[:space:]]*#.*)?$" \
+    -e "^"
+
+EOF
+```
+```
+sudo chmod +x  "$HOME/nuradio/script_gnb/check_gnb_pcap.sh" && \
+sudo cp -rf  "$HOME/nuradio/script_gnb/check_gnb_pcap.sh" /usr/bin/check_gnb_pcap.sh
+```
+```
+sudo check_gnb_pcap.sh	
 ```
 
