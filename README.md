@@ -3078,8 +3078,25 @@ sudo bash "$HOME/nuradio/script_udr_index11/check_udr_3.sh"
 ```
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
+Configure IMSI 
+```
+001010000560123
+```
+Configure K
+```
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+```
+Configure OPC
+```
+9ED73ED8F0FD186430CA9D7ED728EA0F
+```
+
 
 # STEP 5 : OPEN-SOURCE 5G NETWORK  CONFIGURATION SRSRAN_GNB
-
-
+```
+cd && \
+wget 
+https://raw.githubusercontent.com/SitrakaResearchAndPOC/fork_nuradio_5G_Network/ref
+s/heads/main/srsRAN_Project/gnb_n3.yml
+```
 
