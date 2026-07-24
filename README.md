@@ -3179,7 +3179,7 @@ sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_sdr_clock.sh" /usr/bin/check_gnb
 sudo check_gnb_sdr_clock.sh
 ```
 
-### Configuring and checking gnb about GAIN TRX
+### 5.3.3. Configuring and checking gnb about GAIN TRX
 ```
 sudo tee "$HOME/nuradio/script_gnb/configure_gnb_gain_trx.sh" > /dev/null <<'EOF'
 #!/bin/bash
@@ -3294,7 +3294,7 @@ EOF
 ```
 ```
 sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_plmn.sh" && \
-sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_plmn.sh /usr/bin/check_gnb_plmn.sh"
+sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_plmn.sh" /usr/bin/check_gnb_plmn.sh
 ```
 ```
 sudo check_gnb_plmn.sh
