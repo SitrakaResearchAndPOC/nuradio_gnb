@@ -667,9 +667,7 @@ ip addr show "$INTERFACE"
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_network/check_ogstun.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_network/check_ogstun.sh" && \
 sudo cp -rf "$HOME/nuradio/script_network/check_ogstun.sh" /usr/bin/check_ogstun.sh
 ```
 ```
@@ -752,9 +750,7 @@ EOF
 
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_network/configure_ogstun.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_network/configure_ogstun.sh" && \
 sudo cp -rf "$HOME/nuradio/script_network/configure_ogstun.sh" /usr/bin/configure_ogstun.sh
 ```
 ```
@@ -839,9 +835,7 @@ fi
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_network/check_ipv4forward.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_network/check_ipv4forward.sh" && \
 sudo cp -rf "$HOME/nuradio/script_network/check_ipv4forward.sh" /usr/bin/check_ipv4forward.sh
 ```
 ```
@@ -895,9 +889,7 @@ fi
 EOF
 ```
 ```
-sudo chmod +x configure_ipv4forward.sh
-```
-```
+sudo chmod +x configure_ipv4forward.sh && \
 sudo cp -rf configure_ipv4forward.sh /usr/local/bin/configure_ipv4forward.sh
 ```
 ```
@@ -974,9 +966,7 @@ fi
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_network/check_iptableNATforward.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_network/check_iptableNATforward.sh" && \
 sudo cp -rf "$HOME/nuradio/script_network/check_iptableNATforward.sh" /usr/local/bin/check_iptableNATforward.sh
 ```
 ```
@@ -1031,9 +1021,7 @@ fi
 EOF
 ```
 ```
-sudo chmod +x  "$HOME/nuradio/script_network/configure_iptableNATforward.sh"
-```
-```
+sudo chmod +x  "$HOME/nuradio/script_network/configure_iptableNATforward.sh" && \
 sudo cp -rf  "$HOME/nuradio/script_network/configure_iptableNATforward.sh" /usr/local/bin/configure_iptableNATforward.sh
 ```
 ```
@@ -1102,9 +1090,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_amf_index1/configure_amf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_amf_index1/configure_amf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_amf_index1/configure_amf.sh" /usr/bin/configure_amf.sh
 ```
 ```
@@ -1171,9 +1157,7 @@ done
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_amf_index1/check_amf.sh" /usr/bin/check_amf.sh
 ```
 ```
@@ -1382,9 +1366,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_smf_index2/configure_smf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_smf_index2/configure_smf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_smf_index2/configure_smf.sh" /usr/bin/configure_smf.sh
 ```
 ```
@@ -1421,9 +1403,7 @@ sed -n '1,51p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_smf_index2/check_smf.sh" /usr/bin/check_smf.sh
 ```
 ```
@@ -1582,9 +1562,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_upf_index3/configure_upf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_upf_index3/configure_upf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_upf_index3/configure_upf.sh" /usr/bin/configure_upf.sh
 ```
 ```
@@ -1617,9 +1595,7 @@ sed -n '1,27p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_upf_index3/check_upf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_upf_index3/check_upf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_upf_index3/check_upf.sh" /usr/bin/check_upf.sh
 ```
 ```
@@ -1757,9 +1733,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_nrf_index4/configure_nrf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/configure_nrf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nrf_index4/configure_nrf.sh" /usr/bin/configure_nrf.sh
 ```
 ```
@@ -1791,9 +1765,7 @@ sed -n '1,19p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_nrf_index4/check_nrf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_nrf_index4/check_nrf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nrf_index4/check_nrf.sh" /usr/bin/check_nrf.sh
 ```
 ```
@@ -1945,9 +1917,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_scp_index5/configure_scp.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_scp_index5/configure_scp.sh" && \
 sudo cp -rf "$HOME/nuradio/script_scp_index5/configure_scp.sh" /usr/bin/configure_scp.sh
 ```
 ```
@@ -1979,9 +1949,7 @@ sed -n '1,18p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp.sh" && \
 sudo cp -rf "$HOME/nuradio/script_scp_index5/check_scp.sh" /usr/bin/check_scp.sh
 ```
 ```
@@ -2115,9 +2083,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_ausf_index6/configure_ausf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/configure_ausf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_ausf_index6/configure_ausf.sh" /usr/bin/configure_ausf.sh
 ```
 ```
@@ -2148,9 +2114,7 @@ sed -n '1,20p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_ausf_index6/check_ausf.sh" /usr/bin/check_ausf.sh
 ```
 ```
@@ -2284,9 +2248,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_udm_index7/configure_udm.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_udm_index7/configure_udm.sh" && \
 sudo cp -rf "$HOME/nuradio/script_udm_index7/configure_udm.sh" /usr/bin/configure_udm.sh
 ```
 ```
@@ -2317,9 +2279,7 @@ sed -n '1,39p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm.sh"  && \
 sudo cp -rf "$HOME/nuradio/script_udm_index7/check_udm.sh" /usr/bin/check_udm.sh
 ```
 ```
@@ -2456,9 +2416,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x  "$HOME/nuradio/script_pcf_index8/configure_pcf.sh"
-```
-```
+sudo chmod +x  "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" && \
 sudo cp -rf  "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" /usr/bin/configure_pcf.sh
 ```
 ```
@@ -2489,9 +2447,7 @@ sed -n '1,25p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_pcf_index8/check_pcf.sh" /usr/bin/check_pcf.sh
 ```
 ```
@@ -2624,9 +2580,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_nssf_index9/configure_nssf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/configure_nssf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nssf_index9/configure_nssf.sh" /usr/bin/configure_nssf.sh
 ```
 ```
@@ -2657,9 +2611,7 @@ sed -n '1,23p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nssf_index9/check_nssf.sh" /usr/bin/check_nssf.sh
 ```
 ```
@@ -2789,9 +2741,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_bsf_index10/configure_bsf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/configure_bsf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_bsf_index10/configure_bsf.sh" /usr/bin/configure_bsf.sh
 ```
 ```
@@ -2821,9 +2771,7 @@ sed -n '1,20p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_bsf_index10/check_bsf.sh" /usr/bin/check_bsf.sh
 ```
 ```
@@ -2944,9 +2892,7 @@ sudo sed -Ei \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_udr_index11/configure_udr.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_udr_index11/configure_udr.sh" && \
 sudo cp -rf "$HOME/nuradio/script_udr_index11/configure_udr.sh" /usr/bin/configure_udr.sh
 ```
 ```
@@ -2977,9 +2923,7 @@ sed -n '1,21p' "$CONFIG" | grep --color=always -E \
 EOF
 ```
 ```
-sudo chmod +x "$HOME/nuradio/script_udr_index11/check_udr.sh"
-```
-```
+sudo chmod +x "$HOME/nuradio/script_udr_index11/check_udr.sh" && \
 sudo cp -rf "$HOME/nuradio/script_udr_index11/check_udr.sh" /usr/bin/check_udr.sh
 ```
 ```
@@ -3350,10 +3294,10 @@ sudo tee "$HOME/nuradio/script_gnb/check_gnb_log.sh" > /dev/null <<'EOF'
 
 printf "\n\n"
 cat gnb*.yml | grep --color=always -E \
+    -e "^[[:space:]]*log:[[:space:]]*([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*filename:[[:space:]]*/tmp/gnb\.log([[:space:]]*#.*)?$" \
     -e "^[[:space:]]*all_level:[[:space:]]*debug([[:space:]]*#.*)?$" \
     -e "^"
-
 EOF
 ```
 ```
