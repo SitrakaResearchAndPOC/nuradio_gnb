@@ -3466,7 +3466,7 @@ sudo check_gnb_pcap.sh
 # 6. Configuration WIRESHARK
 ## 6.1. Installation  of wireshark
 ```
-sudo apt update \
+sudo apt update && \
 sudo apt install wireshark-qt
 ```
 ```
