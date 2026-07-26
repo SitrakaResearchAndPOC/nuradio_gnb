@@ -420,6 +420,7 @@ sudo systemctl stop open5gs-pcfd
 sudo systemctl stop open5gs-nssfd
 sudo systemctl stop open5gs-bsfd
 sudo systemctl stop open5gs-udrd
+sudo systemctl stop open5gs-seppd
 
 ########################################
 # Stop Open5GS WebUI
@@ -3701,7 +3702,7 @@ sudo cset set --set=/user/cpu_part1 --cpu=$part1
 ```
 sudo cset set --set=/user/cpu_part2 --cpu=$part2
 ```
-### 8.4.3. Verifying all cpu part on shielding cpu
+### 8.4.3. Checking all cpu part on shielding cpu
 ```
 sudo cset set --list --recurse
 ```
@@ -3909,21 +3910,34 @@ sudo dumpcap -i any -w /tmp/open5gs_all.pcap
 tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
 ```
 ## 6.3. Terminal 3 : Configuring and start 5G core && gnb
+### 6.3.1. Configuring network for open5gs
 ```
 sudo configure_network.sh
 ```
+### 6.3.2. Checking network for open5gs
 ```
 sudo check_network.sh
 ```
+### 6.3.3. Launching mongo
+* Launching mongo without cpuset & taskset
 ```
 sudo systemctl restart mongod
 ```
+* Launching mongo with cpuset & taskset
+```
+sudo systemctl stop mongod && \
+sudo cpupower frequency-set -g performance && \
+sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 sudo systemctl start mongod
+```
+### 6.3.4. Checking mongo
 ```
 sudo systemctl status mongod
 ```
+### 6.3.5. Stopping core 5G
 ```
 sudo stop_5gc 
 ```
+### 6.3.6. Launching core 5G
 * Launching 5GC without cpuset & taskset
 ```
 sudo 5gc
@@ -3933,10 +3947,11 @@ sudo 5gc
 sudo cpupower frequency-set -g performance && \
 sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 sudo 5gc
 ```
-Verifying process
+### 6.3.7. Checking process of open5gs
 ```
 sudo ps aux | grep open5gs
 ```
+### 6.3.8. Launching gnb 
 * Launching GNB without cpuset & taskset
 ```
 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
@@ -3947,7 +3962,7 @@ sudo cpupower frequency-set -g performance && \
 sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
 ```
 
-## 6.4. Terminal 4 : 
+## 6.4. Terminal 4 : Wireshark
 ```
 sudo wireshark 
 ```
