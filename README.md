@@ -31,9 +31,6 @@ ifconfig
 ```
 sudo apt install -y linux-lowlatency linux-headers-lowlatency linux-tools-lowlatency linux-cloud-tools-lowlatency
 ```
-```
-sudo apt install  -y cpuset stress-ng
-```
 ### 0.6.2. Configuring grub adding menu mode
 ```
 sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
@@ -570,7 +567,7 @@ Let's see our scenario, and explain each other :
 <font color="green"><b>ogstun</b></font>: flags=4241&lt;UP,POINTOPOINT,NOARP,MULTICAST&gt; mtu 1400
         inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20&lt;link&gt;
         unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
-        RX packets 772 bytes 50678 (49.4 KiB)
+        RX packets 772 bytes 50678 (48.4 KiB)
         RX errors 0 dropped 0 overruns 0 frame 0
         TX packets 213 bytes 10776 (10.5 KiB)
         TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0
@@ -602,7 +599,7 @@ Let's see our scenario, and explain each other :
         inet6 fe80::0c02:ce67:6831 prefixlen 64 scopeid 0x20&lt;link&gt;
         <font color="green"><b>inet</b></font> 2001:db8:ca0e::1 prefixlen 48 scopeid 0x0&lt;global&gt;
         unspec 00-00-00-00-00-00-00-00-00-00-00 00-00-00-00-00-00-00-00-00-
-        RX packets 772 bytes 50678 (49.4 KiB)
+        RX packets 772 bytes 50678 (48.4 KiB)
         RX errors 0 dropped 0 overruns 0 frame 0
         TX packets 213 bytes 10776 (10.5 KiB)
         TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0
@@ -2616,7 +2613,7 @@ sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 sudo bash "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 ```
 
-### 3.5.9. Configuration nssf.yaml
+### 3.5.8. Configuration nssf.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_nssf_index9" && cd "$HOME/nuradio/script_nssf_index9"
@@ -3645,98 +3642,8 @@ sudo cp -rf "$HOME/nuradio/script_gpsdo/check_gpsdo_alignment.sh" /usr/bin/check
 sudo check_gpsdo_alignment.sh
 ```
 
-# 8. Configuration CPUSET & TASKSET
-## 8.1. Optimization
-* KERNEL REAL TIME (USING LOW LATENCY) & OVERCLOCK FREQUENCY (USING CPU POWER)
-* SHIELDING PROCESS ( PROCESS SYSTEM AND PROCESS WILL BE SEPARATED USING CSET SHIELD)
-* SETTING PROCESS (USING CSET CPU) AND LABELLING PROCESS TO BE USED ON SET CPU (USING TASKSET)
-
-## 8.2. Separating CPU
-eg : 
-* Total cpus : 12 cpus numbered 0-11
-* system will be at 0-1 cpus; the rest will be shielding cpu will be at 2-11 named part_all
-* the user cpu will be divided in two part :
-* first part will be named part1 which is 2-6 cpus and the number of cpu is 5 named part1_number_cpu
-* second part will be named part2 which is 7-11 cpus and the number of cpu is 5 named part2_number_cpu
-```
-part_all=2-11
-```
-```
-part1=2-6
-```
-```
-part1_number_cpu=5
-```
-```
-part2=7-11
-```
-```
-part2_number_cpu=5
-```
-## 8.3. Shielding all cpu parts
-```
-sudo cset shield --cpu=$part_all --kthread=on
-```
-```
-sudo cset set --list --recurse
-```
-```
-root
-├── system   CPU 0-1
-└── user     CPU 2-11
-```
-## 8.4. Dividing the shielding cpu in two parts
-The process will be represented as cpu named organized on file : 
-* the first part of cpu part is /user/cpu_part1
-* the second part of cpu part is /user/cpu_part2
-### 8.4.1. Destroying all cpu part before 
-```
-sudo cset set --destroy /user/cpu_part1
-```
-```
-sudo cset set --destroy /user/cpu_part2
-```
-### 8.4.2. Creating all cpu part on shielding cpu
-```
-sudo cset set --set=/user/cpu_part1 --cpu=$part1
-```
-```
-sudo cset set --set=/user/cpu_part2 --cpu=$part2
-```
-### 8.4.3. Checking all cpu part on shielding cpu
-```
-sudo cset set --list --recurse
-```
-```
-root
-├── system          CPU 0-1
-└── user            CPU 2-11
-    ├── cpu_part1   CPU 2-6
-    └── cpu_part2   CPU 7-11
-```
-## 8.5. Stress testing of cpuset
-### 8.5.1. Testing for all cpu part on stress testing
-```
-cpupower frequency-set -g performance && \ 
-sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 stress-ng --cpu $part1_number_cpu --timeout 3000s
-```
-```
-cpupower frequency-set -g performance && \ 
-sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 stress-ng --cpu $part1_number_cpu --timeout 3000s
-```
-### 8.5.2. Testing for binary program part 1
-eg : 5gc
-```
-sudo cpupower frequency-set -g performance && \
-sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 sudo 5gc
-```
-### 8.5.2. Testing for binary program part 2
-```
-sudo cpupower frequency-set -g performance && \
-sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
-```
-# 9. Configuring SIMCARD by PYSIM
-## 9.1. Installing tools
+# 8. Configuring SIMCARD by PYSIM
+## 8.1. Installing tools
 ```
 rm -rf py_sim ; mkdir py_sim && cd py_sim
 ```
@@ -3751,7 +3658,7 @@ sudo docker --version
 ```
 wget --version
 ```
-## 9.2. Downloading Tools
+## 8.2. Downloading Tools
 ```
 [ -f Dockerfile ] && rm -rf Dockerfile ; \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/PySim_Docker/refs/heads/main/Dockerfile
@@ -3761,7 +3668,7 @@ Verify by
 cat Dockerfile
 ```
 Result should be like [Dockerfile](https://raw.githubusercontent.com/SitrakaResearchAndPOC/PySim_Docker/refs/heads/main/Dockerfile)
-## 9.3. Building images
+## 8.3. Building images
 ```
 sudo docker build -t progsim:v1 .
 ```
@@ -3769,7 +3676,7 @@ Verfy by
 ```
 sudo docker images
 ```
-## 9.4. Launching container
+## 8.4. Launching container
 ```
 sudo docker rm -f progsim 2> /dev/null ; \
 sudo docker run -tid --privileged --device=/dev/bus/usb \
@@ -3799,7 +3706,7 @@ sudo docker exec -it progsim cat /root/.bashrc
 Result should be like at [bashrc](https://github.com/SitrakaResearchAndPOC/PySim_Docker/blob/main/bashrc)
 
 
-## 9.5. Testing SIM Card Reader
+## 8.5. Testing SIM Card Reader
 Showing all services if it's run
 ```
 sudo docker exec -it progsim bash show_services.sh
@@ -3816,7 +3723,7 @@ sudo docker exec -it progsim bash show_services.sh
 ```
 All services should be run
 
-## 9.6. Manipulating SIM card by PySIM
+## 8.6. Manipulating SIM card by PySIM
 ```
 suod docker exec -it progsim bash -c 'cd pysim  && \
 python3 -m venv .venv && \
@@ -3825,7 +3732,7 @@ source .venv/bin/activate && \
 ```
 Not test yet pySim-prog.py
 
-## 9.7. Manipulating SIM card by SYSMO Tools
+## 8.7. Manipulating SIM card by SYSMO Tools
 Rules :  </br>
 Miniscule if you want to show </br>
 Majuscule if you want to write </br>
@@ -3908,7 +3815,7 @@ sudo dumpcap -i any -w /tmp/open5gs_all.pcap
 ```
 ## 6.2. Terminal 2 : Launching log AMF
 ```
-tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
+sudo tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
 ```
 ## 6.3. Terminal 3 : Configuring and start 5G core && gnb
 ### 6.3.1. Configuring network for open5gs
@@ -3920,15 +3827,8 @@ sudo configure_network.sh
 sudo check_network.sh
 ```
 ### 6.3.3. Launching mongo
-* Launching mongo without cpuset & taskset
 ```
 sudo systemctl restart mongod
-```
-* Launching mongo with cpuset & taskset
-```
-sudo systemctl stop mongod && \
-sudo cpupower frequency-set -g performance && \
-sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 sudo systemctl start mongod
 ```
 ### 6.3.4. Checking mongo
 ```
@@ -3939,30 +3839,17 @@ sudo systemctl status mongod
 sudo stop_5gc 
 ```
 ### 6.3.6. Launching core 5G
-* Launching 5GC without cpuset & taskset
 ```
 sudo 5gc
-```
-* Launching 5GC with cpuset & taskset
-```
-sudo cpupower frequency-set -g performance && \
-sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 sudo 5gc
 ```
 ### 6.3.7. Checking process of open5gs
 ```
 sudo ps aux | grep open5gs
 ```
 ### 6.3.8. Launching gnb 
-* Launching GNB without cpuset & taskset
 ```
 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
 ```
-* Launching GNB with cpuset & taskset
-```
-sudo cpupower frequency-set -g performance && \
-sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
-```
-
 ## 6.4. Terminal 4 : Wireshark
 ```
 sudo wireshark 
