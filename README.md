@@ -472,6 +472,7 @@ sudo systemctl restart open5gs-pcfd
 sudo systemctl restart open5gs-amfd
 sudo systemctl restart open5gs-smfd
 sudo systemctl restart open5gs-upfd
+sudo systemctl restart open5gs-seppd
 
 ########################################
 # Restart Open5GS WebUI
