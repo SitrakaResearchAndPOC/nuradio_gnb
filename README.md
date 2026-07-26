@@ -3899,7 +3899,6 @@ source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> '
 ```
 
-
 # STEP 6 : RUNNING
 ## 6.1. Terminal 1 : Launching capture wireshark
 ```
@@ -3923,14 +3922,31 @@ sudo systemctl restart mongod
 sudo systemctl status mongod
 ```
 ```
-sudo stop_5gc && 5gc
+sudo stop_5gc 
 ```
+* Launching 5GC without cpuset & taskset
+```
+sudo 5gc
+```
+* Launching 5GC with cpuset & taskset
+```
+sudo cpupower frequency-set -g performance && \
+sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 sudo 5gc
+```
+Verifying process
 ```
 sudo ps aux | grep open5gs
 ```
+* Launching GNB without cpuset & taskset
 ```
 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
 ```
+* Launching GNB with cpuset & taskset
+```
+sudo cpupower frequency-set -g performance && \
+sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
+```
+
 ## 6.4. Terminal 4 : 
 ```
 sudo wireshark 
