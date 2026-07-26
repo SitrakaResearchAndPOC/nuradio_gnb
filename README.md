@@ -394,7 +394,8 @@ sudo tee "$HOME/nuradio/script_open5gs/stop_5gc" > /dev/null <<'EOF'
 ########################################
 # Clear Open5GS logs
 ########################################
-sudo rm -f /var/log/open5gs/*
+# sudo rm -f /var/log/open5gs/*
+sudo find /var/log/open5gs -type f -delete
 
 ########################################
 # Stop Open5GS 4G EPC
