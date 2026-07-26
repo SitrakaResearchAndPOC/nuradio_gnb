@@ -194,7 +194,7 @@ chmod +x "$HOME/nuradio/script_install/install_open5gs_2.7.sh" && \
 bash "$HOME/nuradio/script_install/install_open5gs_2.7.sh"
 ```
 
-### 1.3.4. Checking Open5gs
+### 1.3.5. Checking Open5gs
 ```
 ls /usr/bin/open5gs*
 ```
@@ -672,7 +672,7 @@ sudo chmod +x "$HOME/nuradio/script_network/check_ogstun.sh" && \
 sudo cp -rf "$HOME/nuradio/script_network/check_ogstun.sh" /usr/bin/check_ogstun.sh
 ```
 ```
-bash check_ogstun.sh
+sudo check_ogstun.sh
 ```
 OR
 ```
@@ -680,7 +680,7 @@ bash "$HOME/nuradio/script_network/check_ogstun.sh"
 ```
 The goal is to have Scenario 3, 
 ```
-bash check_ogstun.sh | grep "Scenario 3"
+sudo check_ogstun.sh | grep "Scenario 3"
 ```
 
 ### 3.1.2. Optionnal : If you want to del interface ogstun  : 
@@ -755,17 +755,17 @@ sudo chmod +x "$HOME/nuradio/script_network/configure_ogstun.sh" && \
 sudo cp -rf "$HOME/nuradio/script_network/configure_ogstun.sh" /usr/bin/configure_ogstun.sh
 ```
 ```
-bash configure_ogstun.sh
+sudo configure_ogstun.sh
 ```
 OR
 ```
-bash "$HOME/nuradio/script_network/configure_ogstun.sh"
+sudo bash "$HOME/nuradio/script_network/configure_ogstun.sh"
 ```
 Scenario 3 should appears
 
 ### 3.1.4. Rechecking ogstun
 ```
-bash check_ogstun.sh
+sudo check_ogstun.sh
 ```
 After lauching configure_ogstun.sh , scenario 3 should appears
 ## 3.2. Configuration Blackhaul : IPv4 Forwarding
@@ -840,11 +840,11 @@ sudo chmod +x "$HOME/nuradio/script_network/check_ipv4forward.sh" && \
 sudo cp -rf "$HOME/nuradio/script_network/check_ipv4forward.sh" /usr/bin/check_ipv4forward.sh
 ```
 ```
-bash check_ipv4forward.sh
+sudo check_ipv4forward.sh
 ```
 OR
 ```
-bash "$HOME/nuradio/script_network/check_ipv4forward.sh"
+sudo bash "$HOME/nuradio/script_network/check_ipv4forward.sh"
 ```
 
 The goal is to have  net.ipv4.ip_forwad = 1
@@ -891,14 +891,14 @@ EOF
 ```
 ```
 sudo chmod +x configure_ipv4forward.sh && \
-sudo cp -rf configure_ipv4forward.sh /usr/local/bin/configure_ipv4forward.sh
+sudo cp -rf configure_ipv4forward.sh /usr/bin/configure_ipv4forward.sh
 ```
 ```
-bash configure_ipv4forward.sh
+sudo configure_ipv4forward.sh
 ```
 ### 3.2.3. Rechecking IPv4 Forwading
 ```
-bash configure_ipv4forward.sh
+sudo configure_ipv4forward.sh
 ```
   
 ## 3.3. Configuration Blackhaul : IPTABLE NAT forwarding
@@ -968,14 +968,14 @@ EOF
 ```
 ```
 sudo chmod +x "$HOME/nuradio/script_network/check_iptableNATforward.sh" && \
-sudo cp -rf "$HOME/nuradio/script_network/check_iptableNATforward.sh" /usr/local/bin/check_iptableNATforward.sh
+sudo cp -rf "$HOME/nuradio/script_network/check_iptableNATforward.sh" /usr/bin/check_iptableNATforward.sh
 ```
 ```
-bash check_iptableNATforward.sh
+sudo check_iptableNATforward.sh
 ```
 OR
 ```
-bash "$HOME/nuradio/script_network/check_iptableNATforward.sh"
+sudo bash "$HOME/nuradio/script_network/check_iptableNATforward.sh"
 ```
 
 ### 3.3.2. Configuring IPTABLE NAT forwading
@@ -1023,22 +1023,84 @@ EOF
 ```
 ```
 sudo chmod +x  "$HOME/nuradio/script_network/configure_iptableNATforward.sh" && \
-sudo cp -rf  "$HOME/nuradio/script_network/configure_iptableNATforward.sh" /usr/local/bin/configure_iptableNATforward.sh
+sudo cp -rf  "$HOME/nuradio/script_network/configure_iptableNATforward.sh" /usr/bin/configure_iptableNATforward.sh
 ```
 ```
-bash configure_iptableNATforward.sh
+sudo configure_iptableNATforward.sh
 ```
 OR
 ```
-bash  "$HOME/nuradio/script_network/configure_iptableNATforward.sh"
+sudo bash  "$HOME/nuradio/script_network/configure_iptableNATforward.sh"
 ```
 ### 3.3.3. Rechecking IPTABLE NAT Forwading
 ```
 bash check_iptableNATforward.sh
 ```
- 
-## 3.4. Configuration PLMN & DEBUG MODE
-### 3.4.1. Configuration amf.yaml
+## 3.4. Configuring && Checking network final
+### 3.4.1. Configuring network final
+```
+sudo tee /usr/bin/configure_network.sh > /dev/null <<'EOF'
+#!/bin/bash
+
+set -e
+
+echo "=== Network Configuration ==="
+
+echo "1. Configuring OGSTUN interface..."
+sudo configure_ogstun.sh
+
+echo "2. Enabling IPv4 forwarding..."
+sudo configure_ipv4forward.sh
+
+echo "3. Configuring iptables NAT forwarding..."
+sudo configure_iptableNATforward.sh
+
+echo "=== Network configuration completed successfully. ==="
+EOF
+```
+```
+sudo chmod +x /usr/bin/configure_network.sh
+```
+```
+sudo cp -rf configure_network.sh "$HOME/nuradio/script_network/configure_network.sh"
+```
+```
+sudo configure_network.sh
+```
+
+### 3.4.2. Checking network final
+```
+sudo tee /usr/bin/check_network.sh > /dev/null <<'EOF'
+#!/bin/bash
+
+set -e
+
+echo "=== Checking Network  ==="
+
+echo "1. Checking OGSTUN interface..."
+sudo check_ogstun.sh
+
+echo "2. Enabling IPv4 forwarding..."
+sudo check_ipv4forward.sh
+
+echo "3. Configuring iptables NAT forwarding..."
+sudo check_iptableNATforward.sh
+
+echo "=== Checking Network completed successfully. ==="
+EOF
+```
+```
+sudo chmod +x /usr/bin/check_network.sh
+```
+```
+sudo cp -rf check_network.sh "$HOME/nuradio/script_network/check_network.sh"
+```
+```
+sudo check_network.sh
+```
+
+## 3.5. Configuration PLMN & DEBUG MODE
+### 3.5.1. Configuration amf.yaml
 * Create and change directory
 ```
 mkdir -p "$HOME/nuradio/script_amf_index1" && cd "$HOME/nuradio/script_amf_index1"
@@ -1095,7 +1157,7 @@ sudo chmod +x "$HOME/nuradio/script_amf_index1/configure_amf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_amf_index1/configure_amf.sh" /usr/bin/configure_amf.sh
 ```
 ```
-bash configure_amf.sh
+sudo configure_amf.sh
 ```
 OR,
 ```
@@ -1162,7 +1224,7 @@ sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_amf_index1/check_amf.sh" /usr/bin/check_amf.sh
 ```
 ```
-bash check_amf.sh
+sudo check_amf.sh
 ```
 OR 
 ```
@@ -1338,7 +1400,7 @@ sudo chmod +x "$HOME/nuradio/script_amf_index1/check_amf_4.sh"
 sudo bash "$HOME/nuradio/script_amf_index1/check_amf_4.sh"
 ```
 
-### 3.4.2. Configuration SMF.yaml
+### 3.5.2. Configuration SMF.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_smf_index2" && cd "$HOME/nuradio/script_smf_index2"
@@ -1371,7 +1433,7 @@ sudo chmod +x "$HOME/nuradio/script_smf_index2/configure_smf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_smf_index2/configure_smf.sh" /usr/bin/configure_smf.sh
 ```
 ```
-sudo bash configure_smf.sh
+sudo configure_smf.sh
 ```
 OR,
 ```
@@ -1408,7 +1470,7 @@ sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_smf_index2/check_smf.sh" /usr/bin/check_smf.sh
 ```
 ```
-sudo bash check_smf.sh
+sudo check_smf.sh
 ```
 OR,
 ```
@@ -1534,7 +1596,7 @@ sudo chmod +x "$HOME/nuradio/script_smf_index2/check_smf_4.sh"
 sudo bash "$HOME/nuradio/script_smf_index2/check_smf_4.sh"
 ```
 
-### 3.4.3. Configuration upf.yaml
+### 3.5.3. Configuration upf.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_upf_index3" && cd "$HOME/nuradio/script_upf_index3"
@@ -1567,7 +1629,7 @@ sudo chmod +x "$HOME/nuradio/script_upf_index3/configure_upf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_upf_index3/configure_upf.sh" /usr/bin/configure_upf.sh
 ```
 ```
-sudo bash configure_upf.sh
+sudo configure_upf.sh
 ```
 OR,
 ```
@@ -1600,7 +1662,7 @@ sudo chmod +x "$HOME/nuradio/script_upf_index3/check_upf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_upf_index3/check_upf.sh" /usr/bin/check_upf.sh
 ```
 ```
-sudo bash check_upf.sh
+sudo check_upf.sh
 ```
 OR,
 ```
@@ -1680,7 +1742,7 @@ sudo chmod +x "$HOME/nuradio/script_upf_index3/check_upf_2.sh"
 sudo bash "$HOME/nuradio/script_upf_index3/check_upf_2.sh"
 ```
 
-### 3.4.4. Configuration nrf.yaml
+### 3.5.4. Configuration nrf.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_nrf_index4" && cd "$HOME/nuradio/script_nrf_index4"
@@ -1738,7 +1800,7 @@ sudo chmod +x "$HOME/nuradio/script_nrf_index4/configure_nrf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nrf_index4/configure_nrf.sh" /usr/bin/configure_nrf.sh
 ```
 ```
-sudo bash configure_nrf.sh
+sudo configure_nrf.sh
 ```
 OR, 
 ```
@@ -1770,7 +1832,7 @@ sudo chmod +x "$HOME/nuradio/script_nrf_index4/check_nrf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nrf_index4/check_nrf.sh" /usr/bin/check_nrf.sh
 ```
 ```
-sudo bash check_nrf.sh
+sudo check_nrf.sh
 ```
 OR,
 ```
@@ -1889,7 +1951,7 @@ sudo bash "$HOME/nuradio/script_nrf_index4/check_nrf_2.sh"
 ```
 
   
-### 3.4.5. Configuration scp.yaml
+### 3.5.5. Configuration scp.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_scp_index5" && cd "$HOME/nuradio/script_scp_index5"
@@ -1922,7 +1984,7 @@ sudo chmod +x "$HOME/nuradio/script_scp_index5/configure_scp.sh" && \
 sudo cp -rf "$HOME/nuradio/script_scp_index5/configure_scp.sh" /usr/bin/configure_scp.sh
 ```
 ```
-sudo bash configure_scp.sh
+sudo configure_scp.sh
 ```
 OR,
 ```
@@ -1954,7 +2016,7 @@ sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp.sh" && \
 sudo cp -rf "$HOME/nuradio/script_scp_index5/check_scp.sh" /usr/bin/check_scp.sh
 ```
 ```
-sudo bash check_scp.sh
+sudo check_scp.sh
 ```
 OR,
 ```
@@ -2055,7 +2117,7 @@ sudo chmod +x "$HOME/nuradio/script_scp_index5/check_scp_3.sh"
 sudo bash "$HOME/nuradio/script_scp_index5/check_scp_3.sh"
 ```
 
-### 3.4.6. Configuration ausf.yaml
+### 3.5.6. Configuration ausf.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_ausf_index6" && cd "$HOME/nuradio/script_ausf_index6"
@@ -2088,7 +2150,7 @@ sudo chmod +x "$HOME/nuradio/script_ausf_index6/configure_ausf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_ausf_index6/configure_ausf.sh" /usr/bin/configure_ausf.sh
 ```
 ```
-sudo bash configure_ausf.sh
+sudo configure_ausf.sh
 ```
 OR,
 ```
@@ -2119,7 +2181,7 @@ sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_ausf_index6/check_ausf.sh" /usr/bin/check_ausf.sh
 ```
 ```
-sudo bash check_ausf.sh
+sudo check_ausf.sh
 ```
 OR,
 ```
@@ -2220,7 +2282,7 @@ sudo chmod +x "$HOME/nuradio/script_ausf_index6/check_ausf_3.sh"
 bash "$HOME/nuradio/script_ausf_index6/check_ausf_3.sh"
 ```
 use directly scp not nrf
-### 3.4.7. Configuration udm.yaml
+### 3.5.7. Configuration udm.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_udm_index7" && cd "$HOME/nuradio/script_udm_index7"
@@ -2253,7 +2315,7 @@ sudo chmod +x "$HOME/nuradio/script_udm_index7/configure_udm.sh" && \
 sudo cp -rf "$HOME/nuradio/script_udm_index7/configure_udm.sh" /usr/bin/configure_udm.sh
 ```
 ```
-sudo bash configure_udm.sh
+sudo configure_udm.sh
 ```
 OR,
 ```
@@ -2284,7 +2346,7 @@ sudo chmod +x "$HOME/nuradio/script_udm_index7/check_udm.sh"  && \
 sudo cp -rf "$HOME/nuradio/script_udm_index7/check_udm.sh" /usr/bin/check_udm.sh
 ```
 ```
-sudo bash check_udm.sh
+sudo check_udm.sh
 ```
 OR,
 ```
@@ -2388,7 +2450,7 @@ sudo bash "$HOME/nuradio/script_udm_index7/check_udm_3.sh"
 ```
 Use directly scp not nrf
 
-### 3.4.8. Configuration pcf.yaml
+### 3.5.8. Configuration pcf.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_pcf_index8" && cd "$HOME/nuradio/script_pcf_index8"
@@ -2421,7 +2483,7 @@ sudo chmod +x  "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" && \
 sudo cp -rf  "$HOME/nuradio/script_pcf_index8/configure_pcf.sh" /usr/bin/configure_pcf.sh
 ```
 ```
-sudo bash configure_pcf.sh
+sudo configure_pcf.sh
 ```
 OR,
 ```
@@ -2452,7 +2514,7 @@ sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_pcf_index8/check_pcf.sh" /usr/bin/check_pcf.sh
 ```
 ```
-bash check_pcf.sh
+sudo check_pcf.sh
 ```
 OR,
 ```
@@ -2552,7 +2614,7 @@ sudo chmod +x "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 sudo bash "$HOME/nuradio/script_pcf_index8/check_pcf_3.sh"
 ```
 
-### 3.4.9. Configuration nssf.yaml
+### 3.5.9. Configuration nssf.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_nssf_index9" && cd "$HOME/nuradio/script_nssf_index9"
@@ -2585,7 +2647,7 @@ sudo chmod +x "$HOME/nuradio/script_nssf_index9/configure_nssf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nssf_index9/configure_nssf.sh" /usr/bin/configure_nssf.sh
 ```
 ```
-sudo bash configure_nssf.sh
+sudo configure_nssf.sh
 ```
 OR,
 ```
@@ -2616,7 +2678,7 @@ sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_nssf_index9/check_nssf.sh" /usr/bin/check_nssf.sh
 ```
 ```
-sudo bash check_nssf.sh
+sudo check_nssf.sh
 ```
 OR,
 ```
@@ -2719,7 +2781,7 @@ sudo chmod +x "$HOME/nuradio/script_nssf_index9/check_nssf_3.sh"
 sudo bash "$HOME/nuradio/script_nssf_index9/check_nssf_3.sh"
 ```
 
-### 3.4.10. Configuration bsf.yaml
+### 3.5.10. Configuration bsf.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_bsf_index10" && cd "$HOME/nuradio/script_bsf_index10"
@@ -2746,7 +2808,7 @@ sudo chmod +x "$HOME/nuradio/script_bsf_index10/configure_bsf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_bsf_index10/configure_bsf.sh" /usr/bin/configure_bsf.sh
 ```
 ```
-sudo bash configure_bsf.sh
+sudo configure_bsf.sh
 ```
 OR,
 ```
@@ -2776,7 +2838,7 @@ sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_bsf_index10/check_bsf.sh" /usr/bin/check_bsf.sh
 ```
 ```
-sudo bash check_bsf.sh
+sudo check_bsf.sh
 ```
 OR,
 ```
@@ -2870,7 +2932,7 @@ sudo chmod +x "$HOME/nuradio/script_bsf_index10/check_bsf_3.sh"
 sudo bash "$HOME/nuradio/script_bsf_index10/check_bsf_3.sh"
 ```
 
-### 3.4.11. Configuration udr.yaml
+### 3.5.11. Configuration udr.yaml
 * Create and change directory
 ```
 mkdir "$HOME/nuradio/script_udr_index11" && cd "$HOME/nuradio/script_udr_index11"
@@ -2897,7 +2959,7 @@ sudo chmod +x "$HOME/nuradio/script_udr_index11/configure_udr.sh" && \
 sudo cp -rf "$HOME/nuradio/script_udr_index11/configure_udr.sh" /usr/bin/configure_udr.sh
 ```
 ```
-sudo bash configure_udr.sh
+sudo configure_udr.sh
 ```
 OR,
 ```
@@ -2928,7 +2990,7 @@ sudo chmod +x "$HOME/nuradio/script_udr_index11/check_udr.sh" && \
 sudo cp -rf "$HOME/nuradio/script_udr_index11/check_udr.sh" /usr/bin/check_udr.sh
 ```
 ```
-sudo bash check_udr.sh
+sudo check_udr.sh
 ```
 OR 
 ```
@@ -3081,7 +3143,7 @@ sudo chmod +x "$HOME/nuradio/script_gnb/check_gnb_amf.sh" && \
 sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_amf.sh" /usr/bin/check_gnb_amf.sh
 ```
 ```
-sudo bash check_gnb_amf.sh
+sudo check_gnb_amf.sh
 ```
 ### 5.3.2  Configuring and checking gnb about SDR & CLOCK
 ```
@@ -3162,7 +3224,7 @@ sudo cp -rf "$HOME/nuradio/script_gnb/check_gnb_gain_trx.sh" /usr/bin/check_gnb_
 ```
 sudo check_gnb_gain_trx.sh
 ```
-### 5.3.4. Configuring and checking gnb about BAND
+### 5.3.5. Configuring and checking gnb about BAND
 ```
 tee "$HOME/nuradio/script_gnb/configure_gnb_band.sh" > /dev/null <<'EOF'
 #!/bin/bash
@@ -3352,5 +3414,196 @@ sudo cp -rf  "$HOME/nuradio/script_gnb/check_gnb_pcap.sh" /usr/bin/check_gnb_pca
 ```
 ```
 sudo check_gnb_pcap.sh	
+```
+# 6. Configuration WIRESHARK
+## 6.1. Installation  of wireshark
+```
+sudo apt update \
+sudo apt install wireshark-tq
+```
+```
+sudo usermod -aG wireshark nuradio
+```
+```
+newgrp wireshark
+```
+```
+sudo chown $USER:$USER /tmp/* \
+sudo chmod 664 /tmp/*
+```
+```
+sudo dumpcap -i any -w /tmp/open5gs_all.pcap
+```
+# 7. Configuration GPSDO
+## 7.1. Creating directory
+```
+[ ! -d "$HOME/nuradio/script_gpsdo" ] && mkdir -p "$HOME/nuradio/script_gpsdo"
+```
+## 7.2. Script to wat gpsdo alignment
+```
+sudo tee "$HOME/nuradio/script_gpsdo/wait_gpsdo_alignment.sh" >/dev/null <<'EOF'
+#!/usr/bin/env bash
+
+LOG=/tmp/query_gpsdo_sensors.log
+rm -rf $LOG
+sudo touch $LOG
+sudo chown $USER:$USER $LOG
+
+LOG=/tmp/query_gpsdo_sensors.log
+
+START_TIME=$(date +%s)
+
+is_gpsdo_aligned=false
+
+while [ "$is_gpsdo_aligned" = false ]; do
+
+    sudo query_gpsdo_sensors >"$LOG" 2>&1
+
+    if tr -s '[:space:]' ' ' < "$LOG" | \
+        grep -qi "GPS and UHD Device time are aligned."; then
+
+        is_gpsdo_aligned=true
+
+    else
+        sleep 5
+
+        CURRENT_TIME=$(date +%s)
+        ELAPSED=$((CURRENT_TIME - START_TIME))
+
+        printf "\rElapsed time: %02d seconds - Checking GPSDO..." "$ELAPSED"
+    fi
+
+done
+
+END_TIME=$(date +%s)
+TOTAL_TIME=$((END_TIME - START_TIME))
+
+echo
+echo "GPSDO synchronized."
+echo "Total time: ${TOTAL_TIME} seconds."
+echo "is_gpsdo_aligned=$is_gpsdo_aligned"
+
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gpsdo/wait_gpsdo_alignment.sh"
+```
+```
+sudo cp -rf "$HOME/nuradio/script_gpsdo/wait_gpsdo_alignment.sh" /usr/bin/wait_gpsdo_alignment.sh
+```
+```
+sudo wait_gpsdo_alignment.sh
+```
+## 7.3. Script to check gpsdo alignment
+```
+sudo tee "$HOME/nuradio/script_gpsdo/check_gpsdo_alignment.sh" > /dev/null <<'EOF'
+#!/usr/bin/env bash
+
+LOG=/tmp/query_gpsdo_sensors.log
+rm -rf "$LOG"
+sudo touch "$LOG"
+sudo chown "$USER:$USER" "$LOG"
+
+START_TIME=$(date +%s)
+
+is_gpsdo_aligned=false
+is_gpsdo_gpgga=false
+
+while [ "$is_gpsdo_aligned" = false ]; do
+
+    sudo query_gpsdo_sensors >"$LOG" 2>&1
+
+    if tr -s '[:space:]' ' ' < "$LOG" | \
+        grep -qi "GPS and UHD Device time are aligned."; then
+
+        is_gpsdo_aligned=true
+
+    else
+        sleep 5
+
+        CURRENT_TIME=$(date +%s)
+        ELAPSED=$((CURRENT_TIME - START_TIME))
+
+        printf "\rElapsed time: %02d seconds - Checking GPSDO..." "$ELAPSED"
+    fi
+
+done
+
+
+# Vérification GPGGA après synchronisation GPSDO
+if grep -qi '\$GPGGA' "$LOG"; then
+    is_gpsdo_gpgga=true
+fi
+
+
+END_TIME=$(date +%s)
+TOTAL_TIME=$((END_TIME - START_TIME))
+
+echo
+echo "GPSDO synchronized."
+echo "Total time: ${TOTAL_TIME} seconds."
+echo "is_gpsdo_aligned=$is_gpsdo_aligned"
+echo "is_gpsdo_gpgga=$is_gpsdo_gpgga"
+
+
+if [ "$is_gpsdo_aligned" = true ] && [ "$is_gpsdo_gpgga" = true ]; then
+
+    echo
+    echo "GPSDO + GPGGA check:"
+
+    SAT_COUNT=$(sudo query_gpsdo_sensors 2>/dev/null | \
+    grep -E "^[[:space:]]*GPS_GPGGA[[:space:]]*:" | \
+    awk -F',' '{print $8}')
+
+
+    sudo query_gpsdo_sensors 2>/dev/null | \
+    grep --color=always -E \
+    -e "^[[:space:]]*GPS[[:space:]]+Locked.*$" \
+    -e "^[[:space:]]*GPS[[:space:]]+and[[:space:]]+UHD[[:space:]]+Device[[:space:]]+time[[:space:]]+are[[:space:]]+aligned\..*$" \
+    -e "GPS_GPGGA:|GPGGA|,$SAT_COUNT," \
+    -e "$"
+
+
+elif [ "$is_gpsdo_aligned" = true ]; then
+
+    echo
+    echo "GPSDO alignment check:"
+
+    sudo query_gpsdo_sensors 2>/dev/null | \
+    grep --color=always -E \
+    -e "^[[:space:]]*GPS[[:space:]]+Locked.*$" \
+    -e "^[[:space:]]*GPS[[:space:]]+and[[:space:]]+UHD[[:space:]]+Device[[:space:]]+time[[:space:]]+are[[:space:]]+aligned\..*$" \
+    -e "$"
+
+
+else
+
+    echo
+    echo "Error synchronization"
+
+fi
+EOF
+```
+```
+sudo chmod +x "$HOME/nuradio/script_gpsdo/check_gpsdo_alignment.sh"
+```
+```
+sudo cp -rf "$HOME/nuradio/script_gpsdo/check_gpsdo_alignment.sh" /usr/bin/check_gpsdo_alignment.sh
+```
+```
+sudo check_gpsdo_alignment.sh
+```
+
+# 8. Configuration CPUSET & TASKSET
+
+# STEP 6 : Launching 
+```
+sudo dumpcap -i any -w /tmp/open5gs_all.pcap
+```
+```
+tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
+```
+```
+sudo wait_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
 ```
 
