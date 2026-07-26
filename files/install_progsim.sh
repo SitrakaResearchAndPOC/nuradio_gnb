@@ -22,14 +22,16 @@ sudo apt-get update && \
         python3-setuptools \
         python3-pip \
         python3-pycryptodome \
-        python3-pyscard && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
+        python3-pyscard 
+        
 sudo mkdir -p "$HOME/nuradio/script_progsim"
 
-sudo cd "$HOME/nuradio/script_progsim" && \
+echo "Installing pysim"
+
+sudo rm -rf "$HOME/nuradio/script_progsim/pysim" && \
+cd "$HOME/nuradio/script_progsim" && \
 sudo git clone https://github.com/osmocom/pysim.git && \
+sudo chown -R $USER:$USER  "$HOME/nuradio/script_progsim/pysim" && \
     cd pysim && \
     python3 -m venv .venv && \
     . .venv/bin/activate && \
@@ -37,8 +39,11 @@ sudo git clone https://github.com/osmocom/pysim.git && \
     pip install -r requirements.txt && \
     cd  ..
 
-sudo cd "$HOME/nuradio/script_progsim" && \
+echo "Installing sysmo-usim-tool"
+sudo rm -rf "$HOME/nuradio/script_progsim/sysmo-usim-tool" && \
+cd "$HOME/nuradio/script_progsim" && \
 sudo git clone https://github.com/sysmocom/sysmo-usim-tool.git && \
+sudo chown -R $USER:$USER  "$HOME/nuradio/script_progsim/sysmo-usim-tool" && \
     cd sysmo-usim-tool && \
     python3 -m venv .venv && \
     . .venv/bin/activate && \
@@ -46,88 +51,86 @@ sudo git clone https://github.com/sysmocom/sysmo-usim-tool.git && \
     cd  ..
 
 
-sudo echo '#!/bin/bash\n\
-set -e\n\
-\n\
-# --- DBUS ---\n\
-if pgrep -x dbus-daemon > /dev/null || pgrep -x dbus-broker > /dev/null; then\n\
-    echo "[+] DBus already running"\n\
-else\n\
-    echo "[+] Starting DBus..."\n\
-    service dbus start || true\n\
-fi\n\
-\n\
-# --- POLKIT ---\n\
-if pgrep -x polkitd > /dev/null; then\n\
-    echo "[+] polkit already running"\n\
-else\n\
-    echo "[+] Starting polkit..."\n\
-    service polkit start || systemctl start polkit || true\n\
-fi\n\
-\n\
-# --- PCSCD ---\n\
-if pgrep -x pcscd > /dev/null; then\n\
-    echo "[+] pcscd already running"\n\
-else\n\
-    echo "[+] Starting pcscd..."\n\
-    service pcscd enable \n\
-    service pcscd start || systemctl start pcscd || true\n\
-fi\n\
-\n\
-# --- STATUS ---\n\
-echo "[+] Checking services..."\n\
-ps aux | grep -E "dbus|polkit|pcscd" || true\n\
-\n\
-' > "$HOME/nuradio/script_progsim/start_services.sh"
+sudo tee "$HOME/nuradio/script_progsim/start_services.sh" > /dev/null <<'EOF'
+#!/bin/bash
+set -e
 
+# --- DBUS ---
+if pgrep -x dbus-daemon > /dev/null || pgrep -x dbus-broker > /dev/null; then
+    echo "[+] DBus already running"
+else
+    echo "[+] Starting DBus..."
+    service dbus start || true
+fi
+
+# --- POLKIT ---
+if pgrep -x polkitd > /dev/null; then
+    echo "[+] polkit already running"
+else
+    echo "[+] Starting polkit..."
+    service polkit start || systemctl start polkit || true
+fi
+
+# --- PCSCD ---
+if pgrep -x pcscd > /dev/null; then
+    echo "[+] pcscd already running"
+else
+    echo "[+] Starting pcscd..."
+    systemctl start pcscd || true
+fi
+
+echo "[+] Checking services..."
+ps aux | grep -E "dbus|polkit|pcscd" || true
+EOF
 
 sudo chmod +x "$HOME/nuradio/script_progsim/start_services.sh"
 
 sudo cp -rf "$HOME/nuradio/script_progsim/start_services.sh" /usr/bin/start_services.sh
 
+sudo tee "$HOME/nuradio/script_progsim/show_services.sh" > /dev/null <<'EOF'
+#!/bin/bash
+set -e
 
-sudo echo '#!/bin/bash\n\
-set -e\n\
-\n\
-echo "[+] Showing DBus..."\n\
-service dbus status || true\n\
-\n\
-echo "[+] Showing polkit..."\n\
-service polkit status || systemctl status polkit || true\n\
-\n\
-echo "[+] Showing pcscd..."\n\
-service pcscd enable \n\
-service pcscd status || systemctl status pcscd || true\n\
-\n\
-echo "[+] Checking services..."\n\
-ps aux | grep -E "dbus|polkit|pcscd" || true\n\
-\n' > "$HOME/nuradio/script_progsim/show_services.sh"
+echo "[+] Showing DBus..."
+service dbus status || true
+
+echo "[+] Showing polkit..."
+service polkit status || systemctl status polkit || true
+
+echo "[+] Showing pcscd..."
+systemctl status pcscd || true
+
+echo "[+] Checking services..."
+ps aux | grep -E "dbus|polkit|pcscd" || true
+EOF
 
 sudo chmod +x "$HOME/nuradio/script_progsim/show_services.sh"
 
-cp -rf  "$HOME/nuradio/script_progsim/show_services.sh" /usr/bin/show_services.sh
+sudo cp -rf  "$HOME/nuradio/script_progsim/show_services.sh" /usr/bin/show_services.sh
 
-sudo echo '\n\
-# --- AUTO START SERVICES (SIM LAB SILENT) ---\n\
-\n\
-# DBUS\n\
-if ! pgrep -x dbus-daemon > /dev/null && ! pgrep -x dbus-broker > /dev/null; then\n\
-    echo "[+] Running Dbus" \n\
-    service dbus start > /dev/null 2>&1 || true\n\
-fi\n\
-\n\
-# POLKIT (OPTIONAL)\n\
-if ! pgrep -x polkitd > /dev/null; then\n\
-    echo "[+] Running Polkit" \n\
-    service polkit start > /dev/null 2>&1 || true\n\
-fi\n\
-\n\
-# PCSCD\n\
-if ! pgrep -x pcscd > /dev/null; then\n\
-    echo "[+] Running Pcscd" \n\
-    service pcscd enable > /dev/null 2>&1 || true\n\
-    service pcscd start > /dev/null 2>&1 || true\n\
-fi\n\
-' >> /root/.bashrc
+sudo tee -a /root/.bashrc > /dev/null <<'EOF'
+
+# --- AUTO START SERVICES (SIM LAB SILENT) ---
+
+# DBUS
+if ! pgrep -x dbus-daemon > /dev/null && ! pgrep -x dbus-broker > /dev/null; then
+    echo "[+] Running Dbus"
+    service dbus start > /dev/null 2>&1 || true
+fi
+
+# POLKIT (OPTIONAL)
+if ! pgrep -x polkitd > /dev/null; then
+    echo "[+] Running Polkit"
+    service polkit start > /dev/null 2>&1 || true
+fi
+
+# PCSCD
+if ! pgrep -x pcscd > /dev/null; then
+    echo "[+] Running Pcscd"
+    systemctl enable pcscd > /dev/null 2>&1 || true
+    systemctl start pcscd > /dev/null 2>&1 || true
+fi
+
+EOF
 
 sudo start_services.sh
