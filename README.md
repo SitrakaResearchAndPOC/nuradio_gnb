@@ -3662,7 +3662,7 @@ sudo start_services.sh && sudo show_services.sh
 ```
 Plug and Verify card reader :
 ```
-pcsc_scan
+sudo pcsc_scan
 ```
 
 ## 8.3. Manipulating SIM card by PySIM
@@ -3670,7 +3670,8 @@ pcsc_scan
 cd "$HOME/nuradio/script_progsim/pysim"  && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-./pySim-read.py -p 0
+./pySim-read.py -p 0 && \
+deactivate
 ```
 
 ## 8.4. Manipulating SIM card by SYSMO Tools
@@ -3688,39 +3689,44 @@ Majuscule if you want to write </br>
 cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py --help
+python3 sysmo-isim-tool.sja2.py --help && \
+deactivate
 ```
 
-* For OPc :
+* View OPc :
 ```
 cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -o  -a <ADM> 
+python3 sysmo-isim-tool.sja2.py -o  -a <ADM> && \
+deactivate
 ```
 
-* For keys : 
+* View keys : 
 ```
 cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -k  -a <ADM> 
+python3 sysmo-isim-tool.sja2.py -k  -a <ADM> && \
+deactivate
 ```
 
-* For authentication : 
+* View authentication : 
 ```
 cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -t  -a  <ADM> 
+python3 sysmo-isim-tool.sja2.py -t  -a  <ADM> && \
+deactivate 
 ```
 
-* For all parameters : 
+* View all parameters : 
 ```
 cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> 
+python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> && \
+deactivate
 ```
 * Programming SIM
 ```
@@ -3732,21 +3738,24 @@ source .venv/bin/activate && \
 --iccid 8988211000000012345 \
 --ki FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
 --opc 9ED73ED8F0FD186430CA9D7ED728EA0F \ 
---pin-adm <ADM>
+--pin-adm <ADM> && \
+deactivate
 ```
 * Programming authentication
 ```
 cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py  -T MILENAGE:MILENAGE -a <ADM> 
+python3 sysmo-isim-tool.sja2.py  -T MILENAGE:MILENAGE -a <ADM> && \
+deactivate
 ```
 * Verify all parameters
 ```
 cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> 
+python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> && \
+deactivate
 ```
 
 # STEP 6 : RUNNING
