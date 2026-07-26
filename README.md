@@ -3667,7 +3667,7 @@ pcsc_scan
 
 ## 8.3. Manipulating SIM card by PySIM
 ```
-sudo cd "$HOME/nuradio/script_progsim/pysim"  && \
+cd "$HOME/nuradio/script_progsim/pysim"  && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 ./pySim-read.py -p 0
@@ -3685,7 +3685,7 @@ Majuscule if you want to write </br>
 
 * For help : 
 ```
-sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
+cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py --help
@@ -3693,7 +3693,7 @@ python3 sysmo-isim-tool.sja2.py --help
 
 * For OPc :
 ```
-sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
+cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py -o  -a <ADM> 
@@ -3701,7 +3701,7 @@ python3 sysmo-isim-tool.sja2.py -o  -a <ADM>
 
 * For keys : 
 ```
-sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
+cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py -k  -a <ADM> 
@@ -3709,7 +3709,7 @@ python3 sysmo-isim-tool.sja2.py -k  -a <ADM>
 
 * For authentication : 
 ```
-sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
+cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py -t  -a  <ADM> 
@@ -3717,14 +3717,14 @@ python3 sysmo-isim-tool.sja2.py -t  -a  <ADM>
 
 * For all parameters : 
 ```
-sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
+cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> 
 ```
 * Programming SIM
 ```
-sudo cd "$HOME/nuradio/script_progsim/pysim"  && \
+cd "$HOME/nuradio/script_progsim/pysim"  && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 ./pySim-prog.py -p 0 --mcc 001 --mnc 01 \
@@ -3736,14 +3736,14 @@ source .venv/bin/activate && \
 ```
 * Programming authentication
 ```
-sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
+cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py  -T MILENAGE:MILENAGE -a <ADM> 
 ```
 * Verify all parameters
 ```
-sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
+cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> 
