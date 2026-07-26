@@ -1039,7 +1039,7 @@ bash check_iptableNATforward.sh
 ## 3.4. Configuring && Checking network final
 ### 3.4.1. Configuring network final
 ```
-sudo tee /usr/bin/configure_network.sh > /dev/null <<'EOF'
+sudo tee "$HOME/nuradio/script_network/configure_network.sh" > /dev/null <<'EOF'
 #!/bin/bash
 
 set -e
@@ -1059,10 +1059,10 @@ echo "=== Network configuration completed successfully. ==="
 EOF
 ```
 ```
-sudo chmod +x /usr/bin/configure_network.sh
+sudo chmod +x "$HOME/nuradio/script_network/configure_network.sh"
 ```
 ```
-sudo cp -rf configure_network.sh "$HOME/nuradio/script_network/configure_network.sh"
+sudo cp -rf  "$HOME/nuradio/script_network/configure_network.sh" /usr/bin/configure_network.sh
 ```
 ```
 sudo configure_network.sh
@@ -1070,7 +1070,7 @@ sudo configure_network.sh
 
 ### 3.4.2. Checking network final
 ```
-sudo tee /usr/bin/check_network.sh > /dev/null <<'EOF'
+sudo tee "$HOME/nuradio/script_network/check_network.sh" > /dev/null <<'EOF'
 #!/bin/bash
 
 set -e
@@ -1090,10 +1090,10 @@ echo "=== Checking Network completed successfully. ==="
 EOF
 ```
 ```
-sudo chmod +x /usr/bin/check_network.sh
+sudo chmod +x "$HOME/nuradio/script_network/check_network.sh"
 ```
 ```
-sudo cp -rf check_network.sh "$HOME/nuradio/script_network/check_network.sh"
+sudo cp -rf "$HOME/nuradio/script_network/check_network.sh" /usr/bin/check_network.sh
 ```
 ```
 sudo check_network.sh
@@ -3085,18 +3085,67 @@ sudo bash "$HOME/nuradio/script_udr_index11/check_udr_3.sh"
 ```
 
 # STEP 4 : OPEN-SOURCE 5G NETWORK  CONFIGURATION WEBUI
-Configure IMSI 
+## 4.1. Running all process before configuring
+```
+sudo systemctl restart mongod
+```
+```
+sudo systemctl status mongod
+```
+```
+sudo stop_5gc && 5gc
+```
+```
+sudo ps aux | grep open5gs
+```
+Open in navigator 
+```
+localhost:9999
+```
+USER is
+```
+admin
+```
+PASSWORD is 
+```
+1423
+```
+Clic "ADD A SUBSCRIBER"
+## 4.2. Configure "Subscriber configuration/IMSI" 
+Copy and paste IMSI
 ```
 001010000560123
 ```
-Configure K
+## 4.3. Configure "Subscriber configuration/Subscriber key"
+Copy and past K
 ```
 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 ```
-Configure OPC
+## 4.4. Configure "Subscriber configuration/Operator key (OPc/OP)"
+Make sure that "USIM type" is "OPc" </br>
+Copy and paste OPC 
 ```
 9ED73ED8F0FD186430CA9D7ED728EA0F
 ```
+## 4.5. Configure "Session configurations/[DNN/APN]"
+copy and paste DNN/APN
+```
+apn
+```
+Choose DNN/APN type 
+```
+ipv4
+```
+## 4.6. Configure "PCC Rules/[second "+" ]/[DNN/APN] "
+copy and paste DNN/APN for the second "+"
+```
+ims
+```
+Choose DNN/APN type for the second "+"
+```
+ipv4
+```
+
 # STEP 5 : OPEN-SOURCE 5G NETWORK  CONFIGURATION SRSRAN_GNB
 ## 5.1. Creating directory of gnb script
 ```
@@ -3419,7 +3468,7 @@ sudo check_gnb_pcap.sh
 ## 6.1. Installation  of wireshark
 ```
 sudo apt update \
-sudo apt install wireshark-tq
+sudo apt install wireshark-qt
 ```
 ```
 sudo usermod -aG wireshark nuradio
@@ -3596,14 +3645,39 @@ sudo check_gpsdo_alignment.sh
 
 # 8. Configuration CPUSET & TASKSET
 
-# STEP 6 : Launching 
+# STEP 6 : RUNNING
+## 6.1. Terminal 1 : Launching capture wireshark
 ```
 sudo dumpcap -i any -w /tmp/open5gs_all.pcap
 ```
+## 6.2. Terminal 2 : Launching log AMF
 ```
 tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
 ```
+## 6.3. Terminal 3 : Configuring and start 5G core && gnb
 ```
-sudo wait_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
+sudo configure_network.sh
 ```
-
+```
+sudo check_network.sh
+```
+```
+sudo systemctl restart mongod
+```
+```
+sudo systemctl status mongod
+```
+```
+sudo stop_5gc && 5gc
+```
+```
+sudo ps aux | grep open5gs
+```
+```
+sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
+```
+## 6.4. Terminal 4 : 
+```
+sudo wireshark 
+```
+Open /tmp/open5gs_all.pcap
