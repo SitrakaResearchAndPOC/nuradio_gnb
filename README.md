@@ -3643,85 +3643,37 @@ sudo check_gpsdo_alignment.sh
 ```
 
 # 8. Configuring SIMCARD by PYSIM
-## 8.1. Creating directory progsim
+## 8.1. installing progsim
 ```
-[ ! -d "$HOME/nuradio/script_progsim" ] && mkdir -p "$HOME/nuradio/script_progsim"
+[ ! -d "$HOME/nuradio/script_install" ] && mkdir -p "$HOME/nuradio/script_install"
 ```
-## 8.2. Downloading script 
 ```
-[ -f Dockerfile ] && rm -rf Dockerfile ; \
-wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/PySim_Docker/refs/heads/main/Dockerfile
+cd "$HOME/nuradio/script_install" && \
+[ -f "install_progsim.sh" ] && sudo rm -rf install_progsim.sh; \
+wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/nuradio_gnb/refs/heads/main/files/install_progsim.sh
 ```
-Verify by
 ```
-cat Dockerfile
+chmod +x "$HOME/nuradio/script_install/install_progsim.sh" && \
+bash "$HOME/nuradio/script_install/install_progsim.sh"
 ```
-Result should be like [Dockerfile](https://raw.githubusercontent.com/SitrakaResearchAndPOC/PySim_Docker/refs/heads/main/Dockerfile)
-## 8.3. Building images
+### 8.2. Checking progsim
 ```
-sudo docker build -t progsim:v1 .
-```
-Verfy by 
-```
-sudo docker images
-```
-## 8.4. Launching container
-```
-sudo docker rm -f progsim 2> /dev/null ; \
-sudo docker run -tid --privileged --device=/dev/bus/usb \
--v /tmp/.X11-unix:/tmp/.X11-unix:ro \
--v /home/user/:/home/user/.Xauthority:ro \
--v /run/pcscd:/run/pcscd \
---net=host --env="DISPLAY=$DISPLAY" \
---env="LC_ALL=C.UTF-8" --env="LANG=C.UTF-8" \
---name progsim --hostname progsim progsim:v1
-```
-Verify by : 
-```
-sudo docker ps
-```
-If you want, see the script by using
-```
-sudo docker exec -it progsim cat show_services.sh
-```
-Result should be like [show_services.sh](https://github.com/SitrakaResearchAndPOC/PySim_Docker/blob/main/show_services.sh)
-```
-sudo docker exec -it progsim cat start_services.sh
-```
-Result should be like at [start_services.sh](https://github.com/SitrakaResearchAndPOC/PySim_Docker/blob/main/start_services.sh)
-```
-sudo docker exec -it progsim cat /root/.bashrc
-```
-Result should be like at [bashrc](https://github.com/SitrakaResearchAndPOC/PySim_Docker/blob/main/bashrc)
-
-
-## 8.5. Testing SIM Card Reader
-Showing all services if it's run
-```
-sudo docker exec -it progsim bash show_services.sh
+sudo start_services.sh && sudo show_services.sh
 ```
 Plug and Verify card reader :
 ```
-sudo docker exec -it progsim bash -c 'pcsc_scan'
+pcsc_scan
 ```
-Tape ctrl+C when it stop </br></br>
 
-Showing all service if it's run 
+## 8.3. Manipulating SIM card by PySIM
 ```
-sudo docker exec -it progsim bash show_services.sh
-```
-All services should be run
-
-## 8.6. Manipulating SIM card by PySIM
-```
-suod docker exec -it progsim bash -c 'cd pysim  && \
+sudo cd "$HOME/nuradio/script_progsim/pysim"  && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-./pySim-read.py -p 0'
+./pySim-read.py -p 0
 ```
-Not test yet pySim-prog.py
 
-## 8.7. Manipulating SIM card by SYSMO Tools
+## 8.4. Manipulating SIM card by SYSMO Tools
 Rules :  </br>
 Miniscule if you want to show </br>
 Majuscule if you want to write </br>
@@ -3733,46 +3685,46 @@ Majuscule if you want to write </br>
 
 * For help : 
 ```
-sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py --help'
+python3 sysmo-isim-tool.sja2.py --help
 ```
 
 * For OPc :
 ```
-sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -o  -a <ADM> '
+python3 sysmo-isim-tool.sja2.py -o  -a <ADM> 
 ```
 
 * For keys : 
 ```
-sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -k  -a <ADM> '
+python3 sysmo-isim-tool.sja2.py -k  -a <ADM> 
 ```
 
 * For authentication : 
 ```
-sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -t  -a  <ADM> '
+python3 sysmo-isim-tool.sja2.py -t  -a  <ADM> 
 ```
 
 * For all parameters : 
 ```
-sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> '
+python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> 
 ```
 * Programming SIM
 ```
-sudo docker exec -it progsim bash -c 'cd pysim  && \
+sudo cd "$HOME/nuradio/script_progsim/pysim"  && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
 ./pySim-prog.py -p 0 --mcc 001 --mnc 01 \
@@ -3780,21 +3732,21 @@ source .venv/bin/activate && \
 --iccid 8988211000000012345 \
 --ki FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
 --opc 9ED73ED8F0FD186430CA9D7ED728EA0F \ 
---pin-adm <ADM>'
+--pin-adm <ADM>
 ```
 * Programming authentication
 ```
-sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py  -T MILENAGE:MILENAGE -a <ADM> '
+python3 sysmo-isim-tool.sja2.py  -T MILENAGE:MILENAGE -a <ADM> 
 ```
 * Verify all parameters
 ```
-sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+sudo cd "$HOME/nuradio/script_progsim/sysmo-usim-tool/" && \
 python3 -m venv .venv && \
 source .venv/bin/activate && \
-python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> '
+python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> 
 ```
 
 # STEP 6 : RUNNING
