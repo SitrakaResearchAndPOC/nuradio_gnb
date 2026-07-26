@@ -50,6 +50,7 @@ sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/' /etc/default/grub
 ```
 cat /etc/default/grub | grep GRUB_TIMEOUT | grep 5
 ```
+
 ## 0.7. Changing low latency as default Grub
 ### 0.7.1. Installation
 ```
@@ -60,9 +61,17 @@ cat /etc/default/grub | grep GRUB_DEFAULT | grep lowlatency
 ```
 ### 0.7.2. Upgrading GRUB 
 ```
+sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
+```
+```
+grep 'systemd.unified_cgroup_hierarchy=0' /etc/default/grub
+```
+
+### 0.7.3. Upgrading GRUB 
+```
 sudo update-grub
 ```
-### 0.7.3. Rebooting
+### 0.7.4. Rebooting
 ```
 reboot
 ```
@@ -3908,7 +3917,7 @@ sudo dumpcap -i any -w /tmp/open5gs_all.pcap
 ```
 ## 6.2. Terminal 2 : Launching log AMF
 ```
-tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
+sudo tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
 ```
 ## 6.3. Terminal 3 : Configuring and start 5G core && gnb
 ### 6.3.1. Configuring network for open5gs
