@@ -3643,22 +3643,11 @@ sudo check_gpsdo_alignment.sh
 ```
 
 # 8. Configuring SIMCARD by PYSIM
-## 8.1. Installing tools
+## 8.1. Creating directory progsim
 ```
-rm -rf py_sim ; mkdir py_sim && cd py_sim
+[ ! -d "$HOME/nuradio/script_progsim" ] && mkdir -p "$HOME/nuradio/script_progsim"
 ```
-```
-sudo apt update && \
-sudo apt install docker.io wget
-```
-Verify :
-```
-sudo docker --version
-```
-```
-wget --version
-```
-## 8.2. Downloading Tools
+## 8.2. Downloading script 
 ```
 [ -f Dockerfile ] && rm -rf Dockerfile ; \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/PySim_Docker/refs/heads/main/Dockerfile
