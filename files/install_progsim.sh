@@ -131,4 +131,3 @@ fi\n\
 ' >> /root/.bashrc
 
 sudo start_services.sh
-sudo show_services.sh
