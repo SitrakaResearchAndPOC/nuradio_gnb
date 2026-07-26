@@ -3117,7 +3117,7 @@ Copy and paste IMSI
 001010000560123
 ```
 ## 4.3. Configure "Subscriber configuration/Subscriber key"
-Copy and past K
+Copy and past key Ki
 ```
 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 ```
@@ -3644,6 +3644,261 @@ sudo check_gpsdo_alignment.sh
 ```
 
 # 8. Configuration CPUSET & TASKSET
+## 8.1. Optimization
+* KERNEL REAL TIME (USING LOW LATENCY) & OVERCLOCK FREQUENCY (USING CPU POWER)
+* SHIELDING PROCESS ( PROCESS SYSTEM AND PROCESS WILL BE SEPARATED USING CSET SHIELD)
+* SETTING PROCESS (USING CSET CPU) AND LABELLING PROCESS TO BE USED ON SET CPU (USING TASKSET)
+
+## 8.2. Separating CPU
+eg : 
+* Total cpus : 12 cpus numbered 0-11
+* system will be at 0-1 cpus; the rest will be shielding cpu will be at 2-11 named part_all
+* the user cpu will be divided in two part :
+* first part will be named part1 which is 2-6 cpus and the number of cpu is 5 named part1_number_cpu
+* second part will be named part2 which is 7-11 cpus and the number of cpu is 5 named part2_number_cpu
+```
+part_all=2-11
+```
+```
+part1=2-6
+```
+```
+part1_number_cpu=5
+```
+```
+part2=7-11
+```
+```
+part2_number_cpu=5
+```
+## 8.3. Shielding all cpu parts
+```
+sudo cset shield --cpu=$part_all --kthread=on
+```
+```
+sudo cset set --list --recurse
+```
+```
+root
+├── system   CPU 0-1
+└── user     CPU 2-11
+```
+## 8.4. Dividing the shielding cpu in two parts
+The process will be represented as cpu named organized on file : 
+* the first part of cpu part is /user/cpu_part1
+* the second part of cpu part is /user/cpu_part2
+### 8.4.1. Destroying all cpu part before 
+```
+sudo cset set --destroy /user/cpu_part1
+```
+```
+sudo cset set --destroy /user/cpu_part2
+```
+### 8.4.2. Creating all cpu part on shielding cpu
+```
+sudo cset set --set=/user/cpu_part1 --cpu=$part1
+```
+```
+sudo cset set --set=/user/cpu_part2 --cpu=$part2
+```
+### 8.4.3. Verifying all cpu part on shielding cpu
+```
+sudo cset set --list --recurse
+```
+```
+root
+├── system          CPU 0-1
+└── user            CPU 2-11
+    ├── cpu_part1   CPU 2-6
+    └── cpu_part2   CPU 7-11
+```
+## 8.5. Stress testing of cpuset
+### 8.5.1. Testing for all cpu part on stress testing
+```
+cpupower frequency-set -g performance && \ 
+sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 stress-ng --cpu $part1_number_cpu --timeout 3000s
+```
+```
+cpupower frequency-set -g performance && \ 
+sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 stress-ng --cpu $part1_number_cpu --timeout 3000s
+```
+### 8.5.2. Testing for binary program part 1
+eg : 5gc
+```
+sudo cpupower frequency-set -g performance && \
+sudo cset proc --set=/user/cpu_part1 --exec -- taskset -c $part1 sudo 5gc
+```
+### 8.5.2. Testing for binary program part 2
+```
+sudo cpupower frequency-set -g performance && \
+sudo cset proc --set=/user/cpu_part2 --exec -- taskset -c $part2 sudo check_gpsdo_alignment.sh && sudo gnb -c gnb_n3.yml
+```
+# 9. Configuring SIMCARD by PYSIM
+## 9.1. Installing tools
+```
+rm -rf py_sim ; mkdir py_sim && cd py_sim
+```
+```
+sudo apt update && \
+sudo apt install docker.io wget
+```
+Verify :
+```
+sudo docker --version
+```
+```
+wget --version
+```
+## 9.2. Downloading Tools
+```
+[ -f Dockerfile ] && rm -rf Dockerfile ; \
+wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/PySim_Docker/refs/heads/main/Dockerfile
+```
+Verify by
+```
+cat Dockerfile
+```
+Result should be like [Dockerfile](https://raw.githubusercontent.com/SitrakaResearchAndPOC/PySim_Docker/refs/heads/main/Dockerfile)
+## 9.3. Building images
+```
+sudo docker build -t progsim:v1 .
+```
+Verfy by 
+```
+sudo docker images
+```
+## 9.4. Launching container
+```
+sudo docker rm -f progsim 2> /dev/null ; \
+sudo docker run -tid --privileged --device=/dev/bus/usb \
+-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+-v /home/user/:/home/user/.Xauthority:ro \
+-v /run/pcscd:/run/pcscd \
+--net=host --env="DISPLAY=$DISPLAY" \
+--env="LC_ALL=C.UTF-8" --env="LANG=C.UTF-8" \
+--name progsim --hostname progsim progsim:v1
+```
+Verify by : 
+```
+sudo docker ps
+```
+If you want, see the script by using
+```
+sudo docker exec -it progsim cat show_services.sh
+```
+Result should be like [show_services.sh](https://github.com/SitrakaResearchAndPOC/PySim_Docker/blob/main/show_services.sh)
+```
+sudo docker exec -it progsim cat start_services.sh
+```
+Result should be like at [start_services.sh](https://github.com/SitrakaResearchAndPOC/PySim_Docker/blob/main/start_services.sh)
+```
+sudo docker exec -it progsim cat /root/.bashrc
+```
+Result should be like at [bashrc](https://github.com/SitrakaResearchAndPOC/PySim_Docker/blob/main/bashrc)
+
+
+## 9.5. Testing SIM Card Reader
+Showing all services if it's run
+```
+sudo docker exec -it progsim bash show_services.sh
+```
+Plug and Verify card reader :
+```
+sudo docker exec -it progsim bash -c 'pcsc_scan'
+```
+Tape ctrl+C when it stop </br></br>
+
+Showing all service if it's run 
+```
+sudo docker exec -it progsim bash show_services.sh
+```
+All services should be run
+
+## 9.6. Manipulating SIM card by PySIM
+```
+suod docker exec -it progsim bash -c 'cd pysim  && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+./pySim-read.py -p 0'
+```
+Not test yet pySim-prog.py
+
+## 9.7. Manipulating SIM card by SYSMO Tools
+Rules :  </br>
+Miniscule if you want to show </br>
+Majuscule if you want to write </br>
+
+* ADM : 
+```
+63036416
+```
+
+* For help : 
+```
+sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 sysmo-isim-tool.sja2.py --help'
+```
+
+* For OPc :
+```
+sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 sysmo-isim-tool.sja2.py -o  -a <ADM> '
+```
+
+* For keys : 
+```
+sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 sysmo-isim-tool.sja2.py -k  -a <ADM> '
+```
+
+* For authentication : 
+```
+sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 sysmo-isim-tool.sja2.py -t  -a  <ADM> '
+```
+
+* For all parameters : 
+```
+sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> '
+```
+* Programming SIM
+```
+sudo docker exec -it progsim bash -c 'cd pysim  && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+./pySim-prog.py -p 0 --mcc 001 --mnc 01 \
+-t sysmoISIM-SJA2  --imsi 001010000560123 \
+--iccid 8988211000000012345 \
+--ki FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+--opc 9ED73ED8F0FD186430CA9D7ED728EA0F \ 
+--pin-adm <ADM>'
+```
+* Programming authentication
+```
+sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 sysmo-isim-tool.sja2.py  -T MILENAGE:MILENAGE -a <ADM> '
+```
+* Verify all parameters
+```
+sudo docker exec -it progsim bash -c  'cd sysmo-usim-tool/ && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 sysmo-isim-tool.sja2.py -t -k -o -a <ADM> '
+```
+
 
 # STEP 6 : RUNNING
 ## 6.1. Terminal 1 : Launching capture wireshark
