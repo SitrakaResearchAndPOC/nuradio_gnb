@@ -3765,7 +3765,7 @@ sudo dumpcap -i any -w /tmp/open5gs_all.pcap
 ```
 ## 6.2. Terminal 2 : Launching log AMF
 ```
-sudo tail -f /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
+sudo tail -F /var/log/open5gs/amf.log | grep -i --color=always -E "gnb[[:space:]]*-?[[:space:]]*N2[[:space:]]+accepted|$"
 ```
 ## 6.3. Terminal 3 : Configuring and start 5G core && gnb
 ### 6.3.1. Configuring network for open5gs
